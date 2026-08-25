@@ -28,7 +28,7 @@ class KZ_Element_Ticket {
                 'name'        => __( 'KZ-Ticket', 'kz-plugin' ),
                 'base'        => self::SHORTCODE,
                 'category'    => __( 'Kraonige Zwaone', 'kz-plugin' ),
-                'icon'        => 'icon-wpb-application-icon-large',
+                'icon'        => 'kz-icon-ticket',
                 'description' => __( 'Ticket element met aanpasbare tekst en kleuren', 'kz-plugin' ),
                 'params'      => array(
                     array(
