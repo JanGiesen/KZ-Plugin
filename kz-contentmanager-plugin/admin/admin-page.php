@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-/** @var KZ_CM_Updater $kz_cm_updater Wordt meegegeven door KZ_ContentManager::admin_page(). */
+/** @var KZ_CM_Updater $kz_cm_updater Wordt meegegeven door KZ_ContentManager_Plugin::admin_page(). */
 
 // Sla instellingen op als formulier is verzonden
 if ( isset( $_POST['kz_save_settings'] ) ) {

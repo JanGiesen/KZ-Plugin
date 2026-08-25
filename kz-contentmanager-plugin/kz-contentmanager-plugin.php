@@ -3,7 +3,7 @@
  * Plugin Name: KZ Contentmanager Plugin
  * Plugin URI: https://www.kraonigezwaone.nl/
  * Description: Haalt de content voor de site op vanuit Google Docs.
- * Version: 3.0.5
+ * Version: 3.0.6
  * Author: Kraonige Zwaone
  * License: GPL v2 or later
  * Text Domain: kz-contentmanager-plugin
@@ -21,13 +21,13 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'KZ_CONTENTMANAGER_VERSION', '3.0.5' );
+define( 'KZ_CONTENTMANAGER_VERSION', '3.0.6' );
 define( 'KZ_CONTENTMANAGER_PLUGIN_FILE', __FILE__ );
 define( 'KZ_CONTENTMANAGER_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'KZ_CONTENTMANAGER_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KZ_CONTENTMANAGER_GITHUB_REPO', 'JanGiesen/KZ-Plugin' );
 
-class KZ_ContentManager {
+class KZ_ContentManager_Plugin {
 
     /** @var KZ_CM_Updater */
     private $updater;
@@ -138,7 +138,7 @@ class KZ_ContentManager {
             wp_die( 'Geen toegang' );
         }
 
-        $google_drive = new KZ_Google_Drive_Handler();
+        $google_drive = new KZ_CM_Google_Drive_Handler();
         $result       = $google_drive->sync_documents();
 
         if ( $result['success'] ) {
@@ -156,7 +156,7 @@ class KZ_ContentManager {
         }
 
         $document_id  = isset( $_POST['document_id'] ) ? sanitize_text_field( wp_unslash( $_POST['document_id'] ) ) : '';
-        $google_drive = new KZ_Google_Drive_Handler();
+        $google_drive = new KZ_CM_Google_Drive_Handler();
         $result       = $google_drive->sync_single_document( $document_id );
 
         if ( $result['success'] ) {
@@ -253,4 +253,4 @@ class KZ_ContentManager {
 }
 
 // Initialiseer de plugin
-new KZ_ContentManager();
+new KZ_ContentManager_Plugin();
