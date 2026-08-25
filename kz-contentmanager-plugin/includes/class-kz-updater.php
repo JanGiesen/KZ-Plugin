@@ -175,24 +175,30 @@ class KZ_CM_Updater {
     }
 
     /**
-     * Voegt de GitHub-token-header toe wanneer WordPress de release-asset downloadt
-     * (nodig zolang de repo privé is, want de asset-API levert dan alleen data met auth).
+     * Zorgt dat WordPress de release-asset als ruwe zip binnenkrijgt (niet als
+     * JSON-metadata) wanneer die via de GitHub Asset-API wordt gedownload, en
+     * voegt de token-header toe zolang de repo privé is.
      */
     public function maybe_authenticate_download( $reply, $package, $upgrader ) {
         if ( false === strpos( (string) $package, 'api.github.com/repos/' . $this->repo ) ) {
             return $reply;
         }
 
+        // De GitHub Asset-API levert de ruwe zip alleen als Accept expliciet
+        // application/octet-stream is; zonder die header (en zonder token,
+        // wat voorheen de enige trigger voor deze header was) krijg je JSON-
+        // metadata terug in plaats van het bestand, wat de download-package
+        // laat "verminken" (PCLZip: geen geldig zip-formaat). Deze header
+        // moet dus altijd gezet worden, ongeacht of de repo privé is.
         $token = get_option( 'kz_github_token' );
-        if ( empty( $token ) ) {
-            return $reply;
-        }
 
         add_filter(
             'http_request_args',
             function ( $args ) use ( $token ) {
-                $args['headers']['Authorization'] = 'Bearer ' . $token;
-                $args['headers']['Accept']         = 'application/octet-stream';
+                $args['headers']['Accept'] = 'application/octet-stream';
+                if ( ! empty( $token ) ) {
+                    $args['headers']['Authorization'] = 'Bearer ' . $token;
+                }
                 return $args;
             },
             10,
