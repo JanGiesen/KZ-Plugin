@@ -15,11 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-if ( class_exists( 'KZ_Updater' ) ) {
-    return;
-}
-
-class KZ_Updater {
+class KZ_CM_Updater {
 
     private $plugin_file;
     private $plugin_slug;
