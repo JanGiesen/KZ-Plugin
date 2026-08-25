@@ -27,6 +27,7 @@ class KZ_Element_Vindt_Grid {
                 'name'        => __( 'KZ-Vindt Grid', 'kz-plugin' ),
                 'base'        => self::SHORTCODE,
                 'category'    => __( 'Kraonige Zwaone', 'kz-plugin' ),
+                'icon'        => 'kz-icon-vindt-grid',
                 'description' => __( 'Toont een grid met datums en tijden.', 'kz-plugin' ),
                 'params'      => array(
                     array(

@@ -54,13 +54,33 @@
 	background-position: center;
 }
 
+.wpb_content_element .kz-icon-vindt-grid,
+.vc_element-icon.kz-icon-vindt-grid,
+.kz-icon-vindt-grid {
+	background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+.wpb_content_element .kz-icon-ticket,
+.vc_element-icon.kz-icon-ticket,
+.kz-icon-ticket {
+	background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/></svg>');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
 /* WPBakery verwacht 32px iconen; forceer grootte indien nodig */
 .wpb_element_wrapper .kz-icon-carousel,
 .wpb_element_wrapper .kz-icon-button,
 .wpb_element_wrapper .kz-icon-event,
 .wpb_element_wrapper .kz-icon-header-link,
 .wpb_element_wrapper .kz-icon-hover-image,
-.wpb_element_wrapper .kz-icon-tab-widget {
+.wpb_element_wrapper .kz-icon-tab-widget,
+.wpb_element_wrapper .kz-icon-vindt-grid,
+.wpb_element_wrapper .kz-icon-ticket {
 	width: 32px !important;
 	height: 32px !important;
 }
