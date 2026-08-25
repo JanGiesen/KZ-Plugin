@@ -157,6 +157,11 @@ class KZ_Plugin_Updater {
             'id'            => 'github.com/' . $this->repo . '/' . $this->plugin_slug,
             'slug'          => $this->plugin_slug,
             'plugin'        => $this->plugin_basename,
+            // WordPress vereist deze key expliciet (zie wp_update_plugins() in
+            // wp-includes/update.php: "Is it valid? We require at least a
+            // version."); zonder 'version' wordt de update stilletjes
+            // overgeslagen, ook al is 'new_version' wel aanwezig.
+            'version'       => $release['version'],
             'new_version'   => $release['version'],
             'url'           => 'https://github.com/' . $this->repo,
             'package'       => $release['download'],
