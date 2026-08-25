@@ -36,11 +36,23 @@ jobs:
           mkdir -p dist
           zip -r -q "dist/${{ steps.vars.outputs.zip_name }}" "${{ steps.vars.outputs.plugin_dir }}" -x "*.DS_Store"
 
-      - name: Maak GitHub Release
+      - name: Publiceer zip op de GitHub Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "${GITHUB_REF_NAME}" \
-            "dist/${{ steps.vars.outputs.zip_name }}" \
-            --title "${GITHUB_REF_NAME}" \
-            --generate-notes
+          # De standaard manier om een release te maken is via de GitHub-website
+          # (Releases -> "Draft a new release" -> tag aanmaken bij publiceren),
+          # omdat deze CI-omgeving geen git-tags mag pushen. Die website-flow
+          # maakt de release (en dus de tag) al aan, zonder zip-asset; deze
+          # stap hoeft dan alleen nog de zip te uploaden. Bestaat de release
+          # nog niet (bijv. tag rechtstreeks gepusht), dan maakt dit 'm alsnog.
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            gh release upload "${GITHUB_REF_NAME}" \
+              "dist/${{ steps.vars.outputs.zip_name }}" \
+              --clobber
+          else
+            gh release create "${GITHUB_REF_NAME}" \
+              "dist/${{ steps.vars.outputs.zip_name }}" \
+              --title "${GITHUB_REF_NAME}" \
+              --generate-notes
+          fi

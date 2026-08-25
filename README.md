@@ -47,22 +47,19 @@ Elke release is een GitHub Release met een tag in het juiste formaat en de juist
 
 ### Automatisch via GitHub Actions
 
-1. Versie ophogen in de plugin-header (`Version:` in `kz-plugin.php` of `kz-contentmanager-plugin.php`) én in de bijbehorende `define()`-constante bovenin dat bestand.
-2. Commit en push die wijziging.
-3. Maak en push een tag:
+**Belangrijk:** maak een nieuwe release altijd via de GitHub-website, niet via `git tag` + `git push` vanuit een Claude Code-sessie — die sessies mogen (bewust, vanuit het toegangsbeleid van de omgeving) geen git-tags naar deze repo pushen; dat commando faalt met een HTTP 403. Vanaf je eigen machine kan `git push origin <tag>` overigens wel gewoon.
 
-   ```bash
-   # Voor KZ Plugin
-   git tag kz-plugin-v8.0.1
-   git push origin kz-plugin-v8.0.1
+1. Versie ophogen in de plugin-header (`Version:` in `kz-plugin.php` of `kz-contentmanager-plugin.php`) én in de bijbehorende `define()`-constante bovenin dat bestand. Commit en push die wijziging (gewoon via een PR, dat werkt wel).
+2. Ga naar **Releases → "Draft a new release"** op GitHub: https://github.com/JanGiesen/KZ-Plugin/releases/new
+3. Bij **"Choose a tag"**: typ de nieuwe tag en kies **"Create new tag: ... on publish"**:
+   - KZ Plugin: `kz-plugin-v8.1.0` (formaat: `kz-plugin-v` + versienummer)
+   - KZ Contentmanager Plugin: `kz-contentmanager-v3.0.1` (formaat: `kz-contentmanager-v` + versienummer)
+4. Zorg dat **target** op `main` staat.
+5. Klik **"Publish release"**. Dit maakt en pusht de tag; het aanmaken van een release-zip-asset kun je aan de zip zelf overlaten (zie hierna) — een titel/omschrijving invullen is niet nodig, want de workflow overschrijft/vult de zip-asset toch aan.
+6. De workflow `.github/workflows/release.yml` start automatisch op de tag-push, bouwt de juiste zip en **uploadt die als asset aan de zojuist gepubliceerde release** (de workflow herkent dat de release al bestaat en maakt 'm niet nogmaals aan — dat zou falen).
+7. Binnen 6 uur (of direct via "Nu controleren op updates" in het dashboard) ziet de site de nieuwe versie.
 
-   # Voor KZ Contentmanager Plugin
-   git tag kz-contentmanager-v3.0.1
-   git push origin kz-contentmanager-v3.0.1
-   ```
-
-4. De workflow `.github/workflows/release.yml` bouwt automatisch de juiste zip en publiceert een GitHub Release met die tag.
-5. Binnen 6 uur (of direct via "Nu controleren op updates" in het dashboard) ziet de site de nieuwe versie.
+Alternatief, als je liever vanaf je eigen machine werkt: `git tag <tag>` + `git push origin <tag>` daar werkt gewoon en triggert dezelfde workflow (die maakt dan zelf de release aan, inclusief zip-asset).
 
 ### Lokaal (zonder GitHub Actions)
 
