@@ -5,6 +5,12 @@ on:
     tags:
       - 'kz-plugin-v*'
       - 'kz-contentmanager-v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag om te (her)publiceren, bijv. kz-plugin-v8.1.0 (handig om een release te herstellen zonder een nieuwe tag te hoeven pushen)'
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -13,13 +19,24 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      - name: Bepaal tag
+        id: tagname
+        run: |
+          if [ -n "${{ inputs.tag }}" ]; then
+            echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.tagname.outputs.tag }}
 
       - name: Bepaal plugin uit tag
         id: vars
         run: |
-          TAG="${GITHUB_REF_NAME}"
+          TAG="${{ steps.tagname.outputs.tag }}"
           if [[ "$TAG" == kz-plugin-v* ]]; then
             echo "plugin_dir=kz-plugin" >> "$GITHUB_OUTPUT"
             echo "zip_name=kz-plugin.zip" >> "$GITHUB_OUTPUT"
@@ -46,13 +63,14 @@ jobs:
           # maakt de release (en dus de tag) al aan, zonder zip-asset; deze
           # stap hoeft dan alleen nog de zip te uploaden. Bestaat de release
           # nog niet (bijv. tag rechtstreeks gepusht), dan maakt dit 'm alsnog.
-          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
-            gh release upload "${GITHUB_REF_NAME}" \
+          TAG="${{ steps.tagname.outputs.tag }}"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" \
               "dist/${{ steps.vars.outputs.zip_name }}" \
               --clobber
           else
-            gh release create "${GITHUB_REF_NAME}" \
+            gh release create "$TAG" \
               "dist/${{ steps.vars.outputs.zip_name }}" \
-              --title "${GITHUB_REF_NAME}" \
+              --title "$TAG" \
               --generate-notes
           fi
