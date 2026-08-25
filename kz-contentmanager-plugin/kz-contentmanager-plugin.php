@@ -3,7 +3,7 @@
  * Plugin Name: KZ Contentmanager Plugin
  * Plugin URI: https://www.kraonigezwaone.nl/
  * Description: Haalt de content voor de site op vanuit Google Docs.
- * Version: 3.0.1
+ * Version: 3.0.2
  * Author: Kraonige Zwaone
  * License: GPL v2 or later
  * Text Domain: kz-contentmanager-plugin
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'KZ_CONTENTMANAGER_VERSION', '3.0.1' );
+define( 'KZ_CONTENTMANAGER_VERSION', '3.0.2' );
 define( 'KZ_CONTENTMANAGER_PLUGIN_FILE', __FILE__ );
 define( 'KZ_CONTENTMANAGER_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'KZ_CONTENTMANAGER_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
