@@ -8,10 +8,6 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-if ( class_exists( 'KZ_Link_Helper' ) ) {
-    return;
-}
-
 class KZ_Link_Helper {
 
     public static function parse( $raw_link ) {

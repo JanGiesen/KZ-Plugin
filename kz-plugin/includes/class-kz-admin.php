@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class KZ_Admin {
 
-    /** @var KZ_Updater */
+    /** @var KZ_Plugin_Updater */
     private $updater;
 
     /** Elementen-metadata voor het overzicht + aan/uit-schakelaars. */
@@ -56,7 +56,7 @@ class KZ_Admin {
         ),
     );
 
-    public function __construct( KZ_Updater $updater ) {
+    public function __construct( KZ_Plugin_Updater $updater ) {
         $this->updater = $updater;
         add_action( 'admin_menu', array( $this, 'add_menu' ) );
         add_action( 'admin_post_kz_plugin_save_settings', array( $this, 'save_settings' ) );
