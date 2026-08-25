@@ -1,0 +1,67 @@
+/* WPBakery Element Iconen voor Kraonige Zwaone */
+
+.wpb_content_element .kz-icon-carousel,
+.vc_element-icon.kz-icon-carousel,
+.kz-icon-carousel {
+	background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="6" height="10" rx="1"/><rect x="9" y="5" width="6" height="14" rx="1"/><rect x="15" y="7" width="6" height="10" rx="1"/></svg>');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+.wpb_content_element .kz-icon-button,
+.vc_element-icon.kz-icon-button,
+.kz-icon-button {
+	background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="8" width="16" height="8" rx="4"/><path d="M8 12h8"/></svg>');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+.wpb_content_element .kz-icon-event,
+.vc_element-icon.kz-icon-event,
+.kz-icon-event {
+	background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M8 3v4"/><path d="M16 3v4"/><rect x="7" y="12" width="4" height="4"/></svg>');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+.wpb_content_element .kz-icon-header-link,
+.vc_element-icon.kz-icon-header-link,
+.kz-icon-header-link {
+	background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+.wpb_content_element .kz-icon-hover-image,
+.vc_element-icon.kz-icon-hover-image,
+.kz-icon-hover-image {
+	background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+.wpb_content_element .kz-icon-tab-widget,
+.vc_element-icon.kz-icon-tab-widget,
+.kz-icon-tab-widget {
+	background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/><rect x="4" y="5" width="4" height="2"/><rect x="10" y="5" width="4" height="2"/><rect x="16" y="5" width="4" height="2"/></svg>');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+/* WPBakery verwacht 32px iconen; forceer grootte indien nodig */
+.wpb_element_wrapper .kz-icon-carousel,
+.wpb_element_wrapper .kz-icon-button,
+.wpb_element_wrapper .kz-icon-event,
+.wpb_element_wrapper .kz-icon-header-link,
+.wpb_element_wrapper .kz-icon-hover-image,
+.wpb_element_wrapper .kz-icon-tab-widget {
+	width: 32px !important;
+	height: 32px !important;
+}
+

@@ -1,0 +1,88 @@
+.kz-vindt-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--kz-columns, 3), 1fr);
+    gap: 20px;
+    font-family: 'Roboto Condensed', sans-serif;
+}
+
+.kz-vindt-header {
+    color: #E83A30;
+    /* Red text */
+    font-size: 2.5rem;
+    /* Large font size */
+    font-weight: bold;
+    text-transform: uppercase;
+    line-height: 1;
+    margin-bottom: 10px;
+    align-self: end;
+    /* Align to bottom of cell if heights differ */
+}
+
+.kz-vindt-item {
+    background-color: #E83A30;
+    /* Red color from image */
+    color: white;
+    padding: 20px;
+    aspect-ratio: 1 / 1;
+    /* Square blocks */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.kz-vindt-item.kz-vindt-empty {
+    background-color: transparent;
+    border: 1px solid #ccc;
+    /* Optional: to show empty box outline like in design draft, or remove border for pure whitespace */
+}
+
+.kz-vindt-date {
+    font-size: 4rem;
+    font-weight: bold;
+    line-height: 1;
+    margin-bottom: auto;
+    /* Push rest down */
+    letter-spacing: -2px;
+}
+
+.kz-vindt-label {
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.kz-vindt-time {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Inverted Mode */
+.kz-vindt-grid.kz-vindt-inverted .kz-vindt-header {
+    color: white;
+}
+
+.kz-vindt-grid.kz-vindt-inverted .kz-vindt-item {
+    background-color: white;
+    color: #E83A30;
+}
+
+.kz-vindt-grid.kz-vindt-inverted .kz-vindt-item.kz-vindt-empty {
+    background-color: transparent;
+    border-color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .kz-vindt-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .kz-vindt-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
