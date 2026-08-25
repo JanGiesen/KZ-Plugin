@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-class KZ_Google_Drive_Handler {
+class KZ_CM_Google_Drive_Handler {
 
     private $api_key;
     private $folder_id;

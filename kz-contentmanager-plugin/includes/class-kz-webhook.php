@@ -76,7 +76,7 @@ class KZ_Webhook {
             update_option( 'kz_last_webhook_sync', $current_time );
         }
 
-        $google_drive = new KZ_Google_Drive_Handler();
+        $google_drive = new KZ_CM_Google_Drive_Handler();
 
         if ( 'sync_all' === $action ) {
             $result = $google_drive->sync_documents();
