@@ -45,13 +45,13 @@ class KZ_Admin {
             'params'    => 'widget_id, years (param_group)',
         ),
         'vindt_grid'       => array(
-            'label'     => 'KZ Vindt Grid',
+            'label'     => 'KZ-Vindt Grid',
             'shortcode' => 'kz_vindt_grid',
             'params'    => 'columns, column_headers, inverted, items (param_group)',
         ),
         'ticket'           => array(
-            'label'     => 'KZH Ticket',
-            'shortcode' => 'kzh_ticket',
+            'label'     => 'KZ-Ticket',
+            'shortcode' => 'kz_ticket',
             'params'    => 'logo_type, main_text, subtitle, link, color_preset, max_width, el_class',
         ),
     );

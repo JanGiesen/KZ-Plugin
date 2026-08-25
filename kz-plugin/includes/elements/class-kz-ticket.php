@@ -1,7 +1,10 @@
 <?php
 /**
- * KZH Ticket — shortcode [kzh_ticket]
- * Overgenomen uit KZH Ticket Element 1.0.0, gedrag ongewijzigd.
+ * KZ-Ticket — shortcode [kz_ticket]
+ * Overgenomen uit KZH Ticket Element 1.0.0, gedrag ongewijzigd op naam en
+ * shortcode na: hernoemd naar "KZ-Ticket" en shortcode gewijzigd van
+ * [kzh_ticket] naar [kz_ticket]. Let op: bestaande content die nog
+ * [kzh_ticket] gebruikt, moet handmatig worden bijgewerkt naar [kz_ticket].
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -10,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class KZ_Element_Ticket {
 
-    const SHORTCODE = 'kzh_ticket';
+    const SHORTCODE = 'kz_ticket';
 
     public static function register_shortcode() {
         add_shortcode( self::SHORTCODE, array( __CLASS__, 'render' ) );
@@ -22,7 +25,7 @@ class KZ_Element_Ticket {
         }
         vc_map(
             array(
-                'name'        => __( 'KZH Ticket', 'kz-plugin' ),
+                'name'        => __( 'KZ-Ticket', 'kz-plugin' ),
                 'base'        => self::SHORTCODE,
                 'category'    => __( 'Kraonige Zwaone', 'kz-plugin' ),
                 'icon'        => 'icon-wpb-application-icon-large',
