@@ -4,6 +4,11 @@
  * beveiligde URL (?kz_webhook_sync=true&token=...).
  * Overgenomen uit KZ-Kraonige Zwaone Contentmanager 2.0.0, gedrag ongewijzigd
  * (token-vergelijking is nu timing-safe via hash_equals()).
+ *
+ * De POST-acties (list_documents, sync_all, sync_single) geven naast de
+ * HTML-pagina ook een JSON-response met de documentenlijst, zodat externe
+ * consumenten (zoals kz-studio) hun eigen UI kunnen bouwen op dezelfde
+ * beveiligde endpoint.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -61,6 +66,19 @@ class KZ_Webhook {
 
         $action = isset( $_POST['action'] ) ? sanitize_text_field( wp_unslash( $_POST['action'] ) ) : '';
 
+        if ( 'list_documents' === $action ) {
+            ob_clean();
+            echo wp_json_encode(
+                array(
+                    'success'   => true,
+                    'data'      => 'OK',
+                    'documents' => $this->get_documents_payload(),
+                )
+            );
+            ob_end_flush();
+            die();
+        }
+
         if ( 'sync_all' === $action ) {
             $last_webhook_sync = get_option( 'kz_last_webhook_sync', 0 );
             $current_time      = time();
@@ -68,7 +86,13 @@ class KZ_Webhook {
 
             if ( $rate_limit > 0 && ( $current_time - $last_webhook_sync ) < $rate_limit ) {
                 ob_clean();
-                echo wp_json_encode( array( 'success' => false, 'data' => 'Rate limit exceeded. Please wait before syncing all documents again.' ) );
+                echo wp_json_encode(
+                    array(
+                        'success'   => false,
+                        'data'      => 'Rate limit exceeded. Please wait before syncing all documents again.',
+                        'documents' => $this->get_documents_payload(),
+                    )
+                );
                 ob_end_flush();
                 die();
             }
@@ -93,12 +117,43 @@ class KZ_Webhook {
         ob_clean();
         echo wp_json_encode(
             array(
-                'success' => (bool) $result['success'],
-                'data'    => $result['message'],
+                'success'   => (bool) $result['success'],
+                'data'      => $result['message'],
+                'documents' => $this->get_documents_payload(),
             )
         );
         ob_end_flush();
         die();
+    }
+
+    /**
+     * Haalt de gesynchroniseerde documenten op in een JSON-vriendelijke vorm,
+     * zodat externe consumenten (zoals kz-studio) ze kunnen tonen zonder de
+     * HTML-dashboardpagina te hoeven parsen.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function get_documents_payload() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'kz_documents';
+        $documents  = $wpdb->get_results( "SELECT document_id, document_name, last_modified FROM $table_name ORDER BY document_name" );
+
+        return array_map(
+            static function ( $doc ) {
+                $utc_time = new DateTime( $doc->last_modified, new DateTimeZone( 'UTC' ) );
+
+                $dutch_time = clone $utc_time;
+                $dutch_time->setTimezone( new DateTimeZone( 'Europe/Amsterdam' ) );
+
+                return array(
+                    'document_id'          => $doc->document_id,
+                    'document_name'        => $doc->document_name,
+                    'last_modified'        => $utc_time->format( DateTime::ATOM ),
+                    'last_modified_europe' => $dutch_time->format( 'd-m-Y H:i' ),
+                );
+            },
+            $documents
+        );
     }
 
     private function show_webhook_sync_page() {
