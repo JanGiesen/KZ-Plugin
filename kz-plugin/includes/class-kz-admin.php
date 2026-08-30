@@ -59,6 +59,11 @@ class KZ_Admin {
             'shortcode' => 'kz_recente_galerijen',
             'params'    => 'aantal, columns, show_title',
         ),
+        'recent_products'  => array(
+            'label'     => 'KZ-Winkel Producten',
+            'shortcode' => 'kz_winkel_producten',
+            'params'    => 'min_aantal, max_aantal, columns, show_photo, show_name, show_price, text_color',
+        ),
     );
 
     public function __construct( KZ_Plugin_Updater $updater ) {

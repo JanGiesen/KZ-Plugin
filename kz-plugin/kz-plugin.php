@@ -3,7 +3,7 @@
  * Plugin Name: KZ Plugin
  * Plugin URI: https://github.com/JanGiesen/KZ-Plugin
  * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket).
- * Version: 8.2.3
+ * Version: 8.3.0
  * Author: Kraonige Zwaone
  * Text Domain: kz-plugin
  * Update URI: https://github.com/JanGiesen/KZ-Plugin
@@ -35,13 +35,17 @@
  * gebruikt dezelfde kleur als de ingestelde tekstkleur, verheft zich
  * tijdens hover boven de rest van de rij, en een YYYY-MM-DD-datumprefix
  * in de galerijnaam wordt niet meer getoond.
+ *
+ * 8.3.0: nieuw element KZ-Winkel Producten — willekeurige selectie van
+ * 4 tot 6 op voorraad zijnde WooCommerce-producten (shortcode
+ * kz_winkel_producten), in hetzelfde ontwerp als KZ-Recente Galerijen.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Directe toegang niet toegestaan.
 }
 
-define( 'KZ_PLUGIN_VERSION', '8.2.3' );
+define( 'KZ_PLUGIN_VERSION', '8.3.0' );
 define( 'KZ_PLUGIN_FILE', __FILE__ );
 define( 'KZ_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KZ_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -63,6 +67,7 @@ class KZ_Plugin {
         'vindt_grid'      => 'KZ_Element_Vindt_Grid',
         'ticket'          => 'KZ_Element_Ticket',
         'recent_galleries' => 'KZ_Element_Recent_Galleries',
+        'recent_products'  => 'KZ_Element_Recent_Products',
     );
 
     public function __construct() {
@@ -103,6 +108,7 @@ class KZ_Plugin {
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-vindt-grid.php';
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-ticket.php';
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-recent-galleries.php';
+        require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-recent-products.php';
     }
 
     /**
@@ -165,6 +171,8 @@ class KZ_Plugin {
         wp_register_style( 'kz-vindt-style', KZ_PLUGIN_URL . 'assets/css/kz-vindt.css', array(), KZ_PLUGIN_VERSION );
 
         wp_register_style( 'kz-recente-galerijen-style', KZ_PLUGIN_URL . 'assets/css/kz-recente-galerijen.css', array(), KZ_PLUGIN_VERSION );
+
+        wp_register_style( 'kz-winkel-producten-style', KZ_PLUGIN_URL . 'assets/css/kz-winkel-producten.css', array(), KZ_PLUGIN_VERSION );
 
         wp_register_style( 'swiper', KZ_PLUGIN_URL . 'assets/vendor/swiper/swiper-bundle.min.css', array(), '11' );
         wp_register_script( 'swiper', KZ_PLUGIN_URL . 'assets/vendor/swiper/swiper-bundle.min.js', array(), '11', true );
