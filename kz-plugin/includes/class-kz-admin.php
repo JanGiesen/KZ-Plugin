@@ -62,7 +62,7 @@ class KZ_Admin {
         'recent_products'  => array(
             'label'     => 'KZ-Winkel Producten',
             'shortcode' => 'kz_winkel_producten',
-            'params'    => 'min_aantal, max_aantal, columns, show_photo, show_name, show_price, text_color',
+            'params'    => 'min_aantal, max_aantal, columns, show_photo, show_name, show_price, text_color, price_color, photo_border',
         ),
     );
 

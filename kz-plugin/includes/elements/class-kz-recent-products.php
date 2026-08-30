@@ -93,14 +93,37 @@ class KZ_Element_Recent_Products {
                     ),
                     array(
                         'type'        => 'dropdown',
-                        'heading'     => __( 'Tekstkleur', 'kz-plugin' ),
+                        'heading'     => __( 'Tekstkleur naam', 'kz-plugin' ),
                         'param_name'  => 'text_color',
                         'value'       => array(
                             'Wit'  => 'wit',
                             'Rood' => 'rood',
                         ),
                         'std'         => 'wit',
-                        'description' => __( 'Kleur van naam en prijs onder de productfoto.', 'kz-plugin' ),
+                        'description' => __( 'Kleur van de productnaam onder de productfoto.', 'kz-plugin' ),
+                    ),
+                    array(
+                        'type'        => 'dropdown',
+                        'heading'     => __( 'Kleur prijs', 'kz-plugin' ),
+                        'param_name'  => 'price_color',
+                        'value'       => array(
+                            'Wit'  => 'wit',
+                            'Rood' => 'rood',
+                        ),
+                        'std'         => 'wit',
+                        'description' => __( 'Kleur van de productprijs.', 'kz-plugin' ),
+                    ),
+                    array(
+                        'type'        => 'dropdown',
+                        'heading'     => __( 'Rand om foto', 'kz-plugin' ),
+                        'param_name'  => 'photo_border',
+                        'value'       => array(
+                            'Geen' => 'geen',
+                            'Wit'  => 'wit',
+                            'Rood' => 'rood',
+                        ),
+                        'std'         => 'geen',
+                        'description' => __( 'Vaste rand om de productfoto (los van het hover-effect).', 'kz-plugin' ),
                     ),
                 ),
             )
@@ -119,20 +142,24 @@ class KZ_Element_Recent_Products {
                 'columns'    => '5',
                 'show_photo' => 'true',
                 'show_name'  => 'true',
-                'show_price' => 'true',
-                'text_color' => 'wit',
+                'show_price'   => 'true',
+                'text_color'   => 'wit',
+                'price_color'  => 'wit',
+                'photo_border' => 'geen',
             ),
             $atts,
             self::SHORTCODE
         );
 
-        $min_aantal = max( 1, absint( $atts['min_aantal'] ) );
-        $max_aantal = max( $min_aantal, absint( $atts['max_aantal'] ) );
-        $columns    = max( 1, absint( $atts['columns'] ) );
-        $show_photo = 'true' === $atts['show_photo'];
-        $show_name  = 'true' === $atts['show_name'];
-        $show_price = 'true' === $atts['show_price'];
-        $text_color = 'rood' === $atts['text_color'] ? 'rood' : 'wit';
+        $min_aantal   = max( 1, absint( $atts['min_aantal'] ) );
+        $max_aantal   = max( $min_aantal, absint( $atts['max_aantal'] ) );
+        $columns      = max( 1, absint( $atts['columns'] ) );
+        $show_photo   = 'true' === $atts['show_photo'];
+        $show_name    = 'true' === $atts['show_name'];
+        $show_price   = 'true' === $atts['show_price'];
+        $text_color   = 'rood' === $atts['text_color'] ? 'rood' : 'wit';
+        $price_color  = 'rood' === $atts['price_color'] ? 'rood' : 'wit';
+        $photo_border = in_array( $atts['photo_border'], array( 'wit', 'rood' ), true ) ? $atts['photo_border'] : 'geen';
 
         $aantal = wp_rand( $min_aantal, $max_aantal );
 
@@ -153,7 +180,7 @@ class KZ_Element_Recent_Products {
 
         ob_start();
         ?>
-        <div class="kz-winkel-producten kz-winkel-producten--<?php echo esc_attr( $text_color ); ?>" style="--kz-columns: <?php echo esc_attr( $columns ); ?>;">
+        <div class="kz-winkel-producten kz-winkel-producten--naam-<?php echo esc_attr( $text_color ); ?> kz-winkel-producten--prijs-<?php echo esc_attr( $price_color ); ?> kz-winkel-producten--rand-<?php echo esc_attr( $photo_border ); ?>" style="--kz-columns: <?php echo esc_attr( $columns ); ?>;">
             <?php foreach ( $products as $product ) : ?>
                 <?php
                 $naam      = $product->get_name();
