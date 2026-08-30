@@ -5,6 +5,10 @@
     font-family: 'Roboto Condensed', sans-serif;
 }
 
+.kz-recente-galerij-item {
+    position: relative;
+}
+
 .kz-recente-galerij-item a {
     display: block;
     text-decoration: none;
@@ -13,8 +17,8 @@
 
 .kz-recente-galerij-foto {
     overflow: hidden;
-    outline: 60px solid transparent;
-    outline-offset: -60px;
+    outline: 3px solid transparent;
+    outline-offset: -3px;
     transition: outline-color 0.3s ease, outline-offset 0.3s ease;
 }
 
@@ -27,9 +31,14 @@
     transition: transform 0.35s ease;
 }
 
+.kz-recente-galerij-item a:hover {
+    position: relative;
+    z-index: 2;
+}
+
 .kz-recente-galerij-item a:hover .kz-recente-galerij-foto {
-    outline-color: #e53935;
-    outline-offset: 8px;
+    outline-color: var(--kz-ring-kleur, #e53935);
+    outline-offset: 5px;
 }
 
 .kz-recente-galerij-item a:hover img {
@@ -50,8 +59,16 @@
     text-transform: uppercase;
 }
 
+.kz-recente-galerijen--wit {
+    --kz-ring-kleur: #ffffff;
+}
+
 .kz-recente-galerijen--wit .kz-recente-galerij-titel {
     color: #ffffff;
+}
+
+.kz-recente-galerijen--rood {
+    --kz-ring-kleur: #e53935;
 }
 
 .kz-recente-galerijen--rood .kz-recente-galerij-titel {

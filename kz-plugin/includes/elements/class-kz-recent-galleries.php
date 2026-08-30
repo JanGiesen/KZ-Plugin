@@ -129,6 +129,7 @@ class KZ_Element_Recent_Galleries {
             <?php foreach ( $galleries as $gallery ) : ?>
                 <?php
                 $titel = ! empty( $gallery->title ) ? $gallery->title : $gallery->name;
+                $titel = self::strip_leading_date( $titel );
 
                 $link = self::get_gallery_album_link( $gallery->gid, $gallery->slug, $wpdb );
                 if ( ! $link ) {
@@ -256,5 +257,13 @@ class KZ_Element_Recent_Galleries {
         }
 
         return '';
+    }
+
+    /**
+     * Verbergt de interne YYYY-MM-DD-datumprefix uit galerijnamen
+     * (afspraak: elke galerij heet "YYYY-MM-DD Omschrijving").
+     */
+    private static function strip_leading_date( $titel ) {
+        return preg_replace( '/^\d{4}-\d{2}-\d{2}\s+/', '', $titel );
     }
 }

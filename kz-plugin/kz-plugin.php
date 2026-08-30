@@ -3,7 +3,7 @@
  * Plugin Name: KZ Plugin
  * Plugin URI: https://github.com/JanGiesen/KZ-Plugin
  * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket).
- * Version: 8.2.2
+ * Version: 8.2.3
  * Author: Kraonige Zwaone
  * Text Domain: kz-plugin
  * Update URI: https://github.com/JanGiesen/KZ-Plugin
@@ -30,13 +30,18 @@
  * 8.2.2: fix voor de albumlink uit 8.2.1 — de sortorder-kolom van
  * ngg_album is base64-gecodeerde JSON, geen PHP serialize(), waardoor de
  * albumkoppeling niet herkend werd.
+ *
+ * 8.2.3: KZ-Recente Galerijen — de uitzoom-ring is nu veel dunner en
+ * gebruikt dezelfde kleur als de ingestelde tekstkleur, verheft zich
+ * tijdens hover boven de rest van de rij, en een YYYY-MM-DD-datumprefix
+ * in de galerijnaam wordt niet meer getoond.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Directe toegang niet toegestaan.
 }
 
-define( 'KZ_PLUGIN_VERSION', '8.2.2' );
+define( 'KZ_PLUGIN_VERSION', '8.2.3' );
 define( 'KZ_PLUGIN_FILE', __FILE__ );
 define( 'KZ_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KZ_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
