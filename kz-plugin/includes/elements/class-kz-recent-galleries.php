@@ -191,7 +191,11 @@ class KZ_Element_Recent_Galleries {
         }
 
         if ( ! empty( $gallery->path ) && ! empty( $picture->filename ) ) {
-            return content_url( 'gallery/' . $gallery->path . '/thumbs/thumbs_' . $picture->filename );
+            // De path-kolom bevat het volledige relatieve pad vanaf de site-root
+            // (bijv. "/wp-content/gallery/appel/"), dus niet nog eens onder
+            // wp-content/gallery/ hangen.
+            $relative_path = trim( $gallery->path, '/' );
+            return home_url( '/' . $relative_path . '/thumbs/thumbs-' . $picture->filename );
         }
 
         return '';
