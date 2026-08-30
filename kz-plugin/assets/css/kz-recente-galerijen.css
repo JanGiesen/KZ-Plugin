@@ -26,6 +26,14 @@
     text-transform: uppercase;
 }
 
+.kz-recente-galerijen--wit .kz-recente-galerij-titel {
+    color: #ffffff;
+}
+
+.kz-recente-galerijen--rood .kz-recente-galerij-titel {
+    color: #e53935;
+}
+
 @media (max-width: 768px) {
     .kz-recente-galerijen {
         grid-template-columns: repeat(3, 1fr) !important;

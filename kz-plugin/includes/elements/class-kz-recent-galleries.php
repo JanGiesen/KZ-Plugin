@@ -65,6 +65,17 @@ class KZ_Element_Recent_Galleries {
                         'std'         => 'true',
                         'description' => __( 'Toon de galerijnaam onder de voorbeeldafbeelding.', 'kz-plugin' ),
                     ),
+                    array(
+                        'type'        => 'dropdown',
+                        'heading'     => __( 'Tekstkleur', 'kz-plugin' ),
+                        'param_name'  => 'text_color',
+                        'value'       => array(
+                            'Wit'  => 'wit',
+                            'Rood' => 'rood',
+                        ),
+                        'std'         => 'wit',
+                        'description' => __( 'Kleur van de galerijtitel onder de voorbeeldafbeelding.', 'kz-plugin' ),
+                    ),
                 ),
             )
         );
@@ -78,6 +89,7 @@ class KZ_Element_Recent_Galleries {
                 'aantal'     => '5',
                 'columns'    => '5',
                 'show_title' => 'true',
+                'text_color' => 'wit',
             ),
             $atts,
             self::SHORTCODE
@@ -93,6 +105,7 @@ class KZ_Element_Recent_Galleries {
         $aantal     = max( 1, absint( $atts['aantal'] ) );
         $columns    = max( 1, absint( $atts['columns'] ) );
         $show_title = 'true' === $atts['show_title'];
+        $text_color = 'rood' === $atts['text_color'] ? 'rood' : 'wit';
 
         $galleries = $wpdb->get_results(
             $wpdb->prepare(
@@ -112,7 +125,7 @@ class KZ_Element_Recent_Galleries {
 
         ob_start();
         ?>
-        <div class="kz-recente-galerijen" style="--kz-columns: <?php echo esc_attr( $columns ); ?>;">
+        <div class="kz-recente-galerijen kz-recente-galerijen--<?php echo esc_attr( $text_color ); ?>" style="--kz-columns: <?php echo esc_attr( $columns ); ?>;">
             <?php foreach ( $galleries as $gallery ) : ?>
                 <?php
                 $titel = ! empty( $gallery->title ) ? $gallery->title : $gallery->name;
