@@ -3,7 +3,7 @@
  * Plugin Name: KZ Plugin
  * Plugin URI: https://github.com/JanGiesen/KZ-Plugin
  * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket).
- * Version: 8.1.5
+ * Version: 8.2.0
  * Author: Kraonige Zwaone
  * Text Domain: kz-plugin
  * Update URI: https://github.com/JanGiesen/KZ-Plugin
@@ -18,13 +18,16 @@
  *
  * 8.1.2: dummy-release om de volledige auto-update-cyclus end-to-end te
  * testen (geen functionele wijzigingen).
+ *
+ * 8.2.0: nieuw element KZ-Recente Galerijen — overzicht van de 5 meest
+ * recente NextGEN Gallery-galerijen (shortcode kz_recente_galerijen).
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Directe toegang niet toegestaan.
 }
 
-define( 'KZ_PLUGIN_VERSION', '8.1.5' );
+define( 'KZ_PLUGIN_VERSION', '8.2.0' );
 define( 'KZ_PLUGIN_FILE', __FILE__ );
 define( 'KZ_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KZ_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -45,6 +48,7 @@ class KZ_Plugin {
         'tab_widget'      => 'KZ_Element_Tab_Widget',
         'vindt_grid'      => 'KZ_Element_Vindt_Grid',
         'ticket'          => 'KZ_Element_Ticket',
+        'recent_galleries' => 'KZ_Element_Recent_Galleries',
     );
 
     public function __construct() {
@@ -84,6 +88,7 @@ class KZ_Plugin {
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-tab-widget.php';
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-vindt-grid.php';
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-ticket.php';
+        require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-recent-galleries.php';
     }
 
     /**
@@ -144,6 +149,8 @@ class KZ_Plugin {
         wp_enqueue_style( 'kz-plugin-style' );
 
         wp_register_style( 'kz-vindt-style', KZ_PLUGIN_URL . 'assets/css/kz-vindt.css', array(), KZ_PLUGIN_VERSION );
+
+        wp_register_style( 'kz-recente-galerijen-style', KZ_PLUGIN_URL . 'assets/css/kz-recente-galerijen.css', array(), KZ_PLUGIN_VERSION );
 
         wp_register_style( 'swiper', KZ_PLUGIN_URL . 'assets/vendor/swiper/swiper-bundle.min.css', array(), '11' );
         wp_register_script( 'swiper', KZ_PLUGIN_URL . 'assets/vendor/swiper/swiper-bundle.min.js', array(), '11', true );

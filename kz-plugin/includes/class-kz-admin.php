@@ -54,6 +54,11 @@ class KZ_Admin {
             'shortcode' => 'kz_ticket',
             'params'    => 'logo_type, main_text, subtitle, link, color_preset, max_width, el_class',
         ),
+        'recent_galleries' => array(
+            'label'     => 'KZ-Recente Galerijen',
+            'shortcode' => 'kz_recente_galerijen',
+            'params'    => 'aantal, columns, show_title',
+        ),
     );
 
     public function __construct( KZ_Plugin_Updater $updater ) {
