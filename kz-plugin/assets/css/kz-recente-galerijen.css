@@ -1,0 +1,39 @@
+.kz-recente-galerijen {
+    display: grid;
+    grid-template-columns: repeat(var(--kz-columns, 5), 1fr);
+    gap: 20px;
+    font-family: 'Roboto Condensed', sans-serif;
+}
+
+.kz-recente-galerij-item a {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.kz-recente-galerij-item img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+}
+
+.kz-recente-galerij-titel {
+    margin-top: 10px;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+    .kz-recente-galerijen {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .kz-recente-galerijen {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
