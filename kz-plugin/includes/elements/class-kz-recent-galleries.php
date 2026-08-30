@@ -65,6 +65,17 @@ class KZ_Element_Recent_Galleries {
                         'std'         => 'true',
                         'description' => __( 'Toon de galerijnaam onder de voorbeeldafbeelding.', 'kz-plugin' ),
                     ),
+                    array(
+                        'type'        => 'dropdown',
+                        'heading'     => __( 'Tekstkleur', 'kz-plugin' ),
+                        'param_name'  => 'text_color',
+                        'value'       => array(
+                            'Wit'  => 'wit',
+                            'Rood' => 'rood',
+                        ),
+                        'std'         => 'wit',
+                        'description' => __( 'Kleur van de galerijtitel onder de voorbeeldafbeelding.', 'kz-plugin' ),
+                    ),
                 ),
             )
         );
@@ -78,6 +89,7 @@ class KZ_Element_Recent_Galleries {
                 'aantal'     => '5',
                 'columns'    => '5',
                 'show_title' => 'true',
+                'text_color' => 'wit',
             ),
             $atts,
             self::SHORTCODE
@@ -93,10 +105,11 @@ class KZ_Element_Recent_Galleries {
         $aantal     = max( 1, absint( $atts['aantal'] ) );
         $columns    = max( 1, absint( $atts['columns'] ) );
         $show_title = 'true' === $atts['show_title'];
+        $text_color = 'rood' === $atts['text_color'] ? 'rood' : 'wit';
 
         $galleries = $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT gid, name, title, path, previewpic, pageid, extras_post_id
+                "SELECT gid, name, slug, title, path, previewpic, pageid, extras_post_id
                  FROM {$ngg_gallery_table}
                  ORDER BY date_created DESC, gid DESC
                  LIMIT %d",
@@ -112,16 +125,18 @@ class KZ_Element_Recent_Galleries {
 
         ob_start();
         ?>
-        <div class="kz-recente-galerijen" style="--kz-columns: <?php echo esc_attr( $columns ); ?>;">
+        <div class="kz-recente-galerijen kz-recente-galerijen--<?php echo esc_attr( $text_color ); ?>" style="--kz-columns: <?php echo esc_attr( $columns ); ?>;">
             <?php foreach ( $galleries as $gallery ) : ?>
                 <?php
                 $titel = ! empty( $gallery->title ) ? $gallery->title : $gallery->name;
 
-                $link = '';
-                if ( ! empty( $gallery->extras_post_id ) ) {
-                    $link = get_permalink( $gallery->extras_post_id );
-                } elseif ( ! empty( $gallery->pageid ) ) {
-                    $link = get_permalink( $gallery->pageid );
+                $link = self::get_gallery_album_link( $gallery->gid, $gallery->slug, $wpdb );
+                if ( ! $link ) {
+                    if ( ! empty( $gallery->extras_post_id ) ) {
+                        $link = get_permalink( $gallery->extras_post_id );
+                    } elseif ( ! empty( $gallery->pageid ) ) {
+                        $link = get_permalink( $gallery->pageid );
+                    }
                 }
 
                 $thumb_url = self::get_gallery_thumb_url( $gallery, $ngg_pictures_table, $wpdb );
@@ -132,7 +147,9 @@ class KZ_Element_Recent_Galleries {
                     <?php endif; ?>
 
                     <?php if ( $thumb_url ) : ?>
-                        <img src="<?php echo esc_url( $thumb_url ); ?>" alt="<?php echo esc_attr( $titel ); ?>" loading="lazy" decoding="async" />
+                        <div class="kz-recente-galerij-foto">
+                            <img src="<?php echo esc_url( $thumb_url ); ?>" alt="<?php echo esc_attr( $titel ); ?>" loading="lazy" decoding="async" />
+                        </div>
                     <?php endif; ?>
 
                     <?php if ( $show_title ) : ?>
@@ -196,6 +213,43 @@ class KZ_Element_Recent_Galleries {
             // wp-content/gallery/ hangen.
             $relative_path = trim( $gallery->path, '/' );
             return home_url( '/' . $relative_path . '/thumbs/thumbs-' . $picture->filename );
+        }
+
+        return '';
+    }
+
+    /**
+     * Bouwt de front-end galerij-URL op basis van het NextGEN-album waarin de
+     * galerij zit: /fotos/{album}/ngggaleries/{album}/{galerij-slug}/.
+     *
+     * NextGEN Gallery/Pro genereert deze geneste URL zelf via een intern
+     * rewrite-mechanisme dat niet via een standaard get_permalink() te
+     * benaderen is; de albumkoppeling (welke galerijen bij welk album horen)
+     * staat in de sortorder-kolom van ngg_album als serialized array van
+     * gallery-ID's.
+     */
+    private static function get_gallery_album_link( $gid, $slug, $wpdb ) {
+        if ( empty( $slug ) ) {
+            return '';
+        }
+
+        $ngg_album_table = $wpdb->prefix . 'ngg_album';
+        if ( $wpdb->get_var( "SHOW TABLES LIKE '{$ngg_album_table}'" ) !== $ngg_album_table ) {
+            return '';
+        }
+
+        $albums = $wpdb->get_results( "SELECT name, sortorder FROM {$ngg_album_table}" );
+
+        foreach ( $albums as $album ) {
+            $gallery_ids = maybe_unserialize( $album->sortorder );
+            if ( ! is_array( $gallery_ids ) ) {
+                continue;
+            }
+
+            if ( in_array( (string) $gid, array_map( 'strval', $gallery_ids ), true ) ) {
+                $album_slug = sanitize_title( $album->name );
+                return home_url( '/fotos/' . $album_slug . '/ngggaleries/' . $album_slug . '/' . $slug . '/' );
+            }
         }
 
         return '';
