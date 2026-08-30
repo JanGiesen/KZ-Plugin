@@ -145,7 +145,9 @@ class KZ_Element_Recent_Galleries {
                     <?php endif; ?>
 
                     <?php if ( $thumb_url ) : ?>
-                        <img src="<?php echo esc_url( $thumb_url ); ?>" alt="<?php echo esc_attr( $titel ); ?>" loading="lazy" decoding="async" />
+                        <div class="kz-recente-galerij-foto">
+                            <img src="<?php echo esc_url( $thumb_url ); ?>" alt="<?php echo esc_attr( $titel ); ?>" loading="lazy" decoding="async" />
+                        </div>
                     <?php endif; ?>
 
                     <?php if ( $show_title ) : ?>

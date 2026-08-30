@@ -11,12 +11,36 @@
     color: inherit;
 }
 
+.kz-recente-galerij-foto {
+    overflow: hidden;
+    outline: 60px solid transparent;
+    outline-offset: -60px;
+    transition: outline-color 0.3s ease, outline-offset 0.3s ease;
+}
+
 .kz-recente-galerij-item img {
     display: block;
     width: 100%;
     height: auto;
     aspect-ratio: 1 / 1;
     object-fit: cover;
+    transition: transform 0.35s ease;
+}
+
+.kz-recente-galerij-item a:hover .kz-recente-galerij-foto {
+    outline-color: #e53935;
+    outline-offset: 8px;
+}
+
+.kz-recente-galerij-item a:hover img {
+    transform: scale(1.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .kz-recente-galerij-foto,
+    .kz-recente-galerij-item img {
+        transition: none;
+    }
 }
 
 .kz-recente-galerij-titel {
