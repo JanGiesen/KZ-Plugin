@@ -225,8 +225,8 @@ class KZ_Element_Recent_Galleries {
      * NextGEN Gallery/Pro genereert deze geneste URL zelf via een intern
      * rewrite-mechanisme dat niet via een standaard get_permalink() te
      * benaderen is; de albumkoppeling (welke galerijen bij welk album horen)
-     * staat in de sortorder-kolom van ngg_album als serialized array van
-     * gallery-ID's.
+     * staat in de sortorder-kolom van ngg_album, base64-gecodeerd als JSON-
+     * array van gallery-ID's (geen PHP serialize()).
      */
     private static function get_gallery_album_link( $gid, $slug, $wpdb ) {
         if ( empty( $slug ) ) {
@@ -238,17 +238,20 @@ class KZ_Element_Recent_Galleries {
             return '';
         }
 
-        $albums = $wpdb->get_results( "SELECT name, sortorder FROM {$ngg_album_table}" );
+        $albums = $wpdb->get_results( "SELECT slug, sortorder FROM {$ngg_album_table}" );
 
         foreach ( $albums as $album ) {
-            $gallery_ids = maybe_unserialize( $album->sortorder );
+            if ( empty( $album->sortorder ) ) {
+                continue;
+            }
+
+            $gallery_ids = json_decode( base64_decode( $album->sortorder ), true );
             if ( ! is_array( $gallery_ids ) ) {
                 continue;
             }
 
             if ( in_array( (string) $gid, array_map( 'strval', $gallery_ids ), true ) ) {
-                $album_slug = sanitize_title( $album->name );
-                return home_url( '/fotos/' . $album_slug . '/ngggaleries/' . $album_slug . '/' . $slug . '/' );
+                return home_url( '/fotos/' . $album->slug . '/ngggaleries/' . $album->slug . '/' . $slug . '/' );
             }
         }
 
