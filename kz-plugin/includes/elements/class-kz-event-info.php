@@ -3,7 +3,7 @@
  * KZ-Evenement Info — shortcode [kz_evenement_info]
  * Infoblok voor een evenement op de ticketpagina: rode kop met logo, label
  * en titel, een datumblok (dag, dd/mm, tijd), omschrijving, een lijstje
- * feiten (Waar, Prijs, ...) en een kaartenknop met groet.
+ * feiten (Waar, Prijs, ...) en een kaartenknop.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -147,14 +147,6 @@ class KZ_Element_Event_Info {
                         'group'       => __( 'Kaarten', 'kz-plugin' ),
                     ),
                     array(
-                        'type'        => 'textfield',
-                        'heading'     => __( 'Groet', 'kz-plugin' ),
-                        'param_name'  => 'groet',
-                        'value'       => "Huusse' Helau'!",
-                        'description' => __( 'Rode tekst naast de knop. Leeg = geen groet.', 'kz-plugin' ),
-                        'group'       => __( 'Kaarten', 'kz-plugin' ),
-                    ),
-                    array(
                         'type'        => 'textarea',
                         'heading'     => __( 'Kleine tekst', 'kz-plugin' ),
                         'param_name'  => 'kleine_tekst',
@@ -200,7 +192,6 @@ class KZ_Element_Event_Info {
                 'link'         => '',
                 'knop_tekst'   => 'Kaarten bestellen',
                 'status'       => 'open',
-                'groet'        => "Huusse' Helau'!",
                 'kleine_tekst' => '',
                 'max_width'    => '820px',
                 'el_class'     => '',
@@ -317,15 +308,12 @@ class KZ_Element_Event_Info {
                     <?php endif; ?>
                 </div>
 
-                <?php if ( $toon_knop || '' !== $atts['groet'] ) : ?>
+                <?php if ( $toon_knop ) : ?>
                     <div class="kz-evt__actie">
                         <?php if ( $uitverkocht ) : ?>
                             <span class="kz-evt__knop kz-evt__knop--uit" aria-disabled="true"><span><?php echo esc_html( $knop_tekst ); ?></span></span>
                         <?php elseif ( $toon_knop ) : ?>
                             <a class="kz-evt__knop" href="<?php echo esc_url( $href ); ?>"<?php echo $target ? ' target="' . esc_attr( $target ) . '"' : ''; ?><?php echo $rel ? ' rel="' . esc_attr( $rel ) . '"' : ''; ?>><span><?php echo esc_html( $knop_tekst ); ?></span></a>
-                        <?php endif; ?>
-                        <?php if ( '' !== $atts['groet'] ) : ?>
-                            <span class="kz-evt__groet"><?php echo esc_html( $atts['groet'] ); ?></span>
                         <?php endif; ?>
                     </div>
                 <?php endif; ?>
