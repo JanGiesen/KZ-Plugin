@@ -72,6 +72,15 @@
 	background-position: center;
 }
 
+.wpb_content_element .kz-icon-event-info,
+.vc_element-icon.kz-icon-event-info,
+.kz-icon-event-info {
+	background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><rect x="6" y="12" width="4" height="5"/><path d="M13 13h5M13 16h5"/></svg>');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
 /* WPBakery verwacht 32px iconen; forceer grootte indien nodig */
 .wpb_element_wrapper .kz-icon-carousel,
 .wpb_element_wrapper .kz-icon-button,
@@ -80,7 +89,8 @@
 .wpb_element_wrapper .kz-icon-hover-image,
 .wpb_element_wrapper .kz-icon-tab-widget,
 .wpb_element_wrapper .kz-icon-vindt-grid,
-.wpb_element_wrapper .kz-icon-ticket {
+.wpb_element_wrapper .kz-icon-ticket,
+.wpb_element_wrapper .kz-icon-event-info {
 	width: 32px !important;
 	height: 32px !important;
 }

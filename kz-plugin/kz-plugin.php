@@ -2,8 +2,8 @@
 /**
  * Plugin Name: KZ Plugin
  * Plugin URI: https://github.com/JanGiesen/KZ-Plugin
- * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket).
- * Version: 8.3.1
+ * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, evenement info).
+ * Version: 8.4.0
  * Author: Kraonige Zwaone
  * Text Domain: kz-plugin
  * Update URI: https://github.com/JanGiesen/KZ-Plugin
@@ -43,13 +43,17 @@
  * 8.3.1: KZ-Winkel Producten — losse kleurinstelling voor de prijs
  * (naast de naam), en een optionele vaste rand (wit/rood) om de
  * productfoto, los van het hover-effect.
+ *
+ * 8.4.0: nieuw element KZ-Evenement Info — infoblok voor de ticketpagina
+ * met rode kop, logo, datumblok, omschrijving, feitenlijst en kaartenknop
+ * (shortcode kz_evenement_info).
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Directe toegang niet toegestaan.
 }
 
-define( 'KZ_PLUGIN_VERSION', '8.3.1' );
+define( 'KZ_PLUGIN_VERSION', '8.4.0' );
 define( 'KZ_PLUGIN_FILE', __FILE__ );
 define( 'KZ_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KZ_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -72,6 +76,7 @@ class KZ_Plugin {
         'ticket'          => 'KZ_Element_Ticket',
         'recent_galleries' => 'KZ_Element_Recent_Galleries',
         'recent_products'  => 'KZ_Element_Recent_Products',
+        'event_info'       => 'KZ_Element_Event_Info',
     );
 
     public function __construct() {
@@ -113,6 +118,7 @@ class KZ_Plugin {
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-ticket.php';
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-recent-galleries.php';
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-recent-products.php';
+        require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-event-info.php';
     }
 
     /**
@@ -177,6 +183,9 @@ class KZ_Plugin {
         wp_register_style( 'kz-recente-galerijen-style', KZ_PLUGIN_URL . 'assets/css/kz-recente-galerijen.css', array(), KZ_PLUGIN_VERSION );
 
         wp_register_style( 'kz-winkel-producten-style', KZ_PLUGIN_URL . 'assets/css/kz-winkel-producten.css', array(), KZ_PLUGIN_VERSION );
+
+        wp_register_style( 'kz-evenement-info-style', KZ_PLUGIN_URL . 'assets/css/kz-evenement-info.css', array(), KZ_PLUGIN_VERSION );
+        wp_register_style( 'kz-evenement-info-fonts', 'https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&family=Work+Sans:wght@400;500&display=swap', array(), null );
 
         wp_register_style( 'swiper', KZ_PLUGIN_URL . 'assets/vendor/swiper/swiper-bundle.min.css', array(), '11' );
         wp_register_script( 'swiper', KZ_PLUGIN_URL . 'assets/vendor/swiper/swiper-bundle.min.js', array(), '11', true );
