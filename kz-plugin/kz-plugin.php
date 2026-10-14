@@ -3,7 +3,7 @@
  * Plugin Name: KZ Plugin
  * Plugin URI: https://github.com/JanGiesen/KZ-Plugin
  * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, evenement info).
- * Version: 8.4.3
+ * Version: 8.4.4
  * Author: Kraonige Zwaone
  * Text Domain: kz-plugin
  * Update URI: https://github.com/JanGiesen/KZ-Plugin
@@ -56,16 +56,20 @@
  * 8.4.2: KZ-Evenement Info — titel blijft naast het logo tot 420px
  * blokbreedte, net als de datum naast de tekst.
  *
- * 8.4.3: KZ-Evenement Info — op telefoonbreedte geen logo, en het
+ * 8.4.3: externe URL's in links worden niet meer volledig naar kleine
+ * letters omgezet.
+ *
+ * 8.4.4: KZ-Evenement Info — op telefoonbreedte geen logo, en het
  * datumticket over de volle breedte met uitgeschreven datum ("ZA 14 NOV")
- * in plaats van 14/11 en de losse dagnaam erboven.
+ * in plaats van 14/11 en de losse dagnaam erboven. (Stond eerst als 8.4.3
+ * genoteerd, maar die versie was al uitgebracht met alleen de link-fix.)
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Directe toegang niet toegestaan.
 }
 
-define( 'KZ_PLUGIN_VERSION', '8.4.3' );
+define( 'KZ_PLUGIN_VERSION', '8.4.4' );
 define( 'KZ_PLUGIN_FILE', __FILE__ );
 define( 'KZ_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KZ_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
