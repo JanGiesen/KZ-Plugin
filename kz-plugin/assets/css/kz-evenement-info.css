@@ -57,7 +57,7 @@
 /* Reageert op de breedte van het blok zelf, niet van het scherm, zodat twee
    blokken naast elkaar in WPBakery-kolommen ook de smalle opmaak krijgen. */
 @container kz-evt (max-width:600px){
-  .kz-evt__top{flex-direction:column;align-items:flex-start;gap:16px;padding:22px 20px}
+  .kz-evt__top{gap:18px;padding:22px 20px}
   .kz-evt__logo{width:64px}
   .kz-evt .kz-evt__titel{font-size:42px}
   .kz-evt__body{gap:20px;padding:20px}
@@ -67,8 +67,9 @@
   .kz-evt .kz-evt__knop{font-size:24px}
   .kz-evt__klein{text-align:center}
 }
-/* Pas bij echt smalle blokken (telefoon) komt de datum boven de tekst. */
+/* Pas bij echt smalle blokken (telefoon) komen logo en datum boven titel en tekst. */
 @container kz-evt (max-width:420px){
+  .kz-evt__top{flex-direction:column;align-items:flex-start;gap:16px}
   .kz-evt__body{grid-template-columns:1fr;grid-template-rows:auto auto 1fr}
   .kz-evt--zonder-datum .kz-evt__body{grid-template-rows:auto 1fr}
   .kz-evt__datum{width:140px}
