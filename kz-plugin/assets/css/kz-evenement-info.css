@@ -34,6 +34,7 @@
 .kz-evt__blok::before{top:6px;bottom:6px;left:calc(var(--r) + 4px);right:calc(var(--r) + 4px);border-top-width:2px;border-bottom-width:2px}
 .kz-evt__blok::after{top:calc(var(--r) + 4px);bottom:calc(var(--r) + 4px);left:10px;right:10px;border-left-width:2px;border-right-width:2px}
 .kz-evt__dd{font-family:var(--kz-evt-display);font-weight:700;letter-spacing:-0.04em;font-size:64px;line-height:1;transform:scaleX(.8)}
+.kz-evt__dd--lang{display:none;text-transform:uppercase}
 .kz-evt__tijd{font-family:var(--kz-evt-display);font-weight:700;letter-spacing:-0.04em;font-size:20px}
 .kz-evt__tekst > *:first-child{margin-top:0}
 .kz-evt__tekst p+p{margin-top:12px}
@@ -73,6 +74,9 @@
   .kz-evt__body{grid-template-columns:1fr;grid-template-rows:auto auto 1fr}
   .kz-evt--zonder-datum .kz-evt__body{grid-template-rows:auto 1fr}
   .kz-evt__datum{width:100%}
+  .kz-evt__dd--kort{display:none}
+  .kz-evt__dd--lang{display:block}
+  .kz-evt__datum--auto .kz-evt__dag{display:none}
   .kz-evt__dd{font-size:64px}
   .kz-evt__tijd{font-size:20px}
   .kz-evt .kz-evt__knop{font-size:20px}
