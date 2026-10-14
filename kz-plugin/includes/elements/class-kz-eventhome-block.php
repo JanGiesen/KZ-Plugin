@@ -44,7 +44,7 @@ class KZ_Element_Eventhome_Block {
                         'type'        => 'vc_link',
                         'heading'     => 'Link',
                         'param_name'  => 'link',
-                        'description' => 'Kies of voer de link in (wordt automatisch kleine letters)',
+                        'description' => 'Kies of voer de link in (interne links worden automatisch kleine letters)',
                     ),
                     array(
                         'type'        => 'checkbox',
