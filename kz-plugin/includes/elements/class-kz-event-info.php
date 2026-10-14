@@ -217,6 +217,7 @@ class KZ_Element_Event_Info {
 
         wp_enqueue_style( 'kz-evenement-info-fonts' );
         wp_enqueue_style( 'kz-evenement-info-style' );
+        wp_enqueue_script( 'kz-evenement-info' );
 
         $titel_id  = wp_unique_id( 'kz-evt-titel-' );
         $show_logo = 'false' !== $atts['show_logo'];

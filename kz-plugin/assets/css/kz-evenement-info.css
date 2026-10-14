@@ -2,7 +2,7 @@
 
 .kz-evt{--kz-evt-red:#e83f35;--kz-evt-red-dark:#b82a22;--kz-evt-red-darker:#8f1f19;--kz-evt-white:#fff;--kz-evt-black:#111;
   --kz-evt-display:"Roboto Condensed",Impact,"Arial Narrow",sans-serif;--kz-evt-body:"Work Sans",-apple-system,BlinkMacSystemFont,sans-serif;
-  box-sizing:border-box;container-type:inline-size;container-name:kz-evt;max-width:820px;margin:0 auto;background:var(--kz-evt-white);border:2px solid var(--kz-evt-red);border-radius:4px;overflow:hidden;
+  box-sizing:border-box;display:flex;flex-direction:column;container-type:inline-size;container-name:kz-evt;max-width:820px;margin:0 auto;background:var(--kz-evt-white);border:2px solid var(--kz-evt-red);border-radius:4px;overflow:hidden;
   font-family:var(--kz-evt-body);color:var(--kz-evt-black);font-size:18px;line-height:1.5;text-align:left}
 .kz-evt *,.kz-evt *::before,.kz-evt *::after{box-sizing:border-box}
 .kz-evt p{margin:0}
@@ -15,8 +15,9 @@
 .kz-evt .kz-evt__titel{display:block;font-size:56px;color:var(--kz-evt-white);width:125%}
 
 /* Inhoud */
-.kz-evt__body{display:grid;grid-template-columns:auto 1fr;gap:28px;padding:28px}
-.kz-evt--zonder-datum .kz-evt__body{grid-template-columns:1fr}
+/* Bij gelijke hoogte (naast elkaar) groeit de tekstrij, zodat de knop onderaan staat. */
+.kz-evt__body{flex:1 1 auto;display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto 1fr;align-content:start;gap:28px;padding:28px}
+.kz-evt--zonder-datum .kz-evt__body{grid-template-columns:1fr;grid-template-rows:auto 1fr}
 .kz-evt__balk{grid-column:1/-1;height:10px;background:var(--kz-evt-red);margin-bottom:-8px}
 .kz-evt__datum{text-align:center;width:150px}
 .kz-evt__dag{display:block;font-family:var(--kz-evt-display);font-weight:700;text-transform:uppercase;letter-spacing:-0.04em;font-size:22px;color:var(--kz-evt-red);margin-bottom:8px}
@@ -68,7 +69,8 @@
 }
 /* Pas bij echt smalle blokken (telefoon) komt de datum boven de tekst. */
 @container kz-evt (max-width:420px){
-  .kz-evt__body{grid-template-columns:1fr}
+  .kz-evt__body{grid-template-columns:1fr;grid-template-rows:auto auto 1fr}
+  .kz-evt--zonder-datum .kz-evt__body{grid-template-rows:auto 1fr}
   .kz-evt__datum{width:140px}
   .kz-evt__dd{font-size:64px}
   .kz-evt__tijd{font-size:20px}

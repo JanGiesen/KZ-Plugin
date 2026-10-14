@@ -50,7 +50,8 @@
  *
  * 8.4.1: KZ-Evenement Info — datum blijft naast de tekst tot een blok-
  * breedte van 420px (daarvoor al vanaf 600px eronder), en de datum mag
- * ook zonder jaartal (dd/mm) worden ingevuld.
+ * ook zonder jaartal (dd/mm) worden ingevuld. Blokken die naast elkaar
+ * staan worden even hoog, met de knop onderaan.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -194,6 +195,7 @@ class KZ_Plugin {
         wp_register_style( 'swiper', KZ_PLUGIN_URL . 'assets/vendor/swiper/swiper-bundle.min.css', array(), '11' );
         wp_register_script( 'swiper', KZ_PLUGIN_URL . 'assets/vendor/swiper/swiper-bundle.min.js', array(), '11', true );
         wp_register_script( 'kz-carousel', KZ_PLUGIN_URL . 'assets/js/kz-carousel.js', array( 'swiper' ), KZ_PLUGIN_VERSION, true );
+        wp_register_script( 'kz-evenement-info', KZ_PLUGIN_URL . 'assets/js/kz-evenement-info.js', array(), KZ_PLUGIN_VERSION, true );
         wp_register_script( 'kz-tab-widget', KZ_PLUGIN_URL . 'assets/js/kz-tab-widget.js', array(), KZ_PLUGIN_VERSION, true );
     }
 
