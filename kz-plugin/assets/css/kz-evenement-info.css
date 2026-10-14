@@ -59,8 +59,18 @@
   .kz-evt__top{flex-direction:column;align-items:flex-start;gap:16px;padding:22px 20px}
   .kz-evt__logo{width:64px}
   .kz-evt .kz-evt__titel{font-size:42px}
-  .kz-evt__body{grid-template-columns:1fr;gap:20px;padding:20px}
-  .kz-evt__datum{width:140px}
-    .kz-evt .kz-evt__knop{font-size:24px}
+  .kz-evt__body{gap:20px;padding:20px}
+  .kz-evt__datum{width:124px}
+  .kz-evt__dd{font-size:52px}
+  .kz-evt__tijd{font-size:17px}
+  .kz-evt .kz-evt__knop{font-size:24px}
   .kz-evt__klein{text-align:center}
+}
+/* Pas bij echt smalle blokken (telefoon) komt de datum boven de tekst. */
+@container kz-evt (max-width:420px){
+  .kz-evt__body{grid-template-columns:1fr}
+  .kz-evt__datum{width:140px}
+  .kz-evt__dd{font-size:64px}
+  .kz-evt__tijd{font-size:20px}
+  .kz-evt .kz-evt__knop{font-size:20px}
 }

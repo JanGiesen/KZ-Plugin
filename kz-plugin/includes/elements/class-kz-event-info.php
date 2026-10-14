@@ -100,7 +100,7 @@ class KZ_Element_Event_Info {
                         'heading'     => __( 'Datum', 'kz-plugin' ),
                         'param_name'  => 'datum',
                         'value'       => '',
-                        'description' => __( 'Formaat dd-mm-jjjj (bijv. 27-11-2026). De dag van de week wordt automatisch ingevuld. Leeg = geen datumblok.', 'kz-plugin' ),
+                        'description' => __( 'Formaat dd-mm-jjjj (bijv. 27-11-2026) of dd/mm (bijv. 27/11). De dag van de week wordt automatisch ingevuld. Leeg = geen datumblok.', 'kz-plugin' ),
                         'admin_label' => true,
                         'group'       => __( 'Datum & tijd', 'kz-plugin' ),
                     ),
@@ -369,11 +369,18 @@ class KZ_Element_Event_Info {
         if ( '' === $waarde ) {
             return null;
         }
-        foreach ( array( '!d-m-Y', '!d/m/Y', '!d.m.Y', '!Y-m-d' ) as $formaat ) {
+        foreach ( array( '!d-m-Y', '!d/m/Y', '!d.m.Y', '!Y-m-d', '!d-m', '!d/m', '!d.m' ) as $formaat ) {
             $datum  = DateTime::createFromFormat( $formaat, $waarde );
             $fouten = DateTime::getLastErrors();
             // Ongeldige data als 31-02-2026 geven een waarschuwing in plaats van een fout.
             if ( $datum && ( ! $fouten || ( 0 === $fouten['warning_count'] && 0 === $fouten['error_count'] ) ) ) {
+                // Zonder jaartal (bijv. 14/11): dit jaar, of volgend jaar als die dag al ruim voorbij is.
+                if ( false === strpos( $formaat, 'Y' ) ) {
+                    $datum->setDate( (int) current_time( 'Y' ), (int) $datum->format( 'm' ), (int) $datum->format( 'd' ) );
+                    if ( $datum->format( 'Y-m-d' ) < gmdate( 'Y-m-d', strtotime( current_time( 'Y-m-d' ) . ' -2 months' ) ) ) {
+                        $datum->modify( '+1 year' );
+                    }
+                }
                 return $datum;
             }
         }
