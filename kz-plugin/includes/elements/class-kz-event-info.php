@@ -139,12 +139,25 @@ class KZ_Element_Event_Info {
                         'heading'     => __( 'Status', 'kz-plugin' ),
                         'param_name'  => 'status',
                         'value'       => array(
-                            'Kaarten beschikbaar' => 'open',
-                            'Uitverkocht'         => 'uitverkocht',
+                            'Kaarten beschikbaar'            => 'open',
+                            'Kaartverkoop nog niet gestart' => 'binnenkort',
+                            'Uitverkocht'                   => 'uitverkocht',
                         ),
                         'std'         => 'open',
-                        'description' => __( 'Bij "Uitverkocht" wordt de knop grijs en niet klikbaar.', 'kz-plugin' ),
+                        'description' => __( 'Bij "nog niet gestart" en "Uitverkocht" is de knop niet klikbaar.', 'kz-plugin' ),
                         'group'       => __( 'Kaarten', 'kz-plugin' ),
+                    ),
+                    array(
+                        'type'        => 'textfield',
+                        'heading'     => __( 'Start kaartverkoop', 'kz-plugin' ),
+                        'param_name'  => 'verkoop_start',
+                        'value'       => '',
+                        'description' => __( 'Optioneel, formaat dd-mm-jjjj. De knop toont dan "Kaartverkoop begint op 12/12" en wordt vanaf die dag vanzelf de bestelknop (als er een link is ingevuld). Leeg = "Kaartverkoop nog niet gestart".', 'kz-plugin' ),
+                        'group'       => __( 'Kaarten', 'kz-plugin' ),
+                        'dependency'  => array(
+                            'element' => 'status',
+                            'value'   => 'binnenkort',
+                        ),
                     ),
                     array(
                         'type'        => 'textarea',
@@ -192,6 +205,7 @@ class KZ_Element_Event_Info {
                 'link'         => '',
                 'knop_tekst'   => 'Kaarten bestellen',
                 'status'       => 'open',
+                'verkoop_start' => '',
                 'kleine_tekst' => '',
                 'max_width'    => '820px',
                 'el_class'     => '',
@@ -240,8 +254,24 @@ class KZ_Element_Event_Info {
         if ( '_blank' === $target && false === strpos( $rel, 'noopener' ) ) {
             $rel = trim( $rel . ' noopener' );
         }
-        $knop_tekst = $uitverkocht ? __( 'Uitverkocht', 'kz-plugin' ) : $atts['knop_tekst'];
-        $toon_knop  = $uitverkocht || '' !== $href;
+        // Kaartverkoop nog niet gestart: met startdatum gaat de knop vanaf die dag vanzelf open.
+        $binnenkort = false;
+        if ( 'binnenkort' === $atts['status'] ) {
+            $verkoop_start = self::parse_datum( $atts['verkoop_start'] );
+            $binnenkort    = ! $verkoop_start || '' === $href || $verkoop_start->format( 'Y-m-d' ) > current_time( 'Y-m-d' );
+        }
+
+        if ( $uitverkocht ) {
+            $knop_tekst = __( 'Uitverkocht', 'kz-plugin' );
+        } elseif ( $binnenkort ) {
+            $knop_tekst = $verkoop_start
+                /* translators: %s: startdatum kaartverkoop als dd/mm */
+                ? sprintf( __( 'Kaartverkoop begint op %s', 'kz-plugin' ), $verkoop_start->format( 'd/m' ) )
+                : __( 'Kaartverkoop nog niet gestart', 'kz-plugin' );
+        } else {
+            $knop_tekst = $atts['knop_tekst'];
+        }
+        $toon_knop = $uitverkocht || $binnenkort || '' !== $href;
 
         if ( function_exists( 'wpb_js_remove_wpautop' ) ) {
             $omschrijving = wpb_js_remove_wpautop( $content, true );
@@ -312,6 +342,8 @@ class KZ_Element_Event_Info {
                     <div class="kz-evt__actie">
                         <?php if ( $uitverkocht ) : ?>
                             <span class="kz-evt__knop kz-evt__knop--uit" aria-disabled="true"><span><?php echo esc_html( $knop_tekst ); ?></span></span>
+                        <?php elseif ( $binnenkort ) : ?>
+                            <span class="kz-evt__knop kz-evt__knop--binnenkort" aria-disabled="true"><span><?php echo esc_html( $knop_tekst ); ?></span></span>
                         <?php elseif ( $toon_knop ) : ?>
                             <a class="kz-evt__knop" href="<?php echo esc_url( $href ); ?>"<?php echo $target ? ' target="' . esc_attr( $target ) . '"' : ''; ?><?php echo $rel ? ' rel="' . esc_attr( $rel ) . '"' : ''; ?>><span><?php echo esc_html( $knop_tekst ); ?></span></a>
                         <?php endif; ?>

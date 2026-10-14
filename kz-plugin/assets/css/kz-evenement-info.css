@@ -50,6 +50,7 @@
 .kz-evt .kz-evt__knop:active{background:var(--kz-evt-red-darker)}
 .kz-evt .kz-evt__knop:focus-visible{outline:3px solid var(--kz-evt-black);outline-offset:3px}
 .kz-evt__knop--uit{opacity:.5;cursor:not-allowed;pointer-events:none}
+.kz-evt .kz-evt__knop--binnenkort{background:var(--kz-evt-white);color:var(--kz-evt-red)!important;border-style:dashed;cursor:default;pointer-events:none}
 .kz-evt__klein{grid-column:1/-1;font-size:14px;margin-top:-12px}
 
 /* Reageert op de breedte van het blok zelf, niet van het scherm, zodat twee
@@ -60,5 +61,6 @@
   .kz-evt .kz-evt__titel{font-size:42px}
   .kz-evt__body{grid-template-columns:1fr;gap:20px;padding:20px}
   .kz-evt__datum{width:140px}
-    .kz-evt__klein{text-align:center}
+    .kz-evt .kz-evt__knop{font-size:24px}
+  .kz-evt__klein{text-align:center}
 }
