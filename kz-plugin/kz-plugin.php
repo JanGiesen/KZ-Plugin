@@ -3,7 +3,7 @@
  * Plugin Name: KZ Plugin
  * Plugin URI: https://github.com/JanGiesen/KZ-Plugin
  * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, evenement info).
- * Version: 8.4.0
+ * Version: 8.4.1
  * Author: Kraonige Zwaone
  * Text Domain: kz-plugin
  * Update URI: https://github.com/JanGiesen/KZ-Plugin
@@ -47,13 +47,18 @@
  * 8.4.0: nieuw element KZ-Evenement Info — infoblok voor de ticketpagina
  * met rode kop, logo, datumblok, omschrijving, feitenlijst en kaartenknop
  * (shortcode kz_evenement_info).
+ *
+ * 8.4.1: KZ-Evenement Info — datum blijft naast de tekst tot een blok-
+ * breedte van 420px (daarvoor al vanaf 600px eronder), en de datum mag
+ * ook zonder jaartal (dd/mm) worden ingevuld. Blokken die naast elkaar
+ * staan worden even hoog, met de knop onderaan.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Directe toegang niet toegestaan.
 }
 
-define( 'KZ_PLUGIN_VERSION', '8.4.0' );
+define( 'KZ_PLUGIN_VERSION', '8.4.1' );
 define( 'KZ_PLUGIN_FILE', __FILE__ );
 define( 'KZ_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KZ_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -190,6 +195,7 @@ class KZ_Plugin {
         wp_register_style( 'swiper', KZ_PLUGIN_URL . 'assets/vendor/swiper/swiper-bundle.min.css', array(), '11' );
         wp_register_script( 'swiper', KZ_PLUGIN_URL . 'assets/vendor/swiper/swiper-bundle.min.js', array(), '11', true );
         wp_register_script( 'kz-carousel', KZ_PLUGIN_URL . 'assets/js/kz-carousel.js', array( 'swiper' ), KZ_PLUGIN_VERSION, true );
+        wp_register_script( 'kz-evenement-info', KZ_PLUGIN_URL . 'assets/js/kz-evenement-info.js', array(), KZ_PLUGIN_VERSION, true );
         wp_register_script( 'kz-tab-widget', KZ_PLUGIN_URL . 'assets/js/kz-tab-widget.js', array(), KZ_PLUGIN_VERSION, true );
     }
 
