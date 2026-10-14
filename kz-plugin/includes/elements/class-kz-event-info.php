@@ -16,6 +16,10 @@ class KZ_Element_Event_Info {
 
     private static $dagen = array( 'Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag' );
 
+    private static $dagen_kort = array( 'Zo', 'Ma', 'Di', 'Wo', 'Do', 'Vr', 'Za' );
+
+    private static $maanden_kort = array( 'Jan', 'Feb', 'Mrt', 'Apr', 'Mei', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec' );
+
     public static function register_shortcode() {
         add_shortcode( self::SHORTCODE, array( __CLASS__, 'render' ) );
     }
@@ -311,13 +315,20 @@ class KZ_Element_Event_Info {
                 <div class="kz-evt__balk" aria-hidden="true"></div>
 
                 <?php if ( $toon_datum ) : ?>
-                    <div class="kz-evt__datum">
+                    <div class="kz-evt__datum<?php echo ( $datum && '' === trim( $atts['dag_tekst'] ) ) ? ' kz-evt__datum--auto' : ''; ?>">
                         <?php if ( '' !== $dag_tekst ) : ?>
                             <span class="kz-evt__dag"><?php echo esc_html( $dag_tekst ); ?></span>
                         <?php endif; ?>
                         <div class="kz-evt__blok">
                             <?php if ( $datum ) : ?>
-                                <span class="kz-evt__dd"><?php echo esc_html( $datum->format( 'd/m' ) ); ?></span>
+                                <span class="kz-evt__dd kz-evt__dd--kort"><?php echo esc_html( $datum->format( 'd/m' ) ); ?></span>
+                                <?php // Uitgeschreven variant voor de brede ticket op telefoon, bijv. "Za 14 Nov". ?>
+                                <span class="kz-evt__dd kz-evt__dd--lang"><?php
+                                    echo esc_html(
+                                        ( '' === trim( $atts['dag_tekst'] ) ? self::$dagen_kort[ (int) $datum->format( 'w' ) ] . ' ' : '' )
+                                        . $datum->format( 'j' ) . ' ' . self::$maanden_kort[ (int) $datum->format( 'n' ) - 1 ]
+                                    );
+                                ?></span>
                             <?php elseif ( '' !== trim( $atts['datum'] ) ) : ?>
                                 <span class="kz-evt__dd"><?php echo esc_html( $atts['datum'] ); ?></span>
                             <?php endif; ?>

@@ -55,6 +55,10 @@
  *
  * 8.4.2: KZ-Evenement Info — titel blijft naast het logo tot 420px
  * blokbreedte, net als de datum naast de tekst.
+ *
+ * 8.4.3: KZ-Evenement Info — op telefoonbreedte geen logo, en het
+ * datumticket over de volle breedte met uitgeschreven datum ("ZA 14 NOV")
+ * in plaats van 14/11 en de losse dagnaam erboven.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
