@@ -6,7 +6,7 @@ Deze monorepo bevat twee plugins:
 
 | Map | Plugin | Doel |
 |---|---|---|
-| `kz-plugin/` | **KZ Plugin** | WPBakery-elementen: post carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, recente galerijen, winkel producten, evenement info, evenementen overzicht (+ post type `kz_evenement` voor KZ-Studio) |
+| `kz-plugin/` | **KZ Plugin** | WPBakery-elementen: post carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, recente galerijen, winkel producten, evenement info, evenementen overzicht (+ post type `kz_evenement` voor KZ-Studio), en de Link-In-Bio-pagina op link.kraonigezwaone.nl |
 | `kz-contentmanager-plugin/` | **KZ Contentmanager Plugin** | Haalt content op uit Google Docs en toont die via de shortcode `[kz-content]` |
 
 Beide plugins zijn samenvoegingen/opvolgers van eerder losse plugins (KZ-Kraonige Zwaone Plugin 7.1, KZ Vindt, KZH Ticket Element, KZ-Kraonige Zwaone Contentmanager 2.0.0). Alle shortcode-namen en parameters zijn ongewijzigd overgenomen zodat bestaande content op de site blijft werken. Bij activatie deactiveren de nieuwe plugins automatisch de oude losse plugins (met een melding in het dashboard) om dubbele shortcode-registratie te voorkomen.
@@ -19,10 +19,31 @@ Beide plugins zijn samenvoegingen/opvolgers van eerder losse plugins (KZ-Kraonig
 
 ## Instellingenpagina's
 
-- **KZ Plugin**: menu "KZ Plugin" — overzicht van alle elementen met shortcode en parameters, per element aan/uit-schakelaar (uitschakelen zet de render leeg maar houdt de shortcode geregistreerd, zodat content nooit een kale shortcode-tekst toont), updatestatus + "Nu controleren op updates".
+- **KZ Plugin**: menu "KZ Plugin" — overzicht van alle elementen met shortcode en parameters, per element aan/uit-schakelaar (uitschakelen zet de render leeg maar houdt de shortcode geregistreerd, zodat content nooit een kale shortcode-tekst toont), updatestatus + "Nu controleren op updates", en de Supabase-koppeling voor de Link-In-Bio.
 - **KZ Contentmanager Plugin**: menu "KZ Contentmanager" — documentenoverzicht met shortcodes, synchronisatie, instellingen (Google API key, Drive-map, webhook-URL, rate limit), en een Updates-tab.
 
 Beide plugins delen de optie `kz_github_token` voor toegang tot een private GitHub-repo (zie hieronder).
+
+## Link-In-Bio (link.kraonigezwaone.nl)
+
+Sinds 8.8.0 tekent KZ Plugin een eigen "linktree": logo, kop, omschrijving, socials-iconen en grote knoppen (met of zonder icoon), in het rode of witte thema van het stijlboek. De inhoud beheer je in **KZ-Studio → Website → Link-In-Bio**; die staat in Supabase en de plugin haalt hem op via de openbare functie `link_in_bio_ophalen()` (KZ-Studio-migratie `0040_link_in_bio.sql`). Ophalen gebeurt hooguit eens per minuut; lukt het niet, dan blijft de laatste goede versie staan.
+
+De pagina staat:
+
+- op **https://link.kraonigezwaone.nl** — elk pad op dat subdomein behalve `/wp-…` toont de pagina;
+- als reserve op **/link-in-bio/** van de gewone site.
+
+De pagina is losse HTML (`includes/class-kz-link-in-bio.php` + `assets/css/kz-link-in-bio.css`), buiten het thema om, zodat hij snel laadt in de browser van Instagram en TikTok.
+
+### Eenmalig instellen
+
+1. **KZ-Studio**: migratie `0040_link_in_bio.sql` draaien (zie `supabase/README.md`, hoofdstuk 19, in die repo).
+2. **WordPress → KZ Plugin → Link-In-Bio**: het Supabase-adres (staat al ingevuld) en de **anon**-key van KZ-Studio invullen (Supabase → Project Settings → API). Nooit de service-role key. Opslaan, en met "Link-In-Bio nu opnieuw ophalen" controleren dat "Laatst opgehaald" op *gelukt* staat.
+3. **Hosting/DNS**: het subdomein `link.kraonigezwaone.nl` moet naar **dezelfde WordPress-installatie** wijzen als de site. Bij de meeste hosts heet dat een *alias*, *domeinalias* of *extra domein* met dezelfde map (document root) als de site; plus een SSL-certificaat voor het subdomein (bijv. Let's Encrypt). Een *redirect* is niet genoeg — dan komt de bezoeker op de hoofdsite uit.
+   - Kan dat bij de host niet, stel het subdomein dan in als **doorverwijzing naar `https://www.kraonigezwaone.nl/link-in-bio/`**. Dat werkt meteen, alleen staat dan dat adres in de adresbalk.
+4. Een pagina-cacheplugin moet het subdomein als eigen host behandelen (de meeste doen dat vanzelf). De pagina stuurt zelf `Cache-Control: max-age=60`.
+
+Iconen, de URL-regel (`https://`, `http://`, `mailto:`, `tel:` — nooit `javascript:`) en de CSS staan ook in KZ-Studio, voor het voorbeeld in het beheerscherm (`src/lib/linkInBio.ts`, `src/pages/website/linkInBio.css`). Houd die gelijk.
 
 ## Automatische updates
 

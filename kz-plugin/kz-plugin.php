@@ -3,7 +3,7 @@
  * Plugin Name: KZ Plugin
  * Plugin URI: https://github.com/JanGiesen/KZ-Plugin
  * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, evenement info, evenementen overzicht).
- * Version: 8.7.0
+ * Version: 8.8.0
  * Author: Kraonige Zwaone
  * Text Domain: kz-plugin
  * Update URI: https://github.com/JanGiesen/KZ-Plugin
@@ -85,13 +85,18 @@
  * seizoen (bijv. 2026-2027, meta kz_seizoen, leeg = huidig seizoen) in
  * plaats van een datum. Ook als losse uitvoering van KZ-Evenement Info
  * (parameters variant en seizoen).
+ *
+ * 8.8.0: Link-In-Bio — eigen "linktree" op link.kraonigezwaone.nl (en
+ * /link-in-bio/ op de gewone site) met logo, socials en knoppen. De inhoud
+ * komt uit KZ-Studio (Website → Link-In-Bio) via Supabase; instellingen
+ * onder KZ Plugin → Link-In-Bio.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Directe toegang niet toegestaan.
 }
 
-define( 'KZ_PLUGIN_VERSION', '8.7.0' );
+define( 'KZ_PLUGIN_VERSION', '8.8.0' );
 define( 'KZ_PLUGIN_FILE', __FILE__ );
 define( 'KZ_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KZ_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -144,6 +149,9 @@ class KZ_Plugin {
 
         // Post type voor evenementen uit KZ-Studio (REST: wp/v2/kz-evenementen).
         KZ_Evenementen::init();
+
+        // Link-In-Bio op link.kraonigezwaone.nl (inhoud uit KZ-Studio).
+        KZ_Link_In_Bio::init();
     }
 
     private function load_dependencies() {
@@ -163,6 +171,7 @@ class KZ_Plugin {
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-event-info.php';
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-event-overview.php';
         require_once KZ_PLUGIN_PATH . 'includes/class-kz-evenementen.php';
+        require_once KZ_PLUGIN_PATH . 'includes/class-kz-link-in-bio.php';
     }
 
     /**

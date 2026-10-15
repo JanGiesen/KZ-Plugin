@@ -81,6 +81,7 @@ class KZ_Admin {
         add_action( 'admin_menu', array( $this, 'add_menu' ) );
         add_action( 'admin_post_kz_plugin_save_settings', array( $this, 'save_settings' ) );
         add_action( 'admin_post_kz_plugin_check_updates', array( $this, 'handle_check_updates' ) );
+        add_action( 'admin_post_kz_plugin_link_in_bio_verversen', array( $this, 'handle_link_in_bio_verversen' ) );
     }
 
     public static function get_disabled_elements() {
@@ -128,6 +129,14 @@ class KZ_Admin {
             update_option( 'kz_github_token', sanitize_text_field( wp_unslash( $_POST['kz_github_token'] ) ) );
         }
 
+        if ( isset( $_POST['kz_link_in_bio_supabase_url'] ) ) {
+            update_option( KZ_Link_In_Bio::OPTIE_URL, untrailingslashit( esc_url_raw( trim( wp_unslash( $_POST['kz_link_in_bio_supabase_url'] ) ), array( 'https' ) ) ) );
+        }
+        if ( isset( $_POST['kz_link_in_bio_supabase_key'] ) ) {
+            update_option( KZ_Link_In_Bio::OPTIE_SLEUTEL, sanitize_text_field( wp_unslash( $_POST['kz_link_in_bio_supabase_key'] ) ), false );
+        }
+        KZ_Link_In_Bio::vergeet_cache();
+
         wp_safe_redirect( add_query_arg( array( 'page' => 'kz-plugin', 'kz_saved' => '1' ), admin_url( 'admin.php' ) ) );
         exit;
     }
@@ -151,6 +160,21 @@ class KZ_Admin {
         exit;
     }
 
+    /** Haalt de Link-In-Bio meteen opnieuw op, zonder op de cache te wachten. */
+    public function handle_link_in_bio_verversen() {
+        check_admin_referer( 'kz_plugin_link_in_bio_verversen' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( 'Geen toegang' );
+        }
+
+        KZ_Link_In_Bio::vergeet_cache();
+        KZ_Link_In_Bio::gegevens();
+
+        wp_safe_redirect( add_query_arg( array( 'page' => 'kz-plugin', 'kz_link_ververst' => '1' ), admin_url( 'admin.php' ) ) . '#kz-link-in-bio' );
+        exit;
+    }
+
     public function render_page() {
         if ( ! current_user_can( 'manage_options' ) ) {
             return;
@@ -160,6 +184,9 @@ class KZ_Admin {
         $github_token      = get_option( 'kz_github_token', '' );
         $latest_release    = $this->updater->get_latest_release();
         $current_version   = $this->updater->get_current_version();
+        $link_url          = get_option( KZ_Link_In_Bio::OPTIE_URL, KZ_Link_In_Bio::STANDAARD_URL );
+        $link_sleutel      = get_option( KZ_Link_In_Bio::OPTIE_SLEUTEL, '' );
+        $link_status       = get_option( KZ_Link_In_Bio::OPTIE_STATUS );
         ?>
         <div class="wrap kz-plugin-admin">
             <h1>KZ Plugin</h1>
@@ -169,6 +196,9 @@ class KZ_Admin {
             <?php endif; ?>
             <?php if ( isset( $_GET['kz_checked'] ) ) : ?>
                 <div class="notice notice-success is-dismissible"><p>Update-controle uitgevoerd.</p></div>
+            <?php endif; ?>
+            <?php if ( isset( $_GET['kz_link_ververst'] ) ) : ?>
+                <div class="notice notice-success is-dismissible"><p>Link-In-Bio opnieuw opgehaald.</p></div>
             <?php endif; ?>
 
             <h2>Updates</h2>
@@ -235,6 +265,41 @@ class KZ_Admin {
                     </tbody>
                 </table>
 
+                <h2 id="kz-link-in-bio" style="margin-top: 30px;">Link-In-Bio</h2>
+                <p>
+                    De pagina op <a href="<?php echo esc_url( KZ_Link_In_Bio::pagina_url() ); ?>" target="_blank" rel="noopener"><?php echo esc_html( KZ_Link_In_Bio::HOST ); ?></a>
+                    (en als reserve op <a href="<?php echo esc_url( home_url( '/' . KZ_Link_In_Bio::PAD . '/' ) ); ?>" target="_blank" rel="noopener"><?php echo esc_html( '/' . KZ_Link_In_Bio::PAD . '/' ); ?></a>).
+                    De inhoud beheer je in KZ-Studio onder Website &rarr; Link-In-Bio; deze site haalt die elke minuut op.
+                    Vul hier het Supabase-adres en de <strong>anon</strong>-key van KZ-Studio in (Supabase &rarr; Project Settings &rarr; API) &mdash; nooit de service-role key.
+                </p>
+                <table class="form-table" role="presentation" style="max-width: 700px;">
+                    <tr>
+                        <th scope="row"><label for="kz-link-url">Supabase-adres</label></th>
+                        <td><input type="url" id="kz-link-url" name="kz_link_in_bio_supabase_url" value="<?php echo esc_attr( $link_url ); ?>" class="regular-text" placeholder="https://….supabase.co" /></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="kz-link-sleutel">Anon-key</label></th>
+                        <td><input type="text" id="kz-link-sleutel" name="kz_link_in_bio_supabase_key" value="<?php echo esc_attr( $link_sleutel ); ?>" class="large-text code" autocomplete="off" spellcheck="false" placeholder="eyJ…" /></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Laatst opgehaald</th>
+                        <td>
+                            <?php
+                            if ( is_array( $link_status ) ) {
+                                echo esc_html( wp_date( 'j F Y H:i:s', (int) $link_status['tijd'] ) ) . ' &mdash; ';
+                                if ( $link_status['ok'] ) {
+                                    echo '<span style="color:#008a20;">gelukt</span> (' . esc_html( $link_status['melding'] ) . ')';
+                                } else {
+                                    echo '<span style="color:#d63638;">mislukt</span>: ' . esc_html( $link_status['melding'] );
+                                }
+                            } else {
+                                echo 'Nog niet.';
+                            }
+                            ?>
+                        </td>
+                    </tr>
+                </table>
+
                 <h2 style="margin-top: 30px;">GitHub-token (optioneel)</h2>
                 <p>Alleen nodig zolang de plugin-repository privé is. Fine-grained token met alleen leestoegang tot deze repo.</p>
                 <input type="text" name="kz_github_token" value="<?php echo esc_attr( $github_token ); ?>" class="regular-text" placeholder="ghp_..." />
@@ -242,6 +307,12 @@ class KZ_Admin {
                 <p class="submit">
                     <button type="submit" class="button button-primary">Instellingen opslaan</button>
                 </p>
+            </form>
+
+            <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+                <?php wp_nonce_field( 'kz_plugin_link_in_bio_verversen' ); ?>
+                <input type="hidden" name="action" value="kz_plugin_link_in_bio_verversen" />
+                <button type="submit" class="button button-secondary">Link-In-Bio nu opnieuw ophalen</button>
             </form>
         </div>
         <?php
