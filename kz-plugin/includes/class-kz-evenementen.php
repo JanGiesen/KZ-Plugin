@@ -5,6 +5,7 @@
  * het element KZ-Evenementen Overzicht.
  *
  * Zichtbaar in het overzicht = status "publish", onzichtbaar = "draft".
+ * Daarnaast verdwijnt een evenement vanzelf: zie is_verlopen().
  * De velden zijn dezelfde als die van het losse element KZ-Evenement Info.
  */
 
@@ -54,6 +55,7 @@ class KZ_Evenementen {
             'kz_datum'        => array( __CLASS__, 'schoon_datum' ),
             'kz_verkoop_start' => array( __CLASS__, 'schoon_datum' ),
             'kz_status'       => array( __CLASS__, 'schoon_status' ),
+            'kz_categorie'    => 'sanitize_text_field',
         );
         foreach ( $tekst as $sleutel => $schoonmaker ) {
             self::register_meta( $sleutel, 'string', '', $schoonmaker, true );
@@ -122,6 +124,137 @@ class KZ_Evenementen {
             );
         }
         return $schoon;
+    }
+
+    /* --- Tijd en volgorde ----------------------------------------------------
+     * Deze regels staan ook in KZ-Studio (src/lib/evenementTijd.ts); houd ze
+     * gelijk, anders toont KZ-Studio iets anders dan de website.
+     */
+
+    /** De n-de tijd (0 = start, 1 = eind) uit vrije tekst als "20:11 - 02:00", als "HH:MM". */
+    private static function tijd_uit( $tijd, $n ) {
+        if ( preg_match_all( '/(\d{1,2})[:.](\d{2})/', (string) $tijd, $treffers, PREG_SET_ORDER ) && isset( $treffers[ $n ] ) ) {
+            return sprintf( '%02d:%s', (int) $treffers[ $n ][1], $treffers[ $n ][2] );
+        }
+        return null;
+    }
+
+    public static function starttijd( $tijd ) {
+        $start = self::tijd_uit( $tijd, 0 );
+        return null === $start ? '00:00' : $start;
+    }
+
+    /** "jjjj-mm-dd HH:MM", of leeg zonder datum (die komen achteraan). */
+    public static function sorteersleutel( $post ) {
+        $datum = (string) get_post_meta( $post->ID, 'kz_datum', true );
+        if ( '' === $datum ) {
+            return '';
+        }
+        return $datum . ' ' . self::starttijd( get_post_meta( $post->ID, 'kz_tijd', true ) );
+    }
+
+    /**
+     * Verlopen = vanaf twee dagen na het einde. Het einde is de datum, of de dag
+     * erna als de eindtijd na middernacht valt ("20:11 - 02:00"). Een evenement
+     * op 14/11 staat dus op 15/11 nog op de site en is vanaf 16/11 weg.
+     */
+    public static function is_verlopen( $post, $vandaag = null ) {
+        $datum = (string) get_post_meta( $post->ID, 'kz_datum', true );
+        if ( '' === $datum ) {
+            return false;
+        }
+        $tijd  = get_post_meta( $post->ID, 'kz_tijd', true );
+        $eind  = self::tijd_uit( $tijd, 1 );
+        $dagen = ( null !== $eind && $eind < self::starttijd( $tijd ) ) ? 3 : 2;
+        $grens = gmdate( 'Y-m-d', strtotime( $datum . ' 00:00:00 UTC +' . $dagen . ' days' ) );
+        return ( null === $vandaag ? current_time( 'Y-m-d' ) : $vandaag ) >= $grens;
+    }
+
+    /** Alle gepubliceerde evenementen, gesorteerd op datum + starttijd (zonder datum achteraan). */
+    public static function gesorteerd( $categorie = '' ) {
+        $args = array(
+            'post_type'        => self::POST_TYPE,
+            'post_status'      => 'publish',
+            'posts_per_page'   => -1,
+            'no_found_rows'    => true,
+            'suppress_filters' => false,
+        );
+        if ( '' !== $categorie ) {
+            $args['meta_query'] = array(
+                array(
+                    'key'   => 'kz_categorie',
+                    'value' => $categorie,
+                ),
+            );
+        }
+
+        $rijen = array();
+        foreach ( get_posts( $args ) as $post ) {
+            $rijen[] = array( 'sleutel' => self::sorteersleutel( $post ), 'post' => $post );
+        }
+        usort(
+            $rijen,
+            function ( $a, $b ) {
+                if ( '' === $a['sleutel'] || '' === $b['sleutel'] ) {
+                    return ( '' === $a['sleutel'] ) - ( '' === $b['sleutel'] );
+                }
+                return strcmp( $a['sleutel'], $b['sleutel'] );
+            }
+        );
+        return wp_list_pluck( $rijen, 'post' );
+    }
+
+    /**
+     * Voor KZ-Evenement Info in automatische stand: het eerstvolgende evenement
+     * in de categorie dat nog niet verlopen is, en anders het laatst gehouden.
+     *
+     * @return WP_Post|null
+     */
+    public static function kies_automatisch( $categorie ) {
+        $laatste = null;
+        foreach ( self::gesorteerd( $categorie ) as $post ) {
+            if ( '' === (string) get_post_meta( $post->ID, 'kz_datum', true ) ) {
+                continue;
+            }
+            if ( ! self::is_verlopen( $post ) ) {
+                return $post;
+            }
+            $laatste = $post;
+        }
+        return $laatste;
+    }
+
+    /** Gebruikte categorieën, voor de keuzelijsten in WPBakery. */
+    public static function categorieen() {
+        global $wpdb;
+        $waarden = $wpdb->get_col(
+            $wpdb->prepare(
+                "SELECT DISTINCT pm.meta_value FROM {$wpdb->postmeta} pm
+                 INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+                 WHERE pm.meta_key = %s AND pm.meta_value <> '' AND p.post_type = %s AND p.post_status IN ('publish', 'draft')
+                 ORDER BY pm.meta_value",
+                'kz_categorie',
+                self::POST_TYPE
+            )
+        );
+        return is_array( $waarden ) ? $waarden : array();
+    }
+
+    /**
+     * Keuzelijst voor vc_map: eerst de optie zonder categorie, dan de gebruikte
+     * categorieën. Een eerder gekozen categorie die (nog) niet bestaat blijft
+     * zo geldig in de shortcode, ook al staat hij niet in de lijst.
+     */
+    public static function categorie_opties( $leeg_label ) {
+        $opties = array( $leeg_label => '' );
+        // vc_map draait op elke pagina; alleen in de editor is de lijst nodig.
+        if ( ! is_admin() && empty( $_GET['vc_editable'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+            return $opties;
+        }
+        foreach ( self::categorieen() as $categorie ) {
+            $opties[ $categorie ] = $categorie;
+        }
+        return $opties;
     }
 
     /**

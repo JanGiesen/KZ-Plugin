@@ -29,6 +29,7 @@ class KZ_Element_Event_Info {
             return;
         }
         vc_map(
+            self::met_bron(
             array(
                 'name'        => __( 'KZ-Evenement Info', 'kz-plugin' ),
                 'base'        => self::SHORTCODE,
@@ -40,7 +41,7 @@ class KZ_Element_Event_Info {
                         'type'        => 'textfield',
                         'heading'     => __( 'Label', 'kz-plugin' ),
                         'param_name'  => 'label',
-                        'value'       => 'Kom ook',
+                        'value'       => '',
                         'description' => __( 'Klein wit label boven de titel, bijv. "Wij gaan naar de film". Leeg = geen label.', 'kz-plugin' ),
                         'admin_label' => true,
                         'group'       => __( 'Inhoud', 'kz-plugin' ),
@@ -71,6 +72,7 @@ class KZ_Element_Event_Info {
                                 array(
                                     array( 'label' => 'Waar', 'waarde' => '' ),
                                     array( 'label' => 'Prijs', 'waarde' => '' ),
+                                    array( 'label' => 'Tijden', 'waarde' => '' ),
                                 )
                             )
                         ),
@@ -193,13 +195,78 @@ class KZ_Element_Event_Info {
                     ),
                 ),
             )
+            )
         );
     }
 
+    /**
+     * Zet de keuze "Bron" vooraan en laat alle inhoudsvelden alleen zien bij
+     * handmatig invullen. Bij automatisch komt de inhoud uit het eerstvolgende
+     * evenement in KZ-Studio (zie KZ_Evenementen::kies_automatisch()).
+     */
+    private static function met_bron( $map ) {
+        $handmatig = array( __( 'Inhoud', 'kz-plugin' ), __( 'Datum & tijd', 'kz-plugin' ), __( 'Kaarten', 'kz-plugin' ) );
+        foreach ( $map['params'] as $i => $param ) {
+            if ( isset( $param['group'] ) && in_array( $param['group'], $handmatig, true ) && ! isset( $param['dependency'] ) ) {
+                $map['params'][ $i ]['dependency'] = array(
+                    'element' => 'bron',
+                    'value'   => 'handmatig',
+                );
+            }
+        }
+
+        array_unshift(
+            $map['params'],
+            array(
+                'type'        => 'dropdown',
+                'heading'     => __( 'Bron', 'kz-plugin' ),
+                'param_name'  => 'bron',
+                'value'       => array(
+                    __( 'Handmatig invullen', 'kz-plugin' )                            => 'handmatig',
+                    __( 'Automatisch: eerstvolgend evenement uit KZ-Studio', 'kz-plugin' ) => 'automatisch',
+                ),
+                'std'         => 'handmatig',
+                'description' => __( 'Automatisch toont het eerstvolgende evenement uit de gekozen categorie, of het laatst gehouden als er geen nieuw is.', 'kz-plugin' ),
+                'admin_label' => true,
+            ),
+            array(
+                'type'        => 'dropdown',
+                'heading'     => __( 'Categorie', 'kz-plugin' ),
+                'param_name'  => 'categorie',
+                'value'       => KZ_Evenementen::categorie_opties( __( 'Alle categorieën', 'kz-plugin' ) ),
+                'std'         => '',
+                'admin_label' => true,
+                'dependency'  => array(
+                    'element' => 'bron',
+                    'value'   => 'automatisch',
+                ),
+            )
+        );
+
+        return $map;
+    }
+
     public static function render( $atts, $content = '' ) {
+        // Automatisch: de inhoud komt uit KZ-Studio, de opmaak van dit blok blijft.
+        if ( is_array( $atts ) && isset( $atts['bron'] ) && 'automatisch' === $atts['bron'] ) {
+            $post = class_exists( 'KZ_Evenementen' ) ? KZ_Evenementen::kies_automatisch( isset( $atts['categorie'] ) ? trim( $atts['categorie'] ) : '' ) : null;
+            if ( ! $post ) {
+                return '';
+            }
+            list( $auto_atts, $content ) = KZ_Evenementen::naar_atts( $post );
+            foreach ( array( 'max_width', 'el_class', 'css' ) as $sleutel ) {
+                if ( isset( $atts[ $sleutel ] ) ) {
+                    $auto_atts[ $sleutel ] = $atts[ $sleutel ];
+                } else {
+                    unset( $auto_atts[ $sleutel ] );
+                }
+            }
+            $atts = $auto_atts;
+        }
+
         $atts = shortcode_atts(
             array(
-                'label'        => 'Kom ook',
+                'label'        => '',
                 'titel'        => '',
                 'feiten'       => '',
                 'show_logo'    => 'true',
