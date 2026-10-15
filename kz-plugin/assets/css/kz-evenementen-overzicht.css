@@ -1,0 +1,12 @@
+/* KZ-Evenementen Overzicht — KZ-Evenement Info-blokken in een raster. */
+
+.kz-evt-overzicht{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px;align-items:stretch}
+.kz-evt-overzicht--1{grid-template-columns:minmax(0,1fr)}
+/* Blokken in dezelfde rij even hoog; de knop zakt mee naar onderen. */
+.kz-evt-overzicht__item{display:flex;min-width:0}
+.kz-evt-overzicht__item > .kz-evt{flex:1 1 auto;width:100%}
+.kz-evt-overzicht--leeg{display:block}
+
+@media (max-width:760px){
+  .kz-evt-overzicht{grid-template-columns:minmax(0,1fr);gap:20px}
+}
