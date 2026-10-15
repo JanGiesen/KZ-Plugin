@@ -56,6 +56,7 @@ class KZ_Evenementen {
             'kz_verkoop_start' => array( __CLASS__, 'schoon_datum' ),
             'kz_status'       => array( __CLASS__, 'schoon_status' ),
             'kz_categorie'    => 'sanitize_text_field',
+            'kz_seizoen'      => array( __CLASS__, 'schoon_seizoen' ),
         );
         foreach ( $tekst as $sleutel => $schoonmaker ) {
             self::register_meta( $sleutel, 'string', '', $schoonmaker, true );
@@ -108,6 +109,12 @@ class KZ_Evenementen {
         return preg_match( '/^\d{4}-\d{2}-\d{2}$/', $waarde ) ? $waarde : '';
     }
 
+    /** Alleen "jjjj-jjjj", anders leeg (= automatisch het huidige seizoen). */
+    public static function schoon_seizoen( $waarde ) {
+        $waarde = trim( (string) $waarde );
+        return preg_match( '/^\d{4}-\d{4}$/', $waarde ) ? $waarde : '';
+    }
+
     public static function schoon_status( $waarde ) {
         return in_array( $waarde, array( 'open', 'binnenkort', 'uitverkocht' ), true ) ? $waarde : 'open';
     }
@@ -124,6 +131,31 @@ class KZ_Evenementen {
             );
         }
         return $schoon;
+    }
+
+    /* --- Seizoenskaart -------------------------------------------------------
+     * Er is altijd precies één evenement met categorie "Seizoenskaart": het
+     * staat vooraan, verloopt nooit en toont een seizoen in plaats van een
+     * datum. Ook deze regels staan in KZ-Studio (src/lib/evenementTijd.ts).
+     */
+
+    public static function is_seizoenskaart( $post ) {
+        return 'seizoenskaart' === strtolower( trim( (string) get_post_meta( $post->ID, 'kz_categorie', true ) ) );
+    }
+
+    /**
+     * Het seizoen als "2026-2027": de ingevulde waarde, of anders het huidige
+     * seizoen (1 juni t/m 31 mei, zoals overal in KZ-Studio).
+     */
+    public static function seizoen_label( $waarde, $vandaag = null ) {
+        $waarde = self::schoon_seizoen( $waarde );
+        if ( '' !== $waarde ) {
+            return $waarde;
+        }
+        $vandaag = null === $vandaag ? current_time( 'Y-m-d' ) : $vandaag;
+        $jaar    = (int) substr( $vandaag, 0, 4 );
+        $maand   = (int) substr( $vandaag, 5, 2 );
+        return $maand >= 6 ? $jaar . '-' . ( $jaar + 1 ) : ( $jaar - 1 ) . '-' . $jaar;
     }
 
     /* --- Tijd en volgorde ----------------------------------------------------
@@ -159,6 +191,9 @@ class KZ_Evenementen {
      * op 14/11 staat dus op 15/11 nog op de site en is vanaf 16/11 weg.
      */
     public static function is_verlopen( $post, $vandaag = null ) {
+        if ( self::is_seizoenskaart( $post ) ) {
+            return false;
+        }
         $datum = (string) get_post_meta( $post->ID, 'kz_datum', true );
         if ( '' === $datum ) {
             return false;
@@ -170,7 +205,7 @@ class KZ_Evenementen {
         return ( null === $vandaag ? current_time( 'Y-m-d' ) : $vandaag ) >= $grens;
     }
 
-    /** Alle gepubliceerde evenementen, gesorteerd op datum + starttijd (zonder datum achteraan). */
+    /** Alle gepubliceerde evenementen: Seizoenskaart vooraan, dan op datum + starttijd, zonder datum achteraan. */
     public static function gesorteerd( $categorie = '' ) {
         $args = array(
             'post_type'        => self::POST_TYPE,
@@ -190,11 +225,18 @@ class KZ_Evenementen {
 
         $rijen = array();
         foreach ( get_posts( $args ) as $post ) {
-            $rijen[] = array( 'sleutel' => self::sorteersleutel( $post ), 'post' => $post );
+            $rijen[] = array(
+                'seizoen' => self::is_seizoenskaart( $post ),
+                'sleutel' => self::sorteersleutel( $post ),
+                'post'    => $post,
+            );
         }
         usort(
             $rijen,
             function ( $a, $b ) {
+                if ( $a['seizoen'] !== $b['seizoen'] ) {
+                    return $a['seizoen'] ? -1 : 1;
+                }
                 if ( '' === $a['sleutel'] || '' === $b['sleutel'] ) {
                     return ( '' === $a['sleutel'] ) - ( '' === $b['sleutel'] );
                 }
@@ -213,6 +255,9 @@ class KZ_Evenementen {
     public static function kies_automatisch( $categorie ) {
         $laatste = null;
         foreach ( self::gesorteerd( $categorie ) as $post ) {
+            if ( self::is_seizoenskaart( $post ) ) {
+                return $post;
+            }
             if ( '' === (string) get_post_meta( $post->ID, 'kz_datum', true ) ) {
                 continue;
             }
@@ -295,6 +340,8 @@ class KZ_Evenementen {
             'verkoop_start' => (string) $meta( 'kz_verkoop_start' ),
             'kleine_tekst'  => (string) $meta( 'kz_kleine_tekst' ),
             'max_width'     => '100%',
+            'variant'       => self::is_seizoenskaart( $post ) ? 'seizoen' : 'normaal',
+            'seizoen'       => self::is_seizoenskaart( $post ) ? self::seizoen_label( $meta( 'kz_seizoen' ) ) : '',
         );
 
         return array( $atts, (string) $post->post_content );

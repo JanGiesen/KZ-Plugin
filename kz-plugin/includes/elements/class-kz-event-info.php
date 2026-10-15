@@ -102,6 +102,30 @@ class KZ_Element_Event_Info {
                         'group'       => __( 'Inhoud', 'kz-plugin' ),
                     ),
                     array(
+                        'type'        => 'dropdown',
+                        'heading'     => __( 'Uitvoering', 'kz-plugin' ),
+                        'param_name'  => 'variant',
+                        'value'       => array(
+                            __( 'Normaal', 'kz-plugin' )       => 'normaal',
+                            __( 'Seizoenskaart', 'kz-plugin' ) => 'seizoen',
+                        ),
+                        'std'         => 'normaal',
+                        'description' => __( 'Seizoenskaart: omgekeerde kleuren en een seizoen (bijv. 2026-2027) in plaats van een datum.', 'kz-plugin' ),
+                        'group'       => __( 'Inhoud', 'kz-plugin' ),
+                    ),
+                    array(
+                        'type'        => 'textfield',
+                        'heading'     => __( 'Seizoen', 'kz-plugin' ),
+                        'param_name'  => 'seizoen',
+                        'value'       => '',
+                        'description' => __( 'Twee jaartallen, bijv. 2026-2027. Leeg = automatisch het huidige seizoen (1 juni t/m 31 mei).', 'kz-plugin' ),
+                        'group'       => __( 'Inhoud', 'kz-plugin' ),
+                        'dependency'  => array(
+                            'element' => 'variant',
+                            'value'   => 'seizoen',
+                        ),
+                    ),
+                    array(
                         'type'        => 'textfield',
                         'heading'     => __( 'Datum', 'kz-plugin' ),
                         'param_name'  => 'datum',
@@ -273,6 +297,8 @@ class KZ_Element_Event_Info {
                 'datum'        => '',
                 'dag_tekst'    => '',
                 'tijd'         => '',
+                'variant'      => 'normaal',
+                'seizoen'      => '',
                 'link'         => '',
                 'knop_tekst'   => 'Kaarten bestellen',
                 'status'       => 'open',
@@ -295,6 +321,15 @@ class KZ_Element_Event_Info {
         $datum     = self::parse_datum( $atts['datum'] );
         $dag_tekst = '' !== trim( $atts['dag_tekst'] ) ? $atts['dag_tekst'] : ( $datum ? self::$dagen[ (int) $datum->format( 'w' ) ] : '' );
         $toon_datum = $datum || '' !== trim( $atts['datum'] ) || '' !== trim( $atts['tijd'] );
+
+        // Seizoenskaart: geen datum maar een seizoen, en omgekeerde kleuren.
+        $is_seizoen = 'seizoen' === $atts['variant'];
+        if ( $is_seizoen ) {
+            $seizoen    = class_exists( 'KZ_Evenementen' ) ? KZ_Evenementen::seizoen_label( $atts['seizoen'] ) : trim( $atts['seizoen'] );
+            $datum      = null;
+            $dag_tekst  = '' !== trim( $atts['dag_tekst'] ) ? $atts['dag_tekst'] : __( 'Seizoen', 'kz-plugin' );
+            $toon_datum = true;
+        }
         $uitverkocht = 'uitverkocht' === $atts['status'];
 
         $feiten = array();
@@ -352,6 +387,9 @@ class KZ_Element_Event_Info {
         }
 
         $classes = array( 'kz-evt' );
+        if ( $is_seizoen ) {
+            $classes[] = 'kz-evt--seizoen';
+        }
         if ( ! $toon_datum ) {
             $classes[] = 'kz-evt--zonder-datum';
         }
@@ -366,7 +404,7 @@ class KZ_Element_Event_Info {
         <section class="<?php echo esc_attr( $classes ); ?>" style="max-width: <?php echo esc_attr( $atts['max_width'] ); ?>;"<?php echo '' !== $atts['titel'] ? ' aria-labelledby="' . esc_attr( $titel_id ) . '"' : ''; ?>>
             <div class="kz-evt__top">
                 <?php if ( $show_logo ) : ?>
-                    <img class="kz-evt__logo" src="<?php echo esc_url( KZ_PLUGIN_URL . 'assets/img/kz-logo-wit.svg' ); ?>" width="84" height="100" alt="<?php esc_attr_e( 'Logo Kraonige Zwaone', 'kz-plugin' ); ?>" />
+                    <img class="kz-evt__logo" src="<?php echo esc_url( KZ_PLUGIN_URL . ( $is_seizoen ? 'assets/img/kz-logo-rood.svg' : 'assets/img/kz-logo-wit.svg' ) ); ?>" width="84" height="100" alt="<?php esc_attr_e( 'Logo Kraonige Zwaone', 'kz-plugin' ); ?>" />
                 <?php endif; ?>
                 <div>
                     <?php if ( '' !== $atts['label'] ) : ?>
@@ -382,12 +420,15 @@ class KZ_Element_Event_Info {
                 <div class="kz-evt__balk" aria-hidden="true"></div>
 
                 <?php if ( $toon_datum ) : ?>
-                    <div class="kz-evt__datum<?php echo ( $datum && '' === trim( $atts['dag_tekst'] ) ) ? ' kz-evt__datum--auto' : ''; ?>">
+                    <div class="kz-evt__datum<?php echo ( ( $datum || $is_seizoen ) && '' === trim( $atts['dag_tekst'] ) ) ? ' kz-evt__datum--auto' : ''; ?>">
                         <?php if ( '' !== $dag_tekst ) : ?>
                             <span class="kz-evt__dag"><?php echo esc_html( $dag_tekst ); ?></span>
                         <?php endif; ?>
                         <div class="kz-evt__blok">
-                            <?php if ( $datum ) : ?>
+                            <?php if ( $is_seizoen ) : ?>
+                                <span class="kz-evt__dd kz-evt__dd--seizoen kz-evt__dd--kort"><?php echo esc_html( $seizoen ); ?></span>
+                                <span class="kz-evt__dd kz-evt__dd--seizoen kz-evt__dd--lang"><?php echo esc_html( ( '' === trim( $atts['dag_tekst'] ) ? __( 'Seizoen', 'kz-plugin' ) . ' ' : '' ) . $seizoen ); ?></span>
+                            <?php elseif ( $datum ) : ?>
                                 <span class="kz-evt__dd kz-evt__dd--kort"><?php echo esc_html( $datum->format( 'd/m' ) ); ?></span>
                                 <?php // Uitgeschreven variant voor de brede ticket op telefoon, bijv. "Za 14 Nov". ?>
                                 <span class="kz-evt__dd kz-evt__dd--lang"><?php

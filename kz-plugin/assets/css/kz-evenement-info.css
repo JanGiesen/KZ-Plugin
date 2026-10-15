@@ -55,6 +55,28 @@
 .kz-evt .kz-evt__knop--binnenkort{background:var(--kz-evt-white);color:var(--kz-evt-red)!important;border-style:dashed;cursor:default;pointer-events:none}
 .kz-evt__klein{grid-column:1/-1;font-size:14px;margin-top:-12px}
 
+/* Seizoenskaart: dezelfde opbouw met omgekeerde kleuren — witte kop, rood
+   vlak, wit ticket en een witte knop — zodat hij tussen de andere opvalt. */
+.kz-evt--seizoen{background:var(--kz-evt-red);color:var(--kz-evt-white)}
+.kz-evt--seizoen .kz-evt__top{background:var(--kz-evt-white);color:var(--kz-evt-red)}
+.kz-evt--seizoen .kz-evt__cat{background:var(--kz-evt-red);color:var(--kz-evt-white)}
+.kz-evt.kz-evt--seizoen .kz-evt__titel{color:var(--kz-evt-red)}
+.kz-evt--seizoen .kz-evt__balk{background:var(--kz-evt-white)}
+.kz-evt--seizoen .kz-evt__dag{color:var(--kz-evt-white)}
+.kz-evt--seizoen .kz-evt__blok{background:var(--kz-evt-white);color:var(--kz-evt-red)}
+.kz-evt--seizoen .kz-evt__blok::before,.kz-evt--seizoen .kz-evt__blok::after{border-color:var(--kz-evt-red)}
+.kz-evt--seizoen .kz-evt__dd--seizoen{font-size:34px;line-height:1.1;white-space:nowrap}
+.kz-evt.kz-evt--seizoen .kz-evt__feiten{border-top-color:var(--kz-evt-white)}
+.kz-evt.kz-evt--seizoen .kz-evt__feiten li{border-bottom-color:rgba(255,255,255,.7)}
+.kz-evt--seizoen .kz-evt__feiten b{color:var(--kz-evt-white)}
+.kz-evt--seizoen .kz-evt__tekst a{color:var(--kz-evt-white)}
+.kz-evt--seizoen .kz-evt__actie{border-top-color:var(--kz-evt-white)}
+.kz-evt.kz-evt--seizoen .kz-evt__knop{background:var(--kz-evt-white);border-color:var(--kz-evt-white);color:var(--kz-evt-red)!important}
+.kz-evt.kz-evt--seizoen .kz-evt__knop:hover{background:#f1e4e3;border-color:#f1e4e3}
+.kz-evt.kz-evt--seizoen .kz-evt__knop:active{background:#e6d0ce}
+.kz-evt.kz-evt--seizoen .kz-evt__knop:focus-visible{outline-color:var(--kz-evt-white)}
+.kz-evt.kz-evt--seizoen .kz-evt__knop--binnenkort{background:transparent;border-color:var(--kz-evt-white);color:var(--kz-evt-white)!important}
+
 /* Reageert op de breedte van het blok zelf, niet van het scherm, zodat twee
    blokken naast elkaar in WPBakery-kolommen ook de smalle opmaak krijgen. */
 @container kz-evt (max-width:600px){
@@ -67,6 +89,7 @@
   .kz-evt__tijd{font-size:17px}
   .kz-evt .kz-evt__knop{font-size:24px}
   .kz-evt__klein{text-align:center}
+  .kz-evt--seizoen .kz-evt__dd--seizoen{font-size:28px}
 }
 /* Telefoon: geen logo, en het datumticket over de volle breedte boven de tekst. */
 @container kz-evt (max-width:420px){
@@ -80,4 +103,5 @@
   .kz-evt__dd{font-size:64px}
   .kz-evt__tijd{font-size:20px}
   .kz-evt .kz-evt__knop{font-size:20px}
+  .kz-evt--seizoen .kz-evt__dd--seizoen{font-size:36px}
 }
