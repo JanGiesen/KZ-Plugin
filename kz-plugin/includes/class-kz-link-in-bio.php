@@ -200,12 +200,13 @@ class KZ_Link_In_Bio {
                 if ( ! is_array( $l ) ) {
                     continue;
                 }
-                $soort = isset( $l['soort'] ) && 'social' === $l['soort'] ? 'social' : 'knop';
+                $soort = isset( $l['soort'] ) && in_array( $l['soort'], array( 'social', 'knop', 'kop' ), true ) ? $l['soort'] : 'knop';
                 $links[] = array(
                     'soort' => $soort,
                     'titel' => isset( $l['titel'] ) ? (string) $l['titel'] : '',
                     'url'   => isset( $l['url'] ) ? (string) $l['url'] : '',
                     'icoon' => isset( $l['icoon'] ) ? (string) $l['icoon'] : '',
+                    'foto'  => isset( $l['foto'] ) ? (string) $l['foto'] : '',
                 );
             }
         }
@@ -236,6 +237,15 @@ class KZ_Link_In_Bio {
             return '';
         }
         return esc_url( $url, array( 'http', 'https', 'mailto', 'tel' ) );
+    }
+
+    /** Een foto-adres: alleen https://, anders ''. */
+    public static function veilige_foto( $url ) {
+        $url = trim( (string) $url );
+        if ( ! preg_match( '#^https://\S+$#i', $url ) ) {
+            return '';
+        }
+        return esc_url( $url, array( 'https' ) );
     }
 
     /** Een icoon als inline SVG, of '' bij een onbekende sleutel. */
@@ -312,6 +322,13 @@ class KZ_Link_In_Bio {
         $socials = array();
         $knoppen = array();
         foreach ( $links as $l ) {
+            // Tussenkop: begint een groepje knoppen (deelt hun volgorde).
+            if ( 'kop' === $l['soort'] ) {
+                if ( '' !== trim( $l['titel'] ) ) {
+                    $knoppen[] = '<li class="kzl__kop-rij"><h2 class="kzl__kop"><span>' . esc_html( $l['titel'] ) . '</span></h2></li>';
+                }
+                continue;
+            }
             $url = self::veilige_url( $l['url'] );
             if ( '' === $url ) {
                 continue;
@@ -329,7 +346,11 @@ class KZ_Link_In_Bio {
                 }
                 $svg       = self::icoon_svg( $l['icoon'] );
                 $icoon     = '' !== $svg ? '<span class="kzl__knop-icoon">' . $svg . '</span>' : '';
-                $knoppen[] = '<li><a class="kzl__knop" href="' . $url . '">' . $icoon . '<span class="kzl__knop-tekst"><span>' . esc_html( $l['titel'] ) . '</span></span></a></li>';
+                $foto_url  = isset( $l['foto'] ) ? self::veilige_foto( $l['foto'] ) : '';
+                // De tekst staat al op de knop, dus de foto is decoratief (alt="").
+                $foto      = '' !== $foto_url ? '<img class="kzl__knop-foto" src="' . $foto_url . '" alt="" loading="lazy" decoding="async">' : '';
+                $klasse    = '' !== $foto ? 'kzl__knop kzl__knop--foto' : 'kzl__knop';
+                $knoppen[] = '<li><a class="' . $klasse . '" href="' . $url . '">' . $foto . '<span class="kzl__knop-balk">' . $icoon . '<span class="kzl__knop-tekst"><span>' . esc_html( $l['titel'] ) . '</span></span></span></a></li>';
             }
         }
 
@@ -344,7 +365,15 @@ class KZ_Link_In_Bio {
         if ( $socials ) {
             $html .= '<ul class="kzl__socials">' . implode( '', $socials ) . '</ul>';
         }
-        if ( $knoppen ) {
+        // Alleen koppen zonder knoppen is geen inhoud.
+        $heeft_knop = false;
+        foreach ( $knoppen as $k ) {
+            if ( false === strpos( $k, 'kzl__kop-rij' ) ) {
+                $heeft_knop = true;
+                break;
+            }
+        }
+        if ( $knoppen && $heeft_knop ) {
             $html .= '<ul class="kzl__knoppen">' . implode( '', $knoppen ) . '</ul>';
         } elseif ( ! is_array( $data ) ) {
             $html .= '<p class="kzl__leeg">Hier komen binnenkort onze links.</p>';
@@ -441,6 +470,18 @@ class KZ_Link_In_Bio {
                 'social'  => false,
                 'viewBox' => '0 0 24 24',
                 'svg'     => '<rect x="3" y="6" width="13" height="12" rx="1.5"/><path d="M16 10.5l5-3v9l-5-3"/>',
+            ),
+            'krant' => array(
+                'label'   => 'Krant',
+                'social'  => false,
+                'viewBox' => '0 0 24 24',
+                'svg'     => '<path d="M4 5h13v13a2 2 0 0 0 2 2H6a2 2 0 0 1-2-2z"/><path d="M17 9h3v9a2 2 0 0 1-2 2"/><path d="M7 8.5h7M7 12h7M7 15.5h4"/>',
+            ),
+            'feest' => array(
+                'label'   => 'Feest',
+                'social'  => false,
+                'viewBox' => '0 0 24 24',
+                'svg'     => '<path d="M4 20l4.5-11 6.5 6.5z"/><path d="M12.5 7.5c.2-1.8 1.4-3 3.2-3"/><path d="M16.5 11.5c1.6-.6 3-.2 3.8 1"/><path d="M15 3.5v.01M20.5 7v.01M19.5 16.5v.01M10.5 3.5v.01M18 4l1 1"/>',
             ),
             'nieuws' => array(
                 'label'   => 'Nieuws',

@@ -45,16 +45,27 @@ body.kzl-pagina .kzl{min-height:100vh;min-height:100dvh}
 .kzl a.kzl__social:hover{border-color:var(--kzl-social);color:var(--kzl-social);text-decoration:none}
 .kzl__social svg{width:28px;height:28px}
 .kzl__knoppen{list-style:none;margin:26px 0 0;padding:0;width:100%;display:flex;flex-direction:column;gap:14px}
-.kzl a.kzl__knop{position:relative;display:flex;align-items:center;justify-content:center;min-height:60px;padding:14px 58px 11px;
+.kzl a.kzl__knop{display:block;padding:0;overflow:hidden;
   background:var(--kzl-knop-bg);color:var(--kzl-knop-fg);border:2px solid var(--kzl-knop-rand);border-radius:2px;text-decoration:none;
   font-family:var(--kzl-display);font-weight:700;text-transform:uppercase;letter-spacing:-0.04em;font-size:25px;line-height:1;
   transition:background .12s ease,color .12s ease}
 .kzl a.kzl__knop:hover{background:var(--kzl-knop-bg-hover);color:var(--kzl-knop-fg-hover);text-decoration:none}
+.kzl__knop-balk{position:relative;display:flex;align-items:center;justify-content:center;min-height:56px;padding:14px 58px 11px}
+/* Foto over de volle breedte van de knop, op zijn eigen verhouding; de knoptekst eronder. */
+.kzl__knop-foto{display:block;width:100%;height:auto;border-bottom:2px solid var(--kzl-knop-rand)}
 .kzl__knop-icoon{position:absolute;left:18px;top:50%;width:26px;height:26px;margin-top:-13px;display:flex}
 .kzl__knop-icoon svg{width:26px;height:26px}
 .kzl__knop-tekst{display:block;flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
 .kzl__knop:focus-visible,.kzl__social:focus-visible{outline:3px solid var(--kzl-fg);outline-offset:3px}
 .kzl--wit .kzl__knop:focus-visible,.kzl--wit .kzl__social:focus-visible{outline-color:var(--kzl-red)}
+/* Tussenkop: begint een groepje knoppen. Kop in de huisstijl met een haarlijn
+   links en rechts, in de tekstkleur van de pagina. */
+.kzl__kop-rij{margin-top:14px}
+.kzl__kop-rij:first-child{margin-top:0}
+.kzl__kop{display:flex;align-items:center;gap:10px;margin:0;font-family:var(--kzl-display);font-weight:700;text-transform:uppercase;letter-spacing:-0.04em;font-size:22px;line-height:1;color:var(--kzl-fg)}
+.kzl--wit .kzl__kop{color:var(--kzl-red)}
+.kzl__kop::before,.kzl__kop::after{content:"";flex:1 1 0;min-width:16px;height:2px;background:currentColor}
+.kzl__kop span{display:block;max-width:80%;transform:scaleX(.8);transform-origin:center center;padding-top:2px}
 .kzl__leeg{margin:26px 0 0;opacity:.85}
 .kzl__voet{margin:36px 0 0;font-family:var(--kzl-display);font-weight:700;text-transform:uppercase;letter-spacing:-0.04em;font-size:20px;line-height:1}
 .kzl--wit .kzl__voet{color:var(--kzl-red)}
