@@ -1,0 +1,61 @@
+/*
+ * KZ Link-In-Bio — de pagina op link.kraonigezwaone.nl.
+ *
+ * Volgt het stijlboek van de Kraonige Zwaone: rood (#E83F35) en wit als
+ * vlakken, koppen in Roboto Condensed (vet, kapitalen, 80% breed, -0.04em),
+ * body in Work Sans, solid vlakken, haarlijnranden, minimale afronding en
+ * géén schaduw of verloop.
+ *
+ * Een kopie van dit bestand staat in KZ-Studio (src/pages/website/linkInBio.css)
+ * voor het voorbeeld in het beheerscherm. Wijzig je hier iets, doe het daar ook.
+ */
+.kzl{
+  --kzl-red:#e83f35;--kzl-red-dark:#b82a22;--kzl-red-tint:#fceceb;--kzl-white:#fff;--kzl-black:#111;
+  --kzl-display:"Roboto Condensed",Impact,"Arial Narrow",sans-serif;
+  --kzl-body:"Work Sans",-apple-system,BlinkMacSystemFont,sans-serif;
+  --kzl-bg:var(--kzl-red);--kzl-fg:var(--kzl-white);
+  --kzl-knop-bg:var(--kzl-white);--kzl-knop-fg:var(--kzl-red);--kzl-knop-rand:var(--kzl-white);
+  --kzl-knop-bg-hover:var(--kzl-red-tint);--kzl-knop-fg-hover:var(--kzl-red-dark);
+  --kzl-social:var(--kzl-white);
+  box-sizing:border-box;min-height:100%;background:var(--kzl-bg);color:var(--kzl-fg);
+  font-family:var(--kzl-body);font-size:17px;line-height:1.45;
+  -webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;text-size-adjust:100%
+}
+.kzl--wit{
+  --kzl-bg:var(--kzl-white);--kzl-fg:var(--kzl-black);
+  --kzl-knop-bg:var(--kzl-red);--kzl-knop-fg:var(--kzl-white);--kzl-knop-rand:var(--kzl-red);
+  --kzl-knop-bg-hover:var(--kzl-red-dark);--kzl-knop-fg-hover:var(--kzl-white);
+  --kzl-social:var(--kzl-red)
+}
+/* Alleen op de losse pagina (body.kzl-pagina), niet in het voorbeeld. */
+body.kzl-pagina{margin:0;background:#e83f35}
+body.kzl-pagina--wit{background:#fff}
+body.kzl-pagina .kzl{min-height:100vh;min-height:100dvh}
+.kzl *,.kzl *::before,.kzl *::after{box-sizing:border-box}
+.kzl__binnen{max-width:480px;margin:0 auto;padding:48px 20px 40px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.kzl__logo{display:block;width:140px;height:auto;margin:0 0 22px}
+.kzl__titel{margin:0 0 10px;font-family:var(--kzl-display);font-weight:700;text-transform:uppercase;letter-spacing:-0.04em;font-size:38px;line-height:.95;color:var(--kzl-fg)}
+.kzl--wit .kzl__titel{color:var(--kzl-red)}
+/* Versmald tot 80%: de tekst krijgt eerst 125% van de breedte, zodat hij pas
+   afbreekt waar de versmalde tekst echt niet meer past. */
+.kzl__titel span,.kzl__knop-tekst span,.kzl__voet span{display:block;width:125%;margin:0 -12.5%;transform:scaleX(.8);transform-origin:center center}
+.kzl__omschrijving{margin:0 0 4px;max-width:36ch;white-space:pre-line}
+.kzl__socials{list-style:none;margin:18px 0 0;padding:0;display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+.kzl a.kzl__social{display:flex;align-items:center;justify-content:center;width:46px;height:46px;color:var(--kzl-social);border:2px solid transparent;border-radius:2px;text-decoration:none;transition:border-color .12s ease}
+.kzl a.kzl__social:hover{border-color:var(--kzl-social);color:var(--kzl-social);text-decoration:none}
+.kzl__social svg{width:28px;height:28px}
+.kzl__knoppen{list-style:none;margin:26px 0 0;padding:0;width:100%;display:flex;flex-direction:column;gap:14px}
+.kzl a.kzl__knop{position:relative;display:flex;align-items:center;justify-content:center;min-height:60px;padding:14px 58px 11px;
+  background:var(--kzl-knop-bg);color:var(--kzl-knop-fg);border:2px solid var(--kzl-knop-rand);border-radius:2px;text-decoration:none;
+  font-family:var(--kzl-display);font-weight:700;text-transform:uppercase;letter-spacing:-0.04em;font-size:25px;line-height:1;
+  transition:background .12s ease,color .12s ease}
+.kzl a.kzl__knop:hover{background:var(--kzl-knop-bg-hover);color:var(--kzl-knop-fg-hover);text-decoration:none}
+.kzl__knop-icoon{position:absolute;left:18px;top:50%;width:26px;height:26px;margin-top:-13px;display:flex}
+.kzl__knop-icoon svg{width:26px;height:26px}
+.kzl__knop-tekst{display:block;flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
+.kzl__knop:focus-visible,.kzl__social:focus-visible{outline:3px solid var(--kzl-fg);outline-offset:3px}
+.kzl--wit .kzl__knop:focus-visible,.kzl--wit .kzl__social:focus-visible{outline-color:var(--kzl-red)}
+.kzl__leeg{margin:26px 0 0;opacity:.85}
+.kzl__voet{margin:36px 0 0;font-family:var(--kzl-display);font-weight:700;text-transform:uppercase;letter-spacing:-0.04em;font-size:20px;line-height:1}
+.kzl--wit .kzl__voet{color:var(--kzl-red)}
+@media (prefers-reduced-motion:reduce){.kzl__knop,.kzl__social{transition:none}}
