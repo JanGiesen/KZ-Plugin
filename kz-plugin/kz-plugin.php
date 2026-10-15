@@ -3,7 +3,7 @@
  * Plugin Name: KZ Plugin
  * Plugin URI: https://github.com/JanGiesen/KZ-Plugin
  * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, evenement info, evenementen overzicht).
- * Version: 8.5.0
+ * Version: 8.6.0
  * Author: Kraonige Zwaone
  * Text Domain: kz-plugin
  * Update URI: https://github.com/JanGiesen/KZ-Plugin
@@ -71,13 +71,21 @@
  * KZ-Studio evenementen kan aanmaken, plus nieuw element KZ-Evenementen
  * Overzicht (shortcode kz_evenementen_overzicht) dat alle zichtbare
  * evenementen als KZ-Evenement Info-blokken in rijen van 2 toont.
+ *
+ * 8.6.0: evenementen krijgen een categorie (kz_categorie); het overzicht
+ * sorteert op datum + begintijd, filtert op categorie en laat verlopen
+ * evenementen (vanaf 2 dagen na de datum) vanzelf weg. KZ-Evenement Info
+ * kan automatisch het eerstvolgende evenement uit een categorie tonen (of
+ * het laatste als er geen nieuw is). Rode koppen naast elkaar worden even
+ * hoog zodat de balken op één lijn liggen. Label standaard leeg, feiten
+ * standaard Waar / Prijs / Tijden.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Directe toegang niet toegestaan.
 }
 
-define( 'KZ_PLUGIN_VERSION', '8.5.0' );
+define( 'KZ_PLUGIN_VERSION', '8.6.0' );
 define( 'KZ_PLUGIN_FILE', __FILE__ );
 define( 'KZ_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KZ_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

@@ -2,7 +2,9 @@
 /**
  * KZ-Evenementen Overzicht — shortcode [kz_evenementen_overzicht]
  * Toont alle zichtbare evenementen (post type kz_evenement, beheerd in
- * KZ-Studio) als KZ-Evenement Info-blokken in rijen van 2.
+ * KZ-Studio) als KZ-Evenement Info-blokken in rijen van 2, gesorteerd op
+ * datum en begintijd, optioneel uit één categorie. Verlopen evenementen
+ * (vanaf 2 dagen na de datum) verdwijnen vanzelf.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -49,17 +51,15 @@ class KZ_Element_Event_Overview {
                             __( 'Datum, laatste eerst', 'kz-plugin' )       => 'aflopend',
                         ),
                         'std'         => 'oplopend',
-                        'description' => __( 'Evenementen zonder datum staan altijd achteraan.', 'kz-plugin' ),
+                        'description' => __( 'Op datum en begintijd. Evenementen zonder datum staan altijd achteraan.', 'kz-plugin' ),
                     ),
                     array(
                         'type'        => 'dropdown',
-                        'heading'     => __( 'Voorbije evenementen', 'kz-plugin' ),
-                        'param_name'  => 'alleen_komend',
-                        'value'       => array(
-                            __( 'Tonen (zichtbaarheid regel je per evenement in KZ-Studio)', 'kz-plugin' ) => 'nee',
-                            __( 'Automatisch verbergen na de datum', 'kz-plugin' )                       => 'ja',
-                        ),
-                        'std'         => 'nee',
+                        'heading'     => __( 'Categorie', 'kz-plugin' ),
+                        'param_name'  => 'categorie',
+                        'value'       => KZ_Evenementen::categorie_opties( __( 'Alle categorieën', 'kz-plugin' ) ),
+                        'std'         => '',
+                        'description' => __( 'Alleen evenementen uit deze categorie (ingesteld in KZ-Studio). Verlopen evenementen verdwijnen altijd vanzelf, vanaf 2 dagen na de datum.', 'kz-plugin' ),
                     ),
                     array(
                         'type'        => 'textfield',
@@ -98,6 +98,7 @@ class KZ_Element_Event_Overview {
                 'kolommen'      => '2',
                 'sortering'     => 'oplopend',
                 'alleen_komend' => 'nee',
+                'categorie'     => '',
                 'max_aantal'    => '',
                 'leeg_tekst'    => '',
                 'el_class'      => '',
@@ -107,38 +108,29 @@ class KZ_Element_Event_Overview {
             self::SHORTCODE
         );
 
-        $evenementen = get_posts(
-            array(
-                'post_type'        => KZ_Evenementen::POST_TYPE,
-                'post_status'      => 'publish',
-                'posts_per_page'   => -1,
-                'no_found_rows'    => true,
-                'suppress_filters' => false,
-            )
-        );
-
-        // Sorteren in PHP: evenementen zonder datum moeten achteraan, wat met
-        // een meta-orderby niet lukt (die laat ze weg of zet ze vooraan).
-        $vandaag  = current_time( 'Y-m-d' );
-        $aflopend = 'aflopend' === $atts['sortering'];
-        $rijen    = array();
-        foreach ( $evenementen as $post ) {
-            $datum = (string) get_post_meta( $post->ID, 'kz_datum', true );
-            if ( 'ja' === $atts['alleen_komend'] && '' !== $datum && $datum < $vandaag ) {
-                continue;
+        // Verlopen evenementen (vanaf 2 dagen na de datum) laten we altijd weg.
+        // Het oude attribuut alleen_komend wordt nog geaccepteerd maar doet
+        // niets meer, zodat bestaande shortcodes blijven werken.
+        $rijen = array();
+        foreach ( KZ_Evenementen::gesorteerd( trim( $atts['categorie'] ) ) as $post ) {
+            if ( ! KZ_Evenementen::is_verlopen( $post ) ) {
+                $rijen[] = $post;
             }
-            $rijen[] = array( 'datum' => $datum, 'post' => $post );
         }
-        usort(
-            $rijen,
-            function ( $a, $b ) use ( $aflopend ) {
-                if ( '' === $a['datum'] || '' === $b['datum'] ) {
-                    return ( '' === $a['datum'] ) - ( '' === $b['datum'] );
+
+        if ( 'aflopend' === $atts['sortering'] ) {
+            // Omdraaien, maar evenementen zonder datum blijven achteraan.
+            $met    = array();
+            $zonder = array();
+            foreach ( $rijen as $post ) {
+                if ( '' === KZ_Evenementen::sorteersleutel( $post ) ) {
+                    $zonder[] = $post;
+                } else {
+                    $met[] = $post;
                 }
-                $verschil = strcmp( $a['datum'], $b['datum'] );
-                return $aflopend ? -$verschil : $verschil;
             }
-        );
+            $rijen = array_merge( array_reverse( $met ), $zonder );
+        }
 
         $max = absint( $atts['max_aantal'] );
         if ( $max > 0 ) {
@@ -163,7 +155,7 @@ class KZ_Element_Event_Overview {
 
         $html = '<div class="' . esc_attr( $classes ) . '">';
         foreach ( $rijen as $rij ) {
-            list( $blok_atts, $omschrijving ) = KZ_Evenementen::naar_atts( $rij['post'] );
+            list( $blok_atts, $omschrijving ) = KZ_Evenementen::naar_atts( $rij );
             $html .= '<div class="kz-evt-overzicht__item">' . KZ_Element_Event_Info::render( $blok_atts, $omschrijving ) . '</div>';
         }
         $html .= '</div>';

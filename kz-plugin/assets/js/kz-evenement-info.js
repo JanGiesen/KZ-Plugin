@@ -1,7 +1,8 @@
 /**
  * KZ-Evenement Info — blokken die naast elkaar staan even hoog maken.
  * Blokken met (vrijwel) dezelfde bovenkant staan naast elkaar; die krijgen
- * de hoogte van de hoogste. Onder elkaar (mobiel) gebeurt er niets.
+ * de hoogte van de hoogste, en ook hun rode koppen worden even hoog zodat
+ * de balken op één lijn liggen. Onder elkaar (mobiel) gebeurt er niets.
  */
 (function () {
     'use strict';
@@ -14,11 +15,15 @@
 
         blokken.forEach(function (blok) {
             blok.style.minHeight = '';
+            var kop = blok.querySelector('.kz-evt__top');
+            if (kop) {
+                kop.style.minHeight = '';
+            }
         });
 
         var metingen = blokken.map(function (blok) {
             var rect = blok.getBoundingClientRect();
-            return { blok: blok, top: rect.top + window.pageYOffset, hoogte: rect.height };
+            return { blok: blok, top: rect.top + window.pageYOffset };
         }).sort(function (a, b) {
             return a.top - b.top;
         });
@@ -37,7 +42,16 @@
             if (groep.length < 2) {
                 return;
             }
-            var max = Math.max.apply(null, groep.map(function (m) { return m.hoogte; }));
+
+            // Eerst de rode koppen even hoog, zodat de balken en datumtickets
+            // eronder op dezelfde lijn beginnen; daarna pas de hele blokken.
+            var koppen = groep.map(function (m) { return m.blok.querySelector('.kz-evt__top'); }).filter(Boolean);
+            var maxKop = Math.max.apply(null, koppen.map(function (kop) { return kop.getBoundingClientRect().height; }));
+            koppen.forEach(function (kop) {
+                kop.style.minHeight = Math.ceil(maxKop) + 'px';
+            });
+
+            var max = Math.max.apply(null, groep.map(function (m) { return m.blok.getBoundingClientRect().height; }));
             groep.forEach(function (m) {
                 m.blok.style.minHeight = Math.ceil(max) + 'px';
             });
