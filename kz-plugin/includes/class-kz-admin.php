@@ -69,6 +69,11 @@ class KZ_Admin {
             'shortcode' => 'kz_evenement_info',
             'params'    => 'label, titel, content, feiten (param_group), show_logo, datum, dag_tekst, tijd, link, knop_tekst, status, verkoop_start, kleine_tekst, max_width, el_class',
         ),
+        'event_overview'   => array(
+            'label'     => 'KZ-Evenementen Overzicht',
+            'shortcode' => 'kz_evenementen_overzicht',
+            'params'    => 'kolommen, sortering, alleen_komend, max_aantal, leeg_tekst, el_class',
+        ),
     );
 
     public function __construct( KZ_Plugin_Updater $updater ) {
