@@ -67,7 +67,7 @@ class KZ_Admin {
         'event_info'       => array(
             'label'     => 'KZ-Evenement Info',
             'shortcode' => 'kz_evenement_info',
-            'params'    => 'bron, categorie, label, titel, content, feiten (param_group), show_logo, datum, dag_tekst, tijd, link, knop_tekst, status, verkoop_start, kleine_tekst, max_width, el_class',
+            'params'    => 'bron, categorie, label, titel, content, feiten (param_group), show_logo, variant, seizoen, datum, dag_tekst, tijd, link, knop_tekst, status, verkoop_start, kleine_tekst, max_width, el_class',
         ),
         'event_overview'   => array(
             'label'     => 'KZ-Evenementen Overzicht',

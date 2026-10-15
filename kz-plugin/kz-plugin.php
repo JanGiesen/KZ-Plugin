@@ -3,7 +3,7 @@
  * Plugin Name: KZ Plugin
  * Plugin URI: https://github.com/JanGiesen/KZ-Plugin
  * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, evenement info, evenementen overzicht).
- * Version: 8.6.0
+ * Version: 8.7.0
  * Author: Kraonige Zwaone
  * Text Domain: kz-plugin
  * Update URI: https://github.com/JanGiesen/KZ-Plugin
@@ -79,13 +79,19 @@
  * het laatste als er geen nieuw is). Rode koppen naast elkaar worden even
  * hoog zodat de balken op één lijn liggen. Label standaard leeg, feiten
  * standaard Waar / Prijs / Tijden.
+ *
+ * 8.7.0: Seizoenskaart — het evenement met categorie "Seizoenskaart"
+ * staat altijd vooraan, verloopt nooit en toont in omgekeerde kleuren een
+ * seizoen (bijv. 2026-2027, meta kz_seizoen, leeg = huidig seizoen) in
+ * plaats van een datum. Ook als losse uitvoering van KZ-Evenement Info
+ * (parameters variant en seizoen).
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Directe toegang niet toegestaan.
 }
 
-define( 'KZ_PLUGIN_VERSION', '8.6.0' );
+define( 'KZ_PLUGIN_VERSION', '8.7.0' );
 define( 'KZ_PLUGIN_FILE', __FILE__ );
 define( 'KZ_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KZ_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

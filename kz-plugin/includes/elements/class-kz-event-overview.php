@@ -119,17 +119,21 @@ class KZ_Element_Event_Overview {
         }
 
         if ( 'aflopend' === $atts['sortering'] ) {
-            // Omdraaien, maar evenementen zonder datum blijven achteraan.
+            // Omdraaien, maar de Seizoenskaart blijft vooraan en evenementen
+            // zonder datum blijven achteraan.
+            $voor   = array();
             $met    = array();
             $zonder = array();
             foreach ( $rijen as $post ) {
-                if ( '' === KZ_Evenementen::sorteersleutel( $post ) ) {
+                if ( KZ_Evenementen::is_seizoenskaart( $post ) ) {
+                    $voor[] = $post;
+                } elseif ( '' === KZ_Evenementen::sorteersleutel( $post ) ) {
                     $zonder[] = $post;
                 } else {
                     $met[] = $post;
                 }
             }
-            $rijen = array_merge( array_reverse( $met ), $zonder );
+            $rijen = array_merge( $voor, array_reverse( $met ), $zonder );
         }
 
         $max = absint( $atts['max_aantal'] );
