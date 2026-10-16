@@ -3,7 +3,7 @@
  * Plugin Name: KZ Plugin
  * Plugin URI: https://github.com/JanGiesen/KZ-Plugin
  * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, evenement info, evenementen overzicht).
- * Version: 8.8.0
+ * Version: 8.9.0
  * Author: Kraonige Zwaone
  * Text Domain: kz-plugin
  * Update URI: https://github.com/JanGiesen/KZ-Plugin
@@ -90,13 +90,17 @@
  * /link-in-bio/ op de gewone site) met logo, socials en knoppen. De inhoud
  * komt uit KZ-Studio (Website → Link-In-Bio) via Supabase; instellingen
  * onder KZ Plugin → Link-In-Bio.
+ *
+ * 8.9.0: Link-In-Bio — tussenkoppen om knoppen in groepjes te zetten, een
+ * optionele foto over de volle breedte bij een knop, en de iconen Krant en
+ * Feest. Hoort bij KZ-Studio-migratie 0041.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Directe toegang niet toegestaan.
 }
 
-define( 'KZ_PLUGIN_VERSION', '8.8.0' );
+define( 'KZ_PLUGIN_VERSION', '8.9.0' );
 define( 'KZ_PLUGIN_FILE', __FILE__ );
 define( 'KZ_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KZ_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

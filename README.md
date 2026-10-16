@@ -26,7 +26,7 @@ Beide plugins delen de optie `kz_github_token` voor toegang tot een private GitH
 
 ## Link-In-Bio (link.kraonigezwaone.nl)
 
-Sinds 8.8.0 tekent KZ Plugin een eigen "linktree": logo, kop, omschrijving, socials-iconen en grote knoppen (met of zonder icoon), in het rode of witte thema van het stijlboek. De inhoud beheer je in **KZ-Studio → Website → Link-In-Bio**; die staat in Supabase en de plugin haalt hem op via de openbare functie `link_in_bio_ophalen()` (KZ-Studio-migratie `0040_link_in_bio.sql`). Ophalen gebeurt hooguit eens per minuut; lukt het niet, dan blijft de laatste goede versie staan.
+Sinds 8.8.0 tekent KZ Plugin een eigen "linktree": logo, kop, omschrijving, socials-iconen en grote knoppen (met of zonder icoon), in het rode of witte thema van het stijlboek. Sinds 8.9.0 kunnen knoppen in groepjes onder een tussenkop staan en een foto over de volle breedte krijgen (KZ-Studio-migratie `0041_link_in_bio_groepen_fotos.sql`; foto's alleen via `https://`). De inhoud beheer je in **KZ-Studio → Website → Link-In-Bio**; die staat in Supabase en de plugin haalt hem op via de openbare functie `link_in_bio_ophalen()` (KZ-Studio-migratie `0040_link_in_bio.sql`). Ophalen gebeurt hooguit eens per minuut; lukt het niet, dan blijft de laatste goede versie staan.
 
 De pagina staat:
 
