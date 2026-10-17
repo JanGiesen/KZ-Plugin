@@ -81,6 +81,15 @@
 	background-position: center;
 }
 
+.wpb_content_element .kz-icon-motto,
+.vc_element-icon.kz-icon-motto,
+.kz-icon-motto {
+	background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8c3-2 6-2 9 0s6 2 9 0"/><path d="M5 13h14M8 17h8"/></svg>');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
 .wpb_content_element .kz-icon-event-overview,
 .vc_element-icon.kz-icon-event-overview,
 .kz-icon-event-overview {
@@ -100,7 +109,8 @@
 .wpb_element_wrapper .kz-icon-vindt-grid,
 .wpb_element_wrapper .kz-icon-ticket,
 .wpb_element_wrapper .kz-icon-event-info,
-.wpb_element_wrapper .kz-icon-event-overview {
+.wpb_element_wrapper .kz-icon-event-overview,
+.wpb_element_wrapper .kz-icon-motto {
 	width: 32px !important;
 	height: 32px !important;
 }
