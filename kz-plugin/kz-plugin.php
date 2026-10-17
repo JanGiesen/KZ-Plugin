@@ -3,7 +3,7 @@
  * Plugin Name: KZ Plugin
  * Plugin URI: https://github.com/JanGiesen/KZ-Plugin
  * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, evenement info, evenementen overzicht, motto).
- * Version: 8.10.0
+ * Version: 8.10.1
  * Author: Kraonige Zwaone
  * Text Domain: kz-plugin
  * Update URI: https://github.com/JanGiesen/KZ-Plugin
@@ -100,13 +100,16 @@
  * Keuze. Welke .svg bij welk motto hoort en wat de keuze is, beheer je in
  * KZ-Studio (Website → Overig → Motto, migratie 0042); opgehaald via
  * dezelfde Supabase-instellingen als de Link-In-Bio.
+ *
+ * 8.10.1: KZ-Motto — optie Marges (Aan = 20px boven en onder), standaard
+ * Uit zodat bestaande pagina's niet verschuiven.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Directe toegang niet toegestaan.
 }
 
-define( 'KZ_PLUGIN_VERSION', '8.10.0' );
+define( 'KZ_PLUGIN_VERSION', '8.10.1' );
 define( 'KZ_PLUGIN_FILE', __FILE__ );
 define( 'KZ_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KZ_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

@@ -77,7 +77,7 @@ class KZ_Admin {
         'motto'            => array(
             'label'     => 'KZ-Motto',
             'shortcode' => 'kz_motto',
-            'params'    => 'variant (seizoen, kraonig, elfelf, keuze), breedte, el_class',
+            'params'    => 'variant (seizoen, kraonig, elfelf, keuze), breedte, marges, el_class',
         ),
     );
 

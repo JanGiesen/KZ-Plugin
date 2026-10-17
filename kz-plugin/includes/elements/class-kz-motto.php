@@ -77,6 +77,17 @@ class KZ_Element_Motto {
                         'description' => __( 'Nooit breder dan de kolom.', 'kz-plugin' ),
                     ),
                     array(
+                        'type'        => 'dropdown',
+                        'heading'     => __( 'Marges', 'kz-plugin' ),
+                        'param_name'  => 'marges',
+                        'value'       => array(
+                            __( 'Uit', 'kz-plugin' ) => 'off',
+                            __( 'Aan', 'kz-plugin' ) => 'on',
+                        ),
+                        'std'         => 'off',
+                        'description' => __( 'Zet de standaard verticale marges (20px) aan of uit', 'kz-plugin' ),
+                    ),
+                    array(
                         'type'       => 'textfield',
                         'heading'    => __( 'Extra CSS-klasse', 'kz-plugin' ),
                         'param_name' => 'el_class',
@@ -91,6 +102,7 @@ class KZ_Element_Motto {
             array(
                 'variant'  => 'keuze',
                 'breedte'  => '1000',
+                'marges'   => 'off',
                 'el_class' => '',
             ),
             $atts,
@@ -115,7 +127,9 @@ class KZ_Element_Motto {
         }
         $klasse = trim( 'kz-motto ' . implode( ' ', array_map( 'sanitize_html_class', preg_split( '/\s+/', (string) $atts['el_class'] ) ) ) );
 
-        return '<div class="' . esc_attr( $klasse ) . '" style="text-align:center;">'
+        $stijl = 'text-align:center;' . ( 'on' === $atts['marges'] ? 'margin:20px 0;' : '' );
+
+        return '<div class="' . esc_attr( $klasse ) . '" style="' . esc_attr( $stijl ) . '">'
             . '<img src="' . esc_url( $url ) . '" width="' . esc_attr( $breedte ) . '" alt="' . esc_attr( 'Motto Kraonige Zwaone' ) . '" style="max-width:100%;height:auto;" decoding="async">'
             . '</div>';
     }
