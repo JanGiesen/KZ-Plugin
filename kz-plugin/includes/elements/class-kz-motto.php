@@ -77,15 +77,18 @@ class KZ_Element_Motto {
                         'description' => __( 'Nooit breder dan de kolom.', 'kz-plugin' ),
                     ),
                     array(
-                        'type'        => 'dropdown',
-                        'heading'     => __( 'Marges', 'kz-plugin' ),
-                        'param_name'  => 'marges',
-                        'value'       => array(
-                            __( 'Uit', 'kz-plugin' ) => 'off',
-                            __( 'Aan', 'kz-plugin' ) => 'on',
-                        ),
-                        'std'         => 'off',
-                        'description' => __( 'Zet de standaard verticale marges (20px) aan of uit', 'kz-plugin' ),
+                        'type'        => 'textfield',
+                        'heading'     => __( 'Marge boven (px)', 'kz-plugin' ),
+                        'param_name'  => 'marge_boven',
+                        'std'         => '40',
+                        'description' => __( '0 = geen marge.', 'kz-plugin' ),
+                    ),
+                    array(
+                        'type'        => 'textfield',
+                        'heading'     => __( 'Marge onder (px)', 'kz-plugin' ),
+                        'param_name'  => 'marge_onder',
+                        'std'         => '40',
+                        'description' => __( '0 = geen marge.', 'kz-plugin' ),
                     ),
                     array(
                         'type'       => 'textfield',
@@ -102,7 +105,11 @@ class KZ_Element_Motto {
             array(
                 'variant'  => 'keuze',
                 'breedte'  => '1000',
-                'marges'   => 'off',
+                'marge_boven' => '40',
+                'marge_onder' => '40',
+                // Uit 8.10.1 (Aan/Uit); blijft geaccepteerd zodat oude shortcodes
+                // niet breken, maar marge_boven/marge_onder bepalen de marge.
+                'marges'   => '',
                 'el_class' => '',
             ),
             $atts,
@@ -127,11 +134,17 @@ class KZ_Element_Motto {
         }
         $klasse = trim( 'kz-motto ' . implode( ' ', array_map( 'sanitize_html_class', preg_split( '/\s+/', (string) $atts['el_class'] ) ) ) );
 
-        $stijl = 'text-align:center;' . ( 'on' === $atts['marges'] ? 'margin:20px 0;' : '' );
+        $stijl = 'text-align:center;margin:' . self::marge( $atts['marge_boven'] ) . 'px 0 ' . self::marge( $atts['marge_onder'] ) . 'px;';
 
         return '<div class="' . esc_attr( $klasse ) . '" style="' . esc_attr( $stijl ) . '">'
             . '<img src="' . esc_url( $url ) . '" width="' . esc_attr( $breedte ) . '" alt="' . esc_attr( 'Motto Kraonige Zwaone' ) . '" style="max-width:100%;height:auto;" decoding="async">'
             . '</div>';
+    }
+
+    /** Een marge in px; leeg of onzin = de standaard 40, "0" = geen. */
+    private static function marge( $waarde ) {
+        $waarde = trim( (string) $waarde );
+        return preg_match( '/^\d+$/', $waarde ) ? absint( $waarde ) : 40;
     }
 
     /** Voor redacteuren een HTML-commentaar waarom er niets staat; bezoekers zien niets. */
