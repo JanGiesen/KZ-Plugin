@@ -74,6 +74,11 @@ class KZ_Admin {
             'shortcode' => 'kz_evenementen_overzicht',
             'params'    => 'kolommen, categorie, sortering, max_aantal, leeg_tekst, el_class',
         ),
+        'motto'            => array(
+            'label'     => 'KZ-Motto',
+            'shortcode' => 'kz_motto',
+            'params'    => 'variant (seizoen, kraonig, elfelf, keuze), breedte, el_class',
+        ),
     );
 
     public function __construct( KZ_Plugin_Updater $updater ) {
@@ -82,6 +87,7 @@ class KZ_Admin {
         add_action( 'admin_post_kz_plugin_save_settings', array( $this, 'save_settings' ) );
         add_action( 'admin_post_kz_plugin_check_updates', array( $this, 'handle_check_updates' ) );
         add_action( 'admin_post_kz_plugin_link_in_bio_verversen', array( $this, 'handle_link_in_bio_verversen' ) );
+        add_action( 'admin_post_kz_plugin_motto_verversen', array( $this, 'handle_motto_verversen' ) );
     }
 
     public static function get_disabled_elements() {
@@ -175,6 +181,21 @@ class KZ_Admin {
         exit;
     }
 
+    /** Haalt de motto's meteen opnieuw op, zonder op de cache te wachten. */
+    public function handle_motto_verversen() {
+        check_admin_referer( 'kz_plugin_motto_verversen' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( 'Geen toegang' );
+        }
+
+        KZ_Element_Motto::vergeet_cache();
+        KZ_Element_Motto::gegevens();
+
+        wp_safe_redirect( add_query_arg( array( 'page' => 'kz-plugin', 'kz_motto_ververst' => '1' ), admin_url( 'admin.php' ) ) . '#kz-motto' );
+        exit;
+    }
+
     public function render_page() {
         if ( ! current_user_can( 'manage_options' ) ) {
             return;
@@ -187,6 +208,7 @@ class KZ_Admin {
         $link_url          = get_option( KZ_Link_In_Bio::OPTIE_URL, KZ_Link_In_Bio::STANDAARD_URL );
         $link_sleutel      = get_option( KZ_Link_In_Bio::OPTIE_SLEUTEL, '' );
         $link_status       = get_option( KZ_Link_In_Bio::OPTIE_STATUS );
+        $motto_status      = get_option( KZ_Element_Motto::OPTIE_STATUS );
         ?>
         <div class="wrap kz-plugin-admin">
             <h1>KZ Plugin</h1>
@@ -199,6 +221,9 @@ class KZ_Admin {
             <?php endif; ?>
             <?php if ( isset( $_GET['kz_link_ververst'] ) ) : ?>
                 <div class="notice notice-success is-dismissible"><p>Link-In-Bio opnieuw opgehaald.</p></div>
+            <?php endif; ?>
+            <?php if ( isset( $_GET['kz_motto_ververst'] ) ) : ?>
+                <div class="notice notice-success is-dismissible"><p>Motto's opnieuw opgehaald.</p></div>
             <?php endif; ?>
 
             <h2>Updates</h2>
@@ -313,6 +338,32 @@ class KZ_Admin {
                 <?php wp_nonce_field( 'kz_plugin_link_in_bio_verversen' ); ?>
                 <input type="hidden" name="action" value="kz_plugin_link_in_bio_verversen" />
                 <button type="submit" class="button button-secondary">Link-In-Bio nu opnieuw ophalen</button>
+            </form>
+
+            <h2 id="kz-motto" style="margin-top: 30px;">Motto</h2>
+            <p>
+                De .svg's van het element KZ-Motto en welke er bij &ldquo;Keuze&rdquo; getoond wordt, beheer je in KZ-Studio onder Website &rarr; Overig &rarr; Motto.
+                Deze site haalt die elke minuut op, met het Supabase-adres en de anon-key van de Link-In-Bio hierboven.
+            </p>
+            <p>
+                <strong>Laatst opgehaald:</strong>
+                <?php
+                if ( is_array( $motto_status ) ) {
+                    echo esc_html( wp_date( 'j F Y H:i:s', (int) $motto_status['tijd'] ) ) . ' &mdash; ';
+                    if ( $motto_status['ok'] ) {
+                        echo '<span style="color:#008a20;">gelukt</span> (' . esc_html( $motto_status['melding'] ) . ')';
+                    } else {
+                        echo '<span style="color:#d63638;">mislukt</span>: ' . esc_html( $motto_status['melding'] );
+                    }
+                } else {
+                    echo 'Nog niet.';
+                }
+                ?>
+            </p>
+            <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+                <?php wp_nonce_field( 'kz_plugin_motto_verversen' ); ?>
+                <input type="hidden" name="action" value="kz_plugin_motto_verversen" />
+                <button type="submit" class="button button-secondary">Motto's nu opnieuw ophalen</button>
             </form>
         </div>
         <?php

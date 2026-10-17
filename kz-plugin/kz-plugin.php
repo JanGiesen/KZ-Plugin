@@ -2,8 +2,8 @@
 /**
  * Plugin Name: KZ Plugin
  * Plugin URI: https://github.com/JanGiesen/KZ-Plugin
- * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, evenement info, evenementen overzicht).
- * Version: 8.9.0
+ * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, evenement info, evenementen overzicht, motto).
+ * Version: 8.10.0
  * Author: Kraonige Zwaone
  * Text Domain: kz-plugin
  * Update URI: https://github.com/JanGiesen/KZ-Plugin
@@ -94,13 +94,19 @@
  * 8.9.0: Link-In-Bio — tussenkoppen om knoppen in groepjes te zetten, een
  * optionele foto over de volle breedte bij een knop, en de iconen Krant en
  * Feest. Hoort bij KZ-Studio-migratie 0041.
+ *
+ * 8.10.0: nieuw element KZ-Motto (shortcode kz_motto) — het motto als
+ * afbeelding: Seizoensmotto, Kraonige Motto, 11e van de 11e-Motto of de
+ * Keuze. Welke .svg bij welk motto hoort en wat de keuze is, beheer je in
+ * KZ-Studio (Website → Overig → Motto, migratie 0042); opgehaald via
+ * dezelfde Supabase-instellingen als de Link-In-Bio.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Directe toegang niet toegestaan.
 }
 
-define( 'KZ_PLUGIN_VERSION', '8.9.0' );
+define( 'KZ_PLUGIN_VERSION', '8.10.0' );
 define( 'KZ_PLUGIN_FILE', __FILE__ );
 define( 'KZ_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KZ_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -125,6 +131,7 @@ class KZ_Plugin {
         'recent_products'  => 'KZ_Element_Recent_Products',
         'event_info'       => 'KZ_Element_Event_Info',
         'event_overview'   => 'KZ_Element_Event_Overview',
+        'motto'            => 'KZ_Element_Motto',
     );
 
     public function __construct() {
@@ -174,6 +181,7 @@ class KZ_Plugin {
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-recent-products.php';
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-event-info.php';
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-event-overview.php';
+        require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-motto.php';
         require_once KZ_PLUGIN_PATH . 'includes/class-kz-evenementen.php';
         require_once KZ_PLUGIN_PATH . 'includes/class-kz-link-in-bio.php';
     }

@@ -6,7 +6,7 @@ Deze monorepo bevat twee plugins:
 
 | Map | Plugin | Doel |
 |---|---|---|
-| `kz-plugin/` | **KZ Plugin** | WPBakery-elementen: post carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, recente galerijen, winkel producten, evenement info, evenementen overzicht (+ post type `kz_evenement` voor KZ-Studio), en de Link-In-Bio-pagina op link.kraonigezwaone.nl |
+| `kz-plugin/` | **KZ Plugin** | WPBakery-elementen: post carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, recente galerijen, winkel producten, evenement info, evenementen overzicht, motto (+ post type `kz_evenement` voor KZ-Studio), en de Link-In-Bio-pagina op link.kraonigezwaone.nl |
 | `kz-contentmanager-plugin/` | **KZ Contentmanager Plugin** | Haalt content op uit Google Docs en toont die via de shortcode `[kz-content]` |
 
 Beide plugins zijn samenvoegingen/opvolgers van eerder losse plugins (KZ-Kraonige Zwaone Plugin 7.1, KZ Vindt, KZH Ticket Element, KZ-Kraonige Zwaone Contentmanager 2.0.0). Alle shortcode-namen en parameters zijn ongewijzigd overgenomen zodat bestaande content op de site blijft werken. Bij activatie deactiveren de nieuwe plugins automatisch de oude losse plugins (met een melding in het dashboard) om dubbele shortcode-registratie te voorkomen.
@@ -44,6 +44,10 @@ De pagina is losse HTML (`includes/class-kz-link-in-bio.php` + `assets/css/kz-li
 4. Een pagina-cacheplugin moet het subdomein als eigen host behandelen (de meeste doen dat vanzelf). De pagina stuurt zelf `Cache-Control: max-age=60`.
 
 Iconen, de URL-regel (`https://`, `http://`, `mailto:`, `tel:` — nooit `javascript:`) en de CSS staan ook in KZ-Studio, voor het voorbeeld in het beheerscherm (`src/lib/linkInBio.ts`, `src/pages/website/linkInBio.css`). Houd die gelijk.
+
+## KZ-Motto
+
+Sinds 8.10.0 is er het element **KZ-Motto** (`[kz_motto variant="keuze" breedte="1000"]`), ter vervanging van het losse HTML-blok met `KZH_MOTTO.svg`. `variant` is `seizoen` (Seizoensmotto), `kraonig` (Kraonige Motto), `elfelf` (11e van de 11e-Motto) of `keuze` (standaard). Welke .svg bij welk motto hoort en welke er bij Keuze getoond wordt, beheer je in **KZ-Studio → Website → Overig → Motto** (KZ-Studio-migratie `0042_website_motto.sql`). De plugin haalt dat op via de openbare functie `motto_ophalen()`, met hetzelfde Supabase-adres en dezelfde anon-key als de Link-In-Bio, hooguit eens per minuut; lukt het niet, dan blijft de laatste goede versie staan. Is er bij een motto nog niets gekoppeld, dan toont het element niets (redacteuren zien in de bron een HTML-commentaar met de reden). Onder **KZ Plugin → Motto** staat de status en een knop om meteen opnieuw op te halen.
 
 ## Automatische updates
 
