@@ -3,7 +3,7 @@
  * Plugin Name: KZ Plugin
  * Plugin URI: https://github.com/JanGiesen/KZ-Plugin
  * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, evenement info, evenementen overzicht, motto, pagina).
- * Version: 8.14.0
+ * Version: 8.14.1
  * Author: Kraonige Zwaone
  * Text Domain: kz-plugin
  * Update URI: https://github.com/JanGiesen/KZ-Plugin
@@ -134,13 +134,16 @@
  * of wit, of vast), en op wit worden de witte motto-svg's rood. Per sectie
  * kies je welk motto: KZ (kraonig), Seizoen, 11e van de 11e of Keuze. De
  * grote kop is nu gelijk aan de WPBakery-kop KZ-HEAD (48px/60px, 700).
+ *
+ * 8.14.1: KZ-Pagina — boven de grote kop evenveel ruimte als eronder (16px,
+ * op telefoon 8px) in plaats van 40px erboven.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Directe toegang niet toegestaan.
 }
 
-define( 'KZ_PLUGIN_VERSION', '8.14.0' );
+define( 'KZ_PLUGIN_VERSION', '8.14.1' );
 define( 'KZ_PLUGIN_FILE', __FILE__ );
 define( 'KZ_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KZ_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
