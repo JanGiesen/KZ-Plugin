@@ -71,7 +71,13 @@ html:has(.kzp--vol){overflow-x:clip}
 .kzp .kzp__onderdeel{margin:0;padding:0;border:0}
 .kzp .kzp__onderdeel + .kzp__onderdeel{margin-top:44px}
 .kzp .kzp__onderdeel-titel{font-size:34px;margin:0 0 26px}
-.kzp .kzp__tijd{white-space:nowrap}
+/* De tijd: een kleine contrastkop boven de titel, zoals de Contrastkop van
+   KZ-Studio — effen blok, hoofdletters, versmald tot 80%. Rood op wit, wit
+   op rood. */
+.kzp .kzp__tijd{display:block;width:fit-content;margin:0 0 10px;padding:5px 10px 3px;background:var(--kzp-red);color:var(--kzp-white);
+  font-family:var(--kzp-display);font-weight:700;font-size:18px;line-height:1;letter-spacing:-0.04em;text-transform:uppercase;white-space:nowrap;
+  transform:scaleX(.8);transform-origin:left center}
+.kzp .kzp__band--rood .kzp__tijd{background:var(--kzp-white);color:var(--kzp-red)}
 
 /* Foto's: vaste verhouding 3:2, uitsnede rond het focuspunt */
 .kzp .kzp__fotos{display:grid;grid-template-columns:minmax(0,1fr);gap:40px}

@@ -136,7 +136,9 @@
  * grote kop is nu gelijk aan de WPBakery-kop KZ-HEAD (48px/60px, 700).
  *
  * 8.14.1: KZ-Pagina — boven de grote kop evenveel ruimte als eronder (16px,
- * op telefoon 8px) in plaats van 40px erboven.
+ * op telefoon 8px) in plaats van 40px erboven. De tijd van een onderdeel
+ * staat niet meer als "[20:30]" achter de titel, maar als kleine contrastkop
+ * erboven (rood op wit, wit op rood).
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
