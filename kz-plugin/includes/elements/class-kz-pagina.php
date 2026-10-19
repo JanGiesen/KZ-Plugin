@@ -190,7 +190,7 @@ class KZ_Element_Pagina {
         foreach ( $secties as $n => $s ) {
             $achtergrond = 'wit';
             $fotokant    = 'links';
-            if ( in_array( $s['sjabloon'], array( 'intro', 'dag', 'tekst_foto' ), true ) ) {
+            if ( in_array( $s['sjabloon'], array( 'intro', 'dag', 'tekst_foto', 'motto' ), true ) ) {
                 $k           = isset( $s['inhoud']['kleur'] ) ? $s['inhoud']['kleur'] : 'auto';
                 $achtergrond = 'auto' === $k ? ( 0 === $band % 2 ? 'rood' : 'wit' ) : $k;
                 $band++;
@@ -303,14 +303,26 @@ class KZ_Element_Pagina {
                 }
                 $motto = KZ_Element_Motto::render(
                     array(
-                        'variant'     => 'keuze',
+                        'variant'     => $i['variant'],
                         'marge_boven' => '0',
                         'marge_onder' => '0',
                     )
                 );
-                return '' === $motto ? '' : '<section class="kzp__sectie kzp__motto"><div class="kzp__binnen">' . $motto . '</div></section>';
+                if ( '' === $motto ) {
+                    return '';
+                }
+                // De motto-svg's zijn wit. Op een witte band kleurt een SVG-filter
+                // ze rood (#E83F35); dat werkt ook voor een svg van een ander domein.
+                $filter = 'wit' === $opmaak['achtergrond'] ? self::rood_filter() : '';
+                return '<section class="' . esc_attr( $band . ' kzp__motto' ) . '">' . $filter . '<div class="kzp__binnen">' . $motto . '</div></section>';
         }
         return '';
+    }
+
+    /** Een onzichtbaar SVG-filter dat alles wat niet doorzichtig is #E83F35 maakt. */
+    private static function rood_filter() {
+        return '<svg class="kzp__filter" width="0" height="0" aria-hidden="true" focusable="false"><filter id="kzp-rood" color-interpolation-filters="sRGB">'
+            . '<feColorMatrix type="matrix" values="0 0 0 0 0.9098 0 0 0 0 0.2471 0 0 0 0 0.2078 0 0 0 1 0"/></filter></svg>';
     }
 
     private static function titel( $tekst, $klasse = 'kzp__titel', $tag = 'h2' ) {
@@ -637,6 +649,12 @@ class KZ_Element_Pagina {
                 return array(
                     'titel'   => self::tekst( $r, 'titel', $l['titel'] ),
                     'tickets' => $tickets,
+                );
+
+            case 'motto':
+                return array(
+                    'variant' => self::keuze( $r, 'variant', array( 'keuze', 'kraonig', 'seizoen', 'elfelf' ), 'keuze' ),
+                    'kleur'   => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
                 );
 
             case 'faq':

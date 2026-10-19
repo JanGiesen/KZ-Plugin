@@ -108,9 +108,13 @@ html:has(.kzp--vol){overflow-x:clip}
 .kzp .kzp__slot{margin-top:40px}
 .kzp .kzp__slot p{margin-bottom:.4em;line-height:1.3}
 
-/* Motto */
-.kzp .kzp__motto{padding:24px 0;background:var(--kzp-white)}
+/* Motto: een band die meedoet met om en om. De svg's zijn wit; op een witte
+   band maakt het filter #kzp-rood (in de sectie zelf) ze rood. */
+.kzp .kzp__motto{padding:40px 0}
 .kzp .kzp__motto .kz-motto{margin:0!important}
+.kzp .kzp__motto .kz-motto img{display:inline-block}
+.kzp .kzp__band--wit.kzp__motto .kz-motto img{filter:url(#kzp-rood)}
+.kzp .kzp__filter{position:absolute;width:0;height:0;overflow:hidden}
 
 /* Smal (telefoon): alles onder elkaar, tekst eerst en de foto's eronder */
 @container kzp (max-width: 760px){
