@@ -31,6 +31,8 @@ class KZ_Element_Pagina {
     const OPTIE_STATUS = 'kz_pagina_status';
     const CACHE        = 'kz_pagina_';
     const CACHE_SECONDEN = 60;
+    /** Hoe lang LiteSpeed Cache een pagina met KZ-Pagina mag bewaren. */
+    const PAGINA_CACHE_SECONDEN = 120;
 
     /** Maximale lengtes en aantallen; gelijk aan LIMIET in paginaSjablonen.ts. */
     const LIMIET = array(
@@ -111,6 +113,8 @@ class KZ_Element_Pagina {
             return self::uitleg( 'geen geldige pagina-naam opgegeven' );
         }
 
+        self::kort_cachen();
+
         $data = self::gegevens( $slug );
         if ( null === $data ) {
             return self::uitleg( 'nog geen gegevens uit KZ-Studio opgehaald voor "' . $slug . '"', $slug );
@@ -132,6 +136,16 @@ class KZ_Element_Pagina {
 
         $klasse = 'kz-pagina kzp' . ( 'kolom' === $atts['breedte'] ? '' : ' kzp--vol' );
         return '<div class="' . esc_attr( $klasse ) . '">' . $html . '</div>';
+    }
+
+    /**
+     * Vraagt LiteSpeed Cache om deze pagina maar kort te bewaren. De inhoud komt
+     * uit KZ-Studio en verandert na Publiceren daar, zonder dat WordPress het
+     * merkt; met de standaard-TTL van LiteSpeed zagen bezoekers (niet
+     * ingelogd) dan nog lang de oude versie. Doet niets zonder LiteSpeed.
+     */
+    private static function kort_cachen() {
+        do_action( 'litespeed_control_set_ttl', self::PAGINA_CACHE_SECONDEN );
     }
 
     /**
