@@ -132,7 +132,8 @@
  *
  * 8.14.0: KZ-Pagina — het motto is een band die meedoet met om en om (rood
  * of wit, of vast), en op wit worden de witte motto-svg's rood. Per sectie
- * kies je welk motto: KZ (kraonig), Seizoen, 11e van de 11e of Keuze.
+ * kies je welk motto: KZ (kraonig), Seizoen, 11e van de 11e of Keuze. De
+ * grote kop is nu gelijk aan de WPBakery-kop KZ-HEAD (48px/60px, 700).
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
