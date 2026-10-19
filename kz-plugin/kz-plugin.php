@@ -2,8 +2,8 @@
 /**
  * Plugin Name: KZ Plugin
  * Plugin URI: https://github.com/JanGiesen/KZ-Plugin
- * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, evenement info, evenementen overzicht, motto).
- * Version: 8.11.0
+ * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, evenement info, evenementen overzicht, motto, pagina).
+ * Version: 8.12.0
  * Author: Kraonige Zwaone
  * Text Domain: kz-plugin
  * Update URI: https://github.com/JanGiesen/KZ-Plugin
@@ -110,13 +110,19 @@
  *
  * 8.11.0: Link-In-Bio — drie iconen van de vereniging erbij: Optocht, Steek
  * en Zwaan (gevulde silhouetten).
+ *
+ * 8.12.0: nieuw element KZ-Pagina (shortcode kz_pagina) — een hele pagina uit
+ * vaste secties (kop, intro, dag, tekst + foto, tickets, vragen, motto),
+ * beheerd in KZ-Studio (Website → Pagina's, migratie 0044). De opmaak staat
+ * vast in assets/css/kz-pagina.css; KZ-Studio levert alleen tekst, knoppen en
+ * foto's. Opgehaald via dezelfde Supabase-instellingen als de Link-In-Bio.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Directe toegang niet toegestaan.
 }
 
-define( 'KZ_PLUGIN_VERSION', '8.11.0' );
+define( 'KZ_PLUGIN_VERSION', '8.12.0' );
 define( 'KZ_PLUGIN_FILE', __FILE__ );
 define( 'KZ_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KZ_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -142,6 +148,7 @@ class KZ_Plugin {
         'event_info'       => 'KZ_Element_Event_Info',
         'event_overview'   => 'KZ_Element_Event_Overview',
         'motto'            => 'KZ_Element_Motto',
+        'pagina'           => 'KZ_Element_Pagina',
     );
 
     public function __construct() {
@@ -192,6 +199,7 @@ class KZ_Plugin {
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-event-info.php';
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-event-overview.php';
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-motto.php';
+        require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-pagina.php';
         require_once KZ_PLUGIN_PATH . 'includes/class-kz-evenementen.php';
         require_once KZ_PLUGIN_PATH . 'includes/class-kz-link-in-bio.php';
     }
@@ -261,6 +269,7 @@ class KZ_Plugin {
 
         wp_register_style( 'kz-evenement-info-style', KZ_PLUGIN_URL . 'assets/css/kz-evenement-info.css', array(), KZ_PLUGIN_VERSION );
         wp_register_style( 'kz-evenementen-overzicht-style', KZ_PLUGIN_URL . 'assets/css/kz-evenementen-overzicht.css', array( 'kz-evenement-info-style' ), KZ_PLUGIN_VERSION );
+        wp_register_style( 'kz-pagina-style', KZ_PLUGIN_URL . 'assets/css/kz-pagina.css', array(), KZ_PLUGIN_VERSION );
         wp_register_style( 'kz-evenement-info-fonts', 'https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&family=Work+Sans:wght@400;500&display=swap', array(), null );
 
         wp_register_style( 'swiper', KZ_PLUGIN_URL . 'assets/vendor/swiper/swiper-bundle.min.css', array(), '11' );

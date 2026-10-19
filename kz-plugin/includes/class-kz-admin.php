@@ -79,6 +79,11 @@ class KZ_Admin {
             'shortcode' => 'kz_motto',
             'params'    => 'variant (seizoen, kraonig, elfelf, keuze), breedte, marge_boven, marge_onder, el_class',
         ),
+        'pagina'           => array(
+            'label'     => 'KZ-Pagina',
+            'shortcode' => 'kz_pagina',
+            'params'    => 'pagina, breedte (vol, kolom)',
+        ),
     );
 
     public function __construct( KZ_Plugin_Updater $updater ) {
@@ -88,6 +93,7 @@ class KZ_Admin {
         add_action( 'admin_post_kz_plugin_check_updates', array( $this, 'handle_check_updates' ) );
         add_action( 'admin_post_kz_plugin_link_in_bio_verversen', array( $this, 'handle_link_in_bio_verversen' ) );
         add_action( 'admin_post_kz_plugin_motto_verversen', array( $this, 'handle_motto_verversen' ) );
+        add_action( 'admin_post_kz_plugin_paginas_verversen', array( $this, 'handle_paginas_verversen' ) );
     }
 
     public static function get_disabled_elements() {
@@ -196,6 +202,20 @@ class KZ_Admin {
         exit;
     }
 
+    /** Leegt de cache van alle KZ-Pagina's; het volgende bezoek haalt vers op. */
+    public function handle_paginas_verversen() {
+        check_admin_referer( 'kz_plugin_paginas_verversen' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( 'Geen toegang' );
+        }
+
+        KZ_Element_Pagina::vergeet_cache();
+
+        wp_safe_redirect( add_query_arg( array( 'page' => 'kz-plugin', 'kz_paginas_ververst' => '1' ), admin_url( 'admin.php' ) ) . '#kz-paginas' );
+        exit;
+    }
+
     public function render_page() {
         if ( ! current_user_can( 'manage_options' ) ) {
             return;
@@ -209,6 +229,7 @@ class KZ_Admin {
         $link_sleutel      = get_option( KZ_Link_In_Bio::OPTIE_SLEUTEL, '' );
         $link_status       = get_option( KZ_Link_In_Bio::OPTIE_STATUS );
         $motto_status      = get_option( KZ_Element_Motto::OPTIE_STATUS );
+        $pagina_status     = get_option( KZ_Element_Pagina::OPTIE_STATUS );
         ?>
         <div class="wrap kz-plugin-admin">
             <h1>KZ Plugin</h1>
@@ -224,6 +245,9 @@ class KZ_Admin {
             <?php endif; ?>
             <?php if ( isset( $_GET['kz_motto_ververst'] ) ) : ?>
                 <div class="notice notice-success is-dismissible"><p>Motto's opnieuw opgehaald.</p></div>
+            <?php endif; ?>
+            <?php if ( isset( $_GET['kz_paginas_ververst'] ) ) : ?>
+                <div class="notice notice-success is-dismissible"><p>Cache van de pagina's geleegd; het volgende bezoek haalt ze vers op.</p></div>
             <?php endif; ?>
 
             <h2>Updates</h2>
@@ -364,6 +388,40 @@ class KZ_Admin {
                 <?php wp_nonce_field( 'kz_plugin_motto_verversen' ); ?>
                 <input type="hidden" name="action" value="kz_plugin_motto_verversen" />
                 <button type="submit" class="button button-secondary">Motto's nu opnieuw ophalen</button>
+            </form>
+
+            <h2 id="kz-paginas" style="margin-top: 30px;">Pagina's</h2>
+            <p>
+                Pagina's met het element KZ-Pagina (zoals <code>[kz_pagina pagina="5dd"]</code>) beheer je in KZ-Studio onder Website &rarr; Pagina's.
+                Na Publiceren daar haalt deze site de nieuwe versie binnen een minuut op, met het Supabase-adres en de anon-key van de Link-In-Bio hierboven.
+            </p>
+            <?php if ( is_array( $pagina_status ) && $pagina_status ) : ?>
+                <table class="widefat" style="max-width: 700px;">
+                    <tbody>
+                        <?php foreach ( $pagina_status as $slug => $st ) : ?>
+                            <tr>
+                                <td><strong><?php echo esc_html( $slug ); ?></strong></td>
+                                <td>
+                                    <?php
+                                    echo esc_html( wp_date( 'j F Y H:i:s', (int) $st['tijd'] ) ) . ' &mdash; ';
+                                    if ( $st['ok'] ) {
+                                        echo '<span style="color:#008a20;">gelukt</span> (' . esc_html( $st['melding'] ) . ')';
+                                    } else {
+                                        echo '<span style="color:#d63638;">mislukt</span>: ' . esc_html( $st['melding'] );
+                                    }
+                                    ?>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php else : ?>
+                <p><strong>Laatst opgehaald:</strong> nog niet.</p>
+            <?php endif; ?>
+            <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin-top: 10px;">
+                <?php wp_nonce_field( 'kz_plugin_paginas_verversen' ); ?>
+                <input type="hidden" name="action" value="kz_plugin_paginas_verversen" />
+                <button type="submit" class="button button-secondary">Pagina's nu opnieuw ophalen</button>
             </form>
         </div>
         <?php
