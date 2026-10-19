@@ -113,10 +113,10 @@ class KZ_Element_Pagina {
 
         $data = self::gegevens( $slug );
         if ( null === $data ) {
-            return self::uitleg( 'nog geen gegevens uit KZ-Studio opgehaald voor "' . $slug . '"' );
+            return self::uitleg( 'nog geen gegevens uit KZ-Studio opgehaald voor "' . $slug . '"', $slug );
         }
         if ( empty( $data['gevonden'] ) ) {
-            return self::uitleg( '"' . $slug . '" is in KZ-Studio niet gepubliceerd (of staat in de prullenbak)' );
+            return self::uitleg( '"' . $slug . '" is in KZ-Studio niet gepubliceerd, staat in de prullenbak, of heet daar anders', $slug );
         }
 
         wp_enqueue_style( 'kz-evenement-info-fonts' );
@@ -134,12 +134,30 @@ class KZ_Element_Pagina {
         return '<div class="' . esc_attr( $klasse ) . '">' . $html . '</div>';
     }
 
-    /** Voor redacteuren een HTML-commentaar waarom er niets staat; bezoekers zien niets. */
-    private static function uitleg( $reden ) {
+    /**
+     * Voor redacteuren een zichtbaar geel blokje waarom er niets staat, met de
+     * laatste ophaalstatus van deze pagina; bezoekers zien niets. Zichtbaar en
+     * niet alleen als HTML-commentaar: LiteSpeed Cache haalt commentaar bij
+     * "HTML minify" uit de pagina, en dan was de reden onvindbaar.
+     */
+    private static function uitleg( $reden, $slug = '' ) {
         if ( ! current_user_can( 'edit_posts' ) ) {
             return '';
         }
-        return '<!-- KZ-Pagina: ' . esc_html( $reden ) . ' -->';
+        $regels = array( '<strong>KZ-Pagina</strong> (alleen zichtbaar voor redacteuren): ' . esc_html( $reden ) . '.' );
+
+        $status = get_option( self::OPTIE_STATUS );
+        if ( '' !== $slug && is_array( $status ) && isset( $status[ $slug ] ) && is_array( $status[ $slug ] ) ) {
+            $st       = $status[ $slug ];
+            $regels[] = 'Laatst opgehaald: ' . esc_html( wp_date( 'j F Y H:i:s', (int) $st['tijd'] ) ) . ' &mdash; '
+                . ( $st['ok'] ? 'gelukt' : 'mislukt' ) . ' (' . esc_html( $st['melding'] ) . ').';
+        }
+        $regels[] = 'Net gepubliceerd? De site haalt hooguit eens per minuut op; onder KZ Plugin &rarr; Pagina\'s kun je dat meteen laten doen.';
+
+        return '<!-- KZ-Pagina: ' . esc_html( $reden ) . ' -->'
+            . '<div class="kz-pagina-uitleg" style="margin:24px auto;max-width:900px;padding:14px 18px;background:#fff6d6;border:2px dashed #b88a00;color:#111;font:15px/1.5 -apple-system,BlinkMacSystemFont,sans-serif;text-align:left;">'
+            . implode( '<br>', $regels )
+            . '</div>';
     }
 
     // ------------------------------------------------------------------
