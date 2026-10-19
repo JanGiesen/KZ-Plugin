@@ -53,11 +53,12 @@ Sinds 8.10.0 is er het element **KZ-Motto** (`[kz_motto variant="keuze" breedte=
 
 Sinds 8.12.0 is er het element **KZ-Pagina** (`[kz_pagina pagina="5dd"]`), dat een hele pagina tekent uit vaste secties: Kop, Intro, Dag (onderdelen met tijd en knop, plus een fotokolom), Tekst + foto, Tickets (via het bestaande element KZ-Ticket), Vragen (uitklappers in groepjes) en Motto (via KZ-Motto). De inhoud — alleen tekst, knoppen en foto's — beheer je in **KZ-Studio → Website → Pagina's** (KZ-Studio-migratie `0044_website_paginas.sql`). De opmaak staat vast in `assets/css/kz-pagina.css`, dus er verspringt niets zoals bij losse WPBakery-blokken. Rode en witte banden wisselen vanzelf om en om, net als de kant waar de foto's staan.
 
+- Knoppen zijn het element KZ-Knop zelf (`KZ_Element_Button::render()`, sinds 8.13.0): `KZ-KNOP-WIT` op een rode band, `KZ-KNOP-ROOD` op wit.
 - `pagina` is de naam van de pagina in KZ-Studio; `breedte` is `vol` (standaard: de banden lopen door tot de rand van het venster) of `kolom`.
 - De plugin haalt de nieuwste **gepubliceerde** versie op via de openbare functie `website_pagina_ophalen()`, met hetzelfde Supabase-adres en dezelfde anon-key als de Link-In-Bio, hooguit eens per minuut per pagina. Lukt het niet, dan blijft de laatste goede versie staan. Wijzigingen in KZ-Studio komen pas op de site na **Publiceren** daar.
 - `class-kz-pagina.php` laat alleen bekende velden door, kort ze in tot hun maximale lengte, zet tekst zelf om naar HTML (`tekst_html()`: eerst alles escapen, dan `**vet**`, `*cursief*`, `- opsomming`, `### tussenkop` en `[tekst](https://…)`) en accepteert alleen https-foto's en https-, mailto- en tel-links.
 - Houd gelijk met KZ-Studio (`src/lib/paginaSjablonen.ts`): de sjablonen en hun velden, `LIMIET`, `kleuren()` en `tekst_html()`. `kz-pagina.css` staat daar als kopie in `src/pages/website/pagina.css`, voor het voorbeeld.
-- Staat er niets? Redacteuren zien in de bron van de pagina een HTML-commentaar `<!-- KZ-Pagina: … -->` met de reden. Onder **KZ Plugin → Pagina's** staat per pagina wanneer hij voor het laatst is opgehaald, met een knop om de cache te legen.
+- Staat er niets? Ingelogde redacteuren zien op de pagina zelf een geel blokje met de reden en de laatste ophaalstatus (sinds 8.12.1; daarvoor alleen een HTML-commentaar, en dat haalt LiteSpeed Cache weg). Bezoekers zien niets. Onder **KZ Plugin → Pagina's** staat per pagina wanneer hij voor het laatst is opgehaald, met een knop om de cache te legen.
 
 ## Automatische updates
 

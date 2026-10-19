@@ -9,10 +9,10 @@
 
    Houd gelijk met KZ-Studio: src/pages/website/pagina.css is een kopie. */
 
-.kzp{--kzp-red:#e83f35;--kzp-red-dark:#b82a22;--kzp-red-darker:#8f1f19;--kzp-white:#fff;--kzp-black:#111;
+.kzp{--kzp-red:#e83f35;--kzp-white:#fff;--kzp-black:#111;
   --kzp-display:"Roboto Condensed",Impact,"Arial Narrow",sans-serif;--kzp-body:"Work Sans",-apple-system,BlinkMacSystemFont,sans-serif;
   box-sizing:border-box;container-type:inline-size;container-name:kzp;width:100%;
-  font-family:var(--kzp-body);color:var(--kzp-black);font-size:18px;line-height:1.55;text-align:left}
+  font-family:var(--kzp-body);color:var(--kzp-red);font-size:17px;line-height:1.5;text-align:left}
 .kzp *,.kzp *::before,.kzp *::after{box-sizing:border-box}
 
 /* Over de volle breedte van het venster, ook binnen een smalle themakolom.
@@ -20,29 +20,29 @@
 html:has(.kzp--vol){overflow-x:clip}
 .kzp--vol .kzp__sectie{margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw)}
 
-.kzp .kzp__sectie{display:block;margin-top:0;margin-bottom:0;padding:48px 0}
-.kzp .kzp__binnen{max-width:1140px;margin:0 auto;padding:0 24px}
-.kzp .kzp__smal{max-width:900px}
+.kzp .kzp__sectie{display:block;margin-top:0;margin-bottom:0;padding:60px 0}
+.kzp .kzp__binnen{max-width:1235px;margin:0 auto;padding:0 24px}
+.kzp .kzp__smal{max-width:948px}
 
-/* Banden */
+/* Banden: op wit is alle tekst rood, op rood wit — zoals de oude pagina */
 .kzp .kzp__band--rood{background:var(--kzp-red);color:var(--kzp-white)}
-.kzp .kzp__band--wit{background:var(--kzp-white);color:var(--kzp-black)}
+.kzp .kzp__band--wit{background:var(--kzp-white);color:var(--kzp-red)}
 
-/* Koppen: versmald tot 80%. De tekst krijgt eerst 125% van de breedte, zodat
-   hij pas afbreekt waar hij na het versmallen ook echt de rand raakt. */
-.kzp .kzp__kop-titel,.kzp .kzp__titel,.kzp .kzp__groep-titel{font-family:var(--kzp-display);font-weight:700;text-transform:uppercase;letter-spacing:-0.04em;line-height:.95;margin:0;padding:0;border:0;background:none}
-.kzp .kzp__kop-titel span,.kzp .kzp__titel span,.kzp .kzp__groep-titel span{display:block;width:125%;transform:scaleX(.8);transform-origin:left center}
-.kzp .kzp__kop-titel{font-size:80px;color:var(--kzp-red);text-align:center}
-.kzp .kzp__kop-titel span{margin:0 -12.5%;transform-origin:center center}
-.kzp .kzp__titel{font-size:52px;color:var(--kzp-red);margin-bottom:24px}
-.kzp .kzp__band--rood .kzp__titel{color:var(--kzp-white)}
-.kzp .kzp__groep-titel{font-size:40px;color:var(--kzp-red);margin:40px 0 12px}
+/* Koppen in Roboto Condensed, gewone hoofd- en kleine letters. Alleen de
+   grote kop (en de kop boven de vragen) in hoofdletters, versmald tot 80%:
+   de tekst krijgt eerst 125% van de breedte, zodat hij pas afbreekt waar hij
+   na het versmallen ook echt de rand raakt. */
+.kzp .kzp__kop-titel,.kzp .kzp__titel,.kzp .kzp__groep-titel,.kzp .kzp__onderdeel-titel{font-family:var(--kzp-display);font-weight:700;letter-spacing:0;line-height:1.1;margin:0;padding:0;border:0;background:none;text-transform:none;color:inherit}
+.kzp .kzp__kop-titel{font-size:80px;line-height:.95;letter-spacing:-0.04em;text-transform:uppercase;text-align:center;color:var(--kzp-red)}
+.kzp .kzp__kop-titel span{display:block;width:125%;margin:0 -12.5%;transform:scaleX(.8);transform-origin:center center}
+.kzp .kzp__titel{font-size:54px;margin-bottom:28px}
+.kzp .kzp__groep-titel{font-size:44px;margin:48px 0 12px}
 
 /* Kop: alleen een grote titel op wit */
 .kzp .kzp__kop{padding:40px 0 16px;background:var(--kzp-white)}
 
 /* Rasters: tekst + beeld naast elkaar, op smal onder elkaar */
-.kzp .kzp__raster{display:grid;gap:48px;align-items:start}
+.kzp .kzp__raster{display:grid;gap:44px;align-items:start}
 .kzp .kzp__raster--8-4{grid-template-columns:minmax(0,2fr) minmax(0,1fr);align-items:center}
 .kzp .kzp__raster--4-8{grid-template-columns:minmax(0,1fr) minmax(0,2fr)}
 .kzp .kzp__raster--6-6{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center}
@@ -52,31 +52,28 @@ html:has(.kzp--vol){overflow-x:clip}
 .kzp--foto-rechts.kzp__dag .kzp__raster--4-8{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
 
 /* Tekst uit KZ-Studio: alinea's, tussenkopjes, opsommingen, vet, cursief, links */
-.kzp .kzp__tekst{font-size:18px;line-height:1.55}
+.kzp .kzp__tekst{font-size:17px;line-height:1.5;color:inherit}
 .kzp .kzp__tekst > *:first-child{margin-top:0}
 .kzp .kzp__tekst > *:last-child{margin-bottom:0}
-.kzp .kzp__tekst p{margin:0 0 .8em;padding:0}
-.kzp .kzp__tekst h4{font-family:var(--kzp-display);font-weight:700;text-transform:uppercase;letter-spacing:-0.04em;font-size:22px;line-height:1.1;margin:1.1em 0 .3em;padding:0;color:inherit}
-.kzp .kzp__tekst ul{margin:0 0 .8em;padding:0 0 0 1.2em;list-style:disc}
-.kzp .kzp__tekst li{margin:0 0 .25em;padding:0}
+.kzp .kzp__tekst p{margin:0 0 1.2em;padding:0;color:inherit}
+.kzp .kzp__tekst h4{font-family:var(--kzp-body);font-weight:400;font-size:26px;line-height:1.2;margin:1.3em 0 .6em;padding:0;color:inherit;text-transform:none;letter-spacing:0}
+.kzp .kzp__tekst ul{margin:0 0 1.2em;padding:0 0 0 1.2em;list-style:disc}
+.kzp .kzp__tekst li{margin:0 0 .3em;padding:0;color:inherit}
 .kzp .kzp__tekst a{color:inherit;text-decoration:underline;text-underline-offset:2px}
-.kzp .kzp__tekst strong{font-weight:700}
-.kzp .kzp__band--wit .kzp__tekst a{color:var(--kzp-red)}
+.kzp .kzp__tekst strong{font-weight:700;color:inherit}
 
 /* Intro */
-.kzp .kzp__intro-tekst{font-weight:700;font-size:20px;line-height:1.45;margin:0 0 .8em}
+.kzp .kzp__intro-tekst{font-weight:700;font-size:19px;line-height:1.5;margin:0 0 1em}
 .kzp .kzp__logo{display:block;width:100%;max-width:300px;height:auto;margin:0 0 0 auto}
 
-/* Dag: onderdelen onder elkaar, met een dunne lijn ertussen */
-.kzp .kzp__onderdeel{margin:0;padding:22px 0 0;border-top:2px solid currentColor}
-.kzp .kzp__onderdeel + .kzp__onderdeel{margin-top:26px}
-.kzp .kzp__titel + .kzp__onderdeel{border-top:0;padding-top:0}
-.kzp .kzp__onderdeel-titel{font-family:var(--kzp-display);font-weight:700;text-transform:uppercase;letter-spacing:-0.04em;font-size:28px;line-height:1.05;margin:0 0 10px;padding:0;color:var(--kzp-red)}
-.kzp .kzp__band--rood .kzp__onderdeel-titel{color:var(--kzp-white)}
+/* Dag: onderdelen onder elkaar, zonder lijnen, met lucht ertussen */
+.kzp .kzp__onderdeel{margin:0;padding:0;border:0}
+.kzp .kzp__onderdeel + .kzp__onderdeel{margin-top:44px}
+.kzp .kzp__onderdeel-titel{font-size:34px;margin:0 0 26px}
 .kzp .kzp__tijd{white-space:nowrap}
 
 /* Foto's: vaste verhouding 3:2, uitsnede rond het focuspunt */
-.kzp .kzp__fotos{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.kzp .kzp__fotos{display:grid;grid-template-columns:minmax(0,1fr);gap:40px}
 .kzp .kzp__foto{display:block;margin:0;padding:0;aspect-ratio:3/2;overflow:hidden;background:rgba(17,17,17,.08)}
 .kzp .kzp__band--rood .kzp__foto{background:rgba(255,255,255,.15)}
 .kzp .kzp__foto img{display:block;width:100%;height:100%;max-width:none;object-fit:cover;margin:0;border:0}
@@ -85,37 +82,29 @@ html:has(.kzp--vol){overflow-x:clip}
 .kzp .kzp__foto--heel a{display:block}
 .kzp .kzp__foto--heel img{height:auto;object-fit:contain}
 
-/* Knop: wit op rood, rood op wit */
-.kzp .kzp__knop-rij{margin:18px 0 0;padding:0}
-.kzp .kzp__knop{display:inline-block;max-width:100%;text-align:center;background:var(--kzp-red);color:var(--kzp-white)!important;text-decoration:none!important;font-family:var(--kzp-display);font-weight:700;text-transform:uppercase;letter-spacing:-0.04em;font-size:24px;line-height:1;padding:.32em .7em .26em;border:2px solid var(--kzp-red);transition:background .12s ease}
-.kzp .kzp__knop span{display:inline-block;transform:scaleX(.8)}
-.kzp .kzp__knop:hover{background:var(--kzp-red-dark);border-color:var(--kzp-red-dark)}
-.kzp .kzp__knop:active{background:var(--kzp-red-darker)}
-.kzp .kzp__knop:focus-visible{outline:3px solid var(--kzp-black);outline-offset:3px}
-.kzp .kzp__band--rood .kzp__knop{background:var(--kzp-white);border-color:var(--kzp-white);color:var(--kzp-red)!important}
-.kzp .kzp__band--rood .kzp__knop:hover{background:#f1e4e3;border-color:#f1e4e3}
-.kzp .kzp__band--rood .kzp__knop:focus-visible{outline-color:var(--kzp-white)}
+/* Knoppen: geen eigen opmaak. KZ-Pagina tekent ze met het element KZ-Knop
+   zelf (KZ_Element_Button::render(): KZ-KNOP-ROOD op wit, KZ-KNOP-WIT op
+   rood), dus ze zijn gelijk aan elke andere KZ-Knop op de site. */
 
 /* Tickets */
 .kzp .kzp__tickets{display:flex;flex-wrap:wrap;justify-content:center;gap:24px;margin:0;padding:0}
 .kzp .kzp__ticket{flex:0 1 340px;min-width:0}
-.kzp .kzp__tickets-titel{text-align:center}
-.kzp .kzp__tickets-titel span{margin:0 -12.5%;transform-origin:center center}
+.kzp .kzp__tickets-titel{text-align:center;color:var(--kzp-red)}
 
 /* Vragen */
-.kzp .kzp__faq{background:var(--kzp-white)}
+.kzp .kzp__faq{background:var(--kzp-white);color:var(--kzp-red)}
 .kzp .kzp__faq .kzp__kop-titel{margin-bottom:8px}
 .kzp .kzp__vraag{margin:0;padding:0;border-bottom:2px solid var(--kzp-red)}
 .kzp .kzp__groep-titel + .kzp__vraag{border-top:2px solid var(--kzp-red)}
-.kzp .kzp__vraag summary{display:flex;align-items:flex-start;gap:16px;cursor:pointer;list-style:none;padding:14px 0;margin:0;
-  font-family:var(--kzp-display);font-weight:700;letter-spacing:-0.02em;font-size:24px;line-height:1.15;color:var(--kzp-red)}
+.kzp .kzp__vraag summary{display:flex;align-items:flex-start;gap:16px;cursor:pointer;list-style:none;padding:16px 0;margin:0;
+  font-family:var(--kzp-display);font-weight:700;font-size:26px;line-height:1.2;color:var(--kzp-red)}
 .kzp .kzp__vraag summary::-webkit-details-marker{display:none}
 .kzp .kzp__vraag summary::marker{content:""}
 .kzp .kzp__vraag summary > span{flex:1 1 auto}
-.kzp .kzp__vraag summary::after{content:"+";flex:0 0 auto;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:var(--kzp-red);color:var(--kzp-white);font-size:24px;line-height:1;margin-top:-1px}
+.kzp .kzp__vraag summary::after{content:"+";flex:0 0 auto;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--kzp-red);color:var(--kzp-white);font-family:var(--kzp-body);font-size:22px;line-height:1;margin-top:1px}
 .kzp .kzp__vraag[open] summary::after{content:"−"}
 .kzp .kzp__vraag summary:focus-visible{outline:3px solid var(--kzp-black);outline-offset:3px}
-.kzp .kzp__antwoord{padding:0 0 18px}
+.kzp .kzp__antwoord{padding:0 0 20px}
 .kzp .kzp__slot{margin-top:40px}
 .kzp .kzp__slot p{margin-bottom:.4em;line-height:1.3}
 
@@ -125,21 +114,22 @@ html:has(.kzp--vol){overflow-x:clip}
 
 /* Smal (telefoon): alles onder elkaar, tekst eerst en de foto's eronder */
 @container kzp (max-width: 760px){
-  .kzp .kzp__sectie{padding:32px 0}
+  .kzp .kzp__sectie{padding:36px 0}
   .kzp .kzp__kop{padding:28px 0 8px}
   .kzp .kzp__binnen{padding:0 18px}
   .kzp .kzp__raster,.kzp .kzp__raster--8-4,.kzp .kzp__raster--4-8,.kzp .kzp__raster--6-6,
   .kzp--foto-rechts.kzp__dag .kzp__raster--4-8{grid-template-columns:minmax(0,1fr);gap:28px}
   .kzp--foto-links .kzp__beeldkolom{order:0}
   .kzp .kzp__kop-titel{font-size:48px}
-  .kzp .kzp__titel{font-size:38px;margin-bottom:18px}
-  .kzp .kzp__groep-titel{font-size:30px;margin-top:32px}
-  .kzp .kzp__onderdeel-titel{font-size:24px}
-  .kzp .kzp__tekst{font-size:17px}
-  .kzp .kzp__intro-tekst{font-size:18px}
+  .kzp .kzp__titel{font-size:38px;margin-bottom:20px}
+  .kzp .kzp__groep-titel{font-size:32px;margin-top:36px}
+  .kzp .kzp__onderdeel-titel{font-size:27px;margin-bottom:16px}
+  .kzp .kzp__onderdeel + .kzp__onderdeel{margin-top:32px}
+  .kzp .kzp__tekst{font-size:16px}
+  .kzp .kzp__tekst h4{font-size:22px}
+  .kzp .kzp__intro-tekst{font-size:17px}
   .kzp .kzp__logo{max-width:180px;margin:0 auto}
   .kzp .kzp__dag .kzp__fotos{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .kzp .kzp__dag .kzp__foto--heel{grid-column:1/-1}
-  .kzp .kzp__vraag summary{font-size:20px}
-  .kzp .kzp__knop{font-size:21px}
+  .kzp .kzp__vraag summary{font-size:21px}
 }
