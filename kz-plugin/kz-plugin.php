@@ -3,7 +3,7 @@
  * Plugin Name: KZ Plugin
  * Plugin URI: https://github.com/JanGiesen/KZ-Plugin
  * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, evenement info, evenementen overzicht, motto, pagina).
- * Version: 8.12.1
+ * Version: 8.13.0
  * Author: Kraonige Zwaone
  * Text Domain: kz-plugin
  * Update URI: https://github.com/JanGiesen/KZ-Plugin
@@ -120,13 +120,18 @@
  * 8.12.1: KZ-Pagina — staat er niets, dan zien ingelogde redacteuren op de
  * pagina zelf een geel blokje met de reden en de laatste ophaalstatus. Alleen
  * een HTML-commentaar bleek onvindbaar: LiteSpeed Cache haalt dat weg.
+ *
+ * 8.13.0: KZ-Pagina lijkt meer op de oude pagina's. Knoppen zijn nu het
+ * element KZ-Knop zelf (KZ-KNOP-ROOD op wit, KZ-KNOP-WIT op rood); koppen in
+ * gewone hoofd- en kleine letters; tekst rood op wit; geen lijnen tussen de
+ * onderdelen; meer ruimte tussen alinea's en foto's.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Directe toegang niet toegestaan.
 }
 
-define( 'KZ_PLUGIN_VERSION', '8.12.1' );
+define( 'KZ_PLUGIN_VERSION', '8.13.0' );
 define( 'KZ_PLUGIN_FILE', __FILE__ );
 define( 'KZ_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KZ_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

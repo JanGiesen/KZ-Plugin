@@ -218,7 +218,7 @@ class KZ_Element_Pagina {
                     . self::titel( $i['titel'] )
                     . ( '' !== trim( $i['intro'] ) ? '<p class="kzp__intro-tekst">' . esc_html( $i['intro'] ) . '</p>' : '' )
                     . self::tekst_blok( $i['tekst'], 'kzp__tekst' )
-                    . self::knop( $i['knop'] )
+                    . self::knop( $i['knop'], $opmaak['achtergrond'] )
                     . '</div>'
                     . '<div class="kzp__beeldkolom"><img class="kzp__logo" src="' . esc_url( $beeld ) . '" alt="" decoding="async"></div>'
                     . '</div></section>';
@@ -232,7 +232,7 @@ class KZ_Element_Pagina {
                             . ( '' !== trim( $o['tijd'] ) ? '<span class="kzp__tijd"> [' . esc_html( trim( $o['tijd'] ) ) . ']</span>' : '' )
                             . '</h3>';
                     }
-                    $onderdelen .= '<article class="kzp__onderdeel">' . $kop . self::tekst_blok( $o['tekst'], 'kzp__tekst' ) . self::knop( $o['knop'] ) . '</article>';
+                    $onderdelen .= '<article class="kzp__onderdeel">' . $kop . self::tekst_blok( $o['tekst'], 'kzp__tekst' ) . self::knop( $o['knop'], $opmaak['achtergrond'] ) . '</article>';
                 }
                 $fotos = '';
                 foreach ( $i['fotos'] as $f ) {
@@ -246,7 +246,7 @@ class KZ_Element_Pagina {
             case 'tekst_foto':
                 $foto = self::foto( $i['foto'] );
                 return '<section class="' . esc_attr( $band . ' kzp__tekst-foto ' . $kant ) . '"><div class="kzp__binnen kzp__raster kzp__raster--6-6">'
-                    . '<div class="kzp__tekstkolom">' . self::titel( $i['titel'] ) . self::tekst_blok( $i['tekst'], 'kzp__tekst' ) . self::knop( $i['knop'] ) . '</div>'
+                    . '<div class="kzp__tekstkolom">' . self::titel( $i['titel'] ) . self::tekst_blok( $i['tekst'], 'kzp__tekst' ) . self::knop( $i['knop'], $opmaak['achtergrond'] ) . '</div>'
                     . ( '' !== $foto ? '<div class="kzp__beeldkolom">' . $foto . '</div>' : '' )
                     . '</div></section>';
 
@@ -311,12 +311,25 @@ class KZ_Element_Pagina {
         return '' === $html ? '' : '<div class="' . esc_attr( $klasse ) . '">' . $html . '</div>';
     }
 
-    private static function knop( array $knop ) {
+    /**
+     * Een knop via het element KZ-Knop zelf, zodat hij precies gelijk is aan
+     * elke andere KZ-Knop op de site: wit op een rode band, rood op wit.
+     * KZ-Knop leest zijn link met vc_build_link() (url:…), net als in WPBakery.
+     */
+    private static function knop( array $knop, $achtergrond ) {
         $url = self::veilige_url( $knop['url'] );
-        if ( '' === $url || '' === trim( $knop['tekst'] ) ) {
+        if ( '' === $url || '' === trim( $knop['tekst'] ) || ! class_exists( 'KZ_Element_Button' ) ) {
             return '';
         }
-        return '<p class="kzp__knop-rij"><a class="kzp__knop" href="' . $url . '"><span>' . esc_html( $knop['tekst'] ) . '</span></a></p>';
+        return KZ_Element_Button::render(
+            array(
+                'text'   => $knop['tekst'],
+                'link'   => 'url:' . rawurlencode( html_entity_decode( $url ) ),
+                'color'  => 'rood' === $achtergrond ? 'wit' : 'rood',
+                'align'  => 'left',
+                'margin' => '28px 0 0',
+            )
+        );
     }
 
     private static function foto( array $foto ) {
