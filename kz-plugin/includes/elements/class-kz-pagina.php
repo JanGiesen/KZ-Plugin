@@ -240,11 +240,10 @@ class KZ_Element_Pagina {
             case 'dag':
                 $onderdelen = '';
                 foreach ( $i['onderdelen'] as $o ) {
-                    $kop = '';
-                    if ( '' !== trim( $o['titel'] ) || '' !== trim( $o['tijd'] ) ) {
-                        $kop = '<h3 class="kzp__onderdeel-titel">' . esc_html( $o['titel'] )
-                            . ( '' !== trim( $o['tijd'] ) ? '<span class="kzp__tijd"> [' . esc_html( trim( $o['tijd'] ) ) . ']</span>' : '' )
-                            . '</h3>';
+                    // De tijd als klein contrastlabel boven de titel.
+                    $kop = '' !== trim( $o['tijd'] ) ? '<p class="kzp__tijd"><span>' . esc_html( trim( $o['tijd'] ) ) . '</span></p>' : '';
+                    if ( '' !== trim( $o['titel'] ) ) {
+                        $kop .= '<h3 class="kzp__onderdeel-titel">' . esc_html( $o['titel'] ) . '</h3>';
                     }
                     $onderdelen .= '<article class="kzp__onderdeel">' . $kop . self::tekst_blok( $o['tekst'], 'kzp__tekst' ) . self::knop( $o['knop'], $opmaak['achtergrond'] ) . '</article>';
                 }

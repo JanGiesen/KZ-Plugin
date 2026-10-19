@@ -36,8 +36,11 @@ html:has(.kzp--vol){overflow-x:clip}
 .kzp .kzp__titel{font-size:54px;margin-bottom:28px}
 .kzp .kzp__groep-titel{font-size:44px;margin:48px 0 12px}
 
-/* Kop: alleen een grote titel op wit */
-.kzp .kzp__kop{padding:40px 0 16px;background:var(--kzp-white)}
+/* Kop: alleen een grote titel op wit, met evenveel ruimte erboven als eronder
+   (het thema "Fullwidth w/o Title" zet zelf geen ruimte boven de inhoud).
+   Staat er een sectie boven (kop midden op de pagina), dan meer. */
+.kzp .kzp__kop{padding:16px 0;background:var(--kzp-white)}
+.kzp .kzp__sectie + .kzp__kop{padding-top:40px}
 
 /* Rasters: tekst + beeld naast elkaar, op smal onder elkaar */
 .kzp .kzp__raster{display:grid;gap:44px;align-items:start}
@@ -68,7 +71,13 @@ html:has(.kzp--vol){overflow-x:clip}
 .kzp .kzp__onderdeel{margin:0;padding:0;border:0}
 .kzp .kzp__onderdeel + .kzp__onderdeel{margin-top:44px}
 .kzp .kzp__onderdeel-titel{font-size:34px;margin:0 0 26px}
-.kzp .kzp__tijd{white-space:nowrap}
+/* De tijd: een kleine contrastkop boven de titel, zoals de Contrastkop van
+   KZ-Studio — effen blok, hoofdletters, versmald tot 80%. Rood op wit, wit
+   op rood. */
+.kzp .kzp__tijd{display:block;width:fit-content;margin:0 0 10px;padding:5px 10px 3px;background:var(--kzp-red);color:var(--kzp-white);
+  font-family:var(--kzp-display);font-weight:700;font-size:18px;line-height:1;letter-spacing:-0.04em;text-transform:uppercase;white-space:nowrap;
+  transform:scaleX(.8);transform-origin:left center}
+.kzp .kzp__band--rood .kzp__tijd{background:var(--kzp-white);color:var(--kzp-red)}
 
 /* Foto's: vaste verhouding 3:2, uitsnede rond het focuspunt */
 .kzp .kzp__fotos{display:grid;grid-template-columns:minmax(0,1fr);gap:40px}
@@ -117,7 +126,8 @@ html:has(.kzp--vol){overflow-x:clip}
 /* Smal (telefoon): alles onder elkaar, tekst eerst en de foto's eronder */
 @container kzp (max-width: 760px){
   .kzp .kzp__sectie{padding:36px 0}
-  .kzp .kzp__kop{padding:28px 0 8px}
+  .kzp .kzp__kop{padding:8px 0}
+  .kzp .kzp__sectie + .kzp__kop{padding-top:28px}
   .kzp .kzp__binnen{padding:0 18px}
   .kzp .kzp__raster,.kzp .kzp__raster--8-4,.kzp .kzp__raster--4-8,.kzp .kzp__raster--6-6,
   .kzp--foto-rechts.kzp__dag .kzp__raster--4-8{grid-template-columns:minmax(0,1fr);gap:28px}
