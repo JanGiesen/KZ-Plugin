@@ -1,5 +1,5 @@
 /* KZ-Pagina — een hele pagina uit vaste secties (kop, intro, dag, tekst + foto,
-   evenementen, vragen, motto), beheerd in KZ-Studio (Website → Pagina's).
+   tickets, vragen, motto), beheerd in KZ-Studio (Website → Pagina's).
 
    Huisstijl: rood #E83F35 en wit als volle vlakken, koppen in Roboto Condensed
    (vet, hoofdletters, 80% breed, -0.04em), tekst in Work Sans, geen schaduwen
@@ -33,6 +33,7 @@ html:has(.kzp--vol){overflow-x:clip}
    andere pagina's: 48px, regelhoogte 60px, #e83f35, in hoofdletters. */
 .kzp .kzp__kop-titel,.kzp .kzp__titel,.kzp .kzp__groep-titel,.kzp .kzp__onderdeel-titel{font-family:var(--kzp-display);font-weight:700;letter-spacing:0;line-height:1.1;margin:0;padding:0;border:0;background:none;text-transform:none;color:inherit}
 .kzp .kzp__kop-titel{font-size:48px;line-height:60px;font-style:normal;text-transform:uppercase;text-align:center;color:#e83f35}
+.kzp .kzp__band--rood .kzp__kop-titel{color:var(--kzp-white)}
 .kzp .kzp__titel{font-size:54px;margin-bottom:28px}
 .kzp .kzp__groep-titel{font-size:44px;margin:48px 0 12px}
 
@@ -93,32 +94,43 @@ html:has(.kzp--vol){overflow-x:clip}
    zelf (KZ_Element_Button::render(): KZ-KNOP-ROOD op wit, KZ-KNOP-WIT op
    rood), dus ze zijn gelijk aan elke andere KZ-Knop op de site. */
 
-/* Evenementen: 1, 2 of 3 blokken KZ-Evenement Info naast elkaar. De blokken
-   zelf zijn het element (kz-evenement-info.css); kz-evenement-info.js maakt
-   blokken naast elkaar even hoog. */
-.kzp .kzp__evenementen{background:var(--kzp-white)}
-.kzp .kzp__evenementen-titel{color:var(--kzp-red)}
+/* Tickets (sjabloon "evenementen"): een kop zoals bij de vragen en 1, 2 of 3
+   blokken KZ-Evenement Info naast elkaar. De blokken zelf zijn het element
+   (kz-evenement-info.css); kz-evenement-info.js maakt blokken naast elkaar
+   even hoog. */
+.kzp .kzp__evenementen .kzp__kop-titel{margin-bottom:28px}
 .kzp .kzp__evenementen-rij{display:grid;grid-template-columns:minmax(0,1fr);gap:28px;align-items:stretch}
 .kzp .kzp__evenementen--2 .kzp__evenementen-rij{grid-template-columns:repeat(2,minmax(0,1fr))}
 .kzp .kzp__evenementen--3 .kzp__evenementen-rij{grid-template-columns:repeat(3,minmax(0,1fr))}
 .kzp .kzp__evenement{min-width:0}
 .kzp .kzp__evenement > .kz-evt{height:100%}
+/* Op een rode band omgekeerd: rood en wit wisselen om (de tekst wordt wit),
+   zodat een blok niet wegvalt tegen de achtergrond. Een Seizoenskaart, die
+   al omgekeerd is, wordt dan juist gewoon wit. Het logo kleurt mee: wit op
+   rood, en op een witte kop rood via het filter #kzp-rood. */
+.kzp .kzp__band--rood .kz-evt{--kz-evt-red:#fff;--kz-evt-white:#e83f35;--kz-evt-black:#fff;--kz-evt-red-dark:#f1e4e3;--kz-evt-red-darker:#e6d0ce}
+.kzp .kzp__band--rood .kz-evt.kz-evt--seizoen{--kz-evt-black:#111}
+.kzp .kzp__band--rood .kz-evt:not(.kz-evt--seizoen) .kz-evt__logo{filter:url(#kzp-rood)}
+.kzp .kzp__band--rood .kz-evt--seizoen .kz-evt__logo{filter:brightness(0) invert(1)}
+.kzp .kzp__band--rood .kz-evt.kz-evt--seizoen .kz-evt__feiten li{border-bottom-color:rgba(232,63,53,.7)}
+.kzp .kzp__band--rood .kz-evt.kz-evt--seizoen .kz-evt__knop:hover{background:#b82a22;border-color:#b82a22}
+.kzp .kzp__band--rood .kz-evt.kz-evt--seizoen .kz-evt__knop:active{background:#8f1f19;border-color:#8f1f19}
 
-/* Vragen */
-.kzp .kzp__faq{background:var(--kzp-white);color:var(--kzp-red)}
+/* Vragen: lijnen en vragen in de kleur van de tekst, dus rood op wit en wit op rood */
 .kzp .kzp__faq .kzp__kop-titel{margin-bottom:8px}
-.kzp .kzp__vraag{margin:0;padding:0;border-bottom:2px solid var(--kzp-red)}
-.kzp .kzp__groep-titel + .kzp__vraag{border-top:2px solid var(--kzp-red)}
+.kzp .kzp__vraag{margin:0;padding:0;border-bottom:2px solid currentColor}
+.kzp .kzp__groep-titel + .kzp__vraag{border-top:2px solid currentColor}
 .kzp .kzp__vraag summary{display:flex;align-items:flex-start;gap:16px;cursor:pointer;list-style:none;padding:16px 0;margin:0;
-  font-family:var(--kzp-display);font-weight:700;font-size:26px;line-height:1.2;color:var(--kzp-red)}
+  font-family:var(--kzp-display);font-weight:700;font-size:26px;line-height:1.2;color:inherit}
 .kzp .kzp__vraag summary::-webkit-details-marker{display:none}
 .kzp .kzp__vraag summary::marker{content:""}
 .kzp .kzp__vraag summary > span{flex:1 1 auto}
 .kzp .kzp__vraag summary::after{content:"+";flex:0 0 auto;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--kzp-red);color:var(--kzp-white);font-family:var(--kzp-body);font-size:22px;line-height:1;margin-top:1px}
+.kzp .kzp__band--rood .kzp__vraag summary::after{background:var(--kzp-white);color:var(--kzp-red)}
 .kzp .kzp__vraag[open] summary::after{content:"−"}
 .kzp .kzp__vraag summary:focus-visible{outline:3px solid var(--kzp-black);outline-offset:3px}
 .kzp .kzp__antwoord{padding:0 0 20px}
-.kzp .kzp__slot{margin-top:40px}
+.kzp .kzp__slot{margin-top:40px;text-align:center}
 .kzp .kzp__slot p{margin-bottom:.4em;line-height:1.3}
 
 /* Motto: een band die meedoet met om en om. De svg's zijn wit; op een witte

@@ -3,7 +3,7 @@
  * KZ-Pagina — shortcode [kz_pagina pagina="5dd"]
  *
  * Tekent een hele pagina uit vaste secties: kop, intro, dag, tekst + foto,
- * evenementen (KZ-Evenement Info), vragen en motto. De inhoud (teksten, knoppen, foto's) beheer je in
+ * tickets (KZ-Evenement Info), vragen en motto. De inhoud (teksten, knoppen, foto's) beheer je in
  * KZ-Studio (Website → Pagina's); de opmaak staat hier vast, zodat er niets
  * verspringt zoals bij losse WPBakery-blokken.
  *
@@ -197,7 +197,7 @@ class KZ_Element_Pagina {
         foreach ( $secties as $n => $s ) {
             $achtergrond = 'wit';
             $fotokant    = 'links';
-            if ( in_array( $s['sjabloon'], array( 'intro', 'dag', 'tekst_foto', 'motto' ), true ) ) {
+            if ( in_array( $s['sjabloon'], array( 'intro', 'dag', 'tekst_foto', 'evenementen', 'faq', 'motto' ), true ) ) {
                 $k           = isset( $s['inhoud']['kleur'] ) ? $s['inhoud']['kleur'] : 'auto';
                 $achtergrond = 'auto' === $k ? ( 0 === $band % 2 ? 'rood' : 'wit' ) : $k;
                 $band++;
@@ -287,8 +287,10 @@ class KZ_Element_Pagina {
                 if ( '' === $blokken ) {
                     return '';
                 }
-                return '<section class="' . esc_attr( 'kzp__sectie kzp__evenementen kzp__evenementen--' . $i['kolommen'] ) . '"><div class="kzp__binnen">'
-                    . self::titel( $i['titel'], 'kzp__titel kzp__evenementen-titel' )
+                // Op rood zijn de blokken omgekeerd; het witte logo op de witte kop wordt rood.
+                $filter = 'rood' === $opmaak['achtergrond'] ? self::rood_filter() : '';
+                return '<section class="' . esc_attr( $band . ' kzp__evenementen kzp__evenementen--' . $i['kolommen'] ) . '">' . $filter . '<div class="kzp__binnen">'
+                    . self::titel( $i['titel'], 'kzp__kop-titel kzp__evenementen-titel' )
                     . '<div class="kzp__evenementen-rij">' . $blokken . '</div>'
                     . '</div></section>';
 
@@ -312,7 +314,7 @@ class KZ_Element_Pagina {
                     }
                     $groepen .= '</div>';
                 }
-                return '<section class="kzp__sectie kzp__faq"><div class="kzp__binnen kzp__smal">'
+                return '<section class="' . esc_attr( $band . ' kzp__faq' ) . '"><div class="kzp__binnen kzp__smal">'
                     . self::titel( $i['titel'], 'kzp__kop-titel' )
                     . $groepen
                     . self::tekst_blok( $i['slottekst'], 'kzp__tekst kzp__slot' )
@@ -733,6 +735,7 @@ class KZ_Element_Pagina {
                     'titel'    => self::tekst( $r, 'titel', $l['titel'] ),
                     'kolommen' => isset( $r['kolommen'] ) && in_array( $r['kolommen'], array( 2, 3 ), true ) ? $r['kolommen'] : 1,
                     'blokken'  => $blokken,
+                    'kleur'    => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
                 );
 
             case 'motto':
@@ -762,6 +765,7 @@ class KZ_Element_Pagina {
                     'titel'     => self::tekst( $r, 'titel', $l['titel'] ),
                     'groepen'   => $groepen,
                     'slottekst' => self::tekst( $r, 'slottekst', $l['slottekst'] ),
+                    'kleur'     => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
                 );
         }
         return array();
