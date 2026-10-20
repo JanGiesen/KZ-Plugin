@@ -3,7 +3,7 @@
  * Plugin Name: KZ Plugin
  * Plugin URI: https://github.com/JanGiesen/KZ-Plugin
  * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, evenement info, evenementen overzicht, motto, pagina).
- * Version: 8.17.0
+ * Version: 8.18.0
  * Author: Kraonige Zwaone
  * Text Domain: kz-plugin
  * Update URI: https://github.com/JanGiesen/KZ-Plugin
@@ -154,13 +154,20 @@
  * krijgt een kop zoals de vragen. Tickets en vragen doen mee met om en om
  * rood en wit (veld kleur); op een rode band zijn de ticketblokken
  * omgekeerd. De slottekst onder de vragen staat gecentreerd.
+ *
+ * 8.18.0: KZ-Pagina — drie nieuwe sjablonen. Tekst (titel, intro, blokken
+ * met tussenkop, tekst en knop; foto's mogen), Route (een tijdlijn met punten
+ * en stappen met pijltjes, met de kaart ernaast) en Uitslagen (per jaar en
+ * categorie, zoals het KZ-Tab Widget, maar op de server getekend; het nieuwe
+ * assets/js/kz-pagina.js wisselt alleen de panelen). De grote kop wordt op
+ * een heel smal scherm iets kleiner. Hoort bij KZ-Studio-migratie 0046.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Directe toegang niet toegestaan.
 }
 
-define( 'KZ_PLUGIN_VERSION', '8.17.0' );
+define( 'KZ_PLUGIN_VERSION', '8.18.0' );
 define( 'KZ_PLUGIN_FILE', __FILE__ );
 define( 'KZ_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KZ_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -315,6 +322,7 @@ class KZ_Plugin {
         wp_register_script( 'kz-carousel', KZ_PLUGIN_URL . 'assets/js/kz-carousel.js', array( 'swiper' ), KZ_PLUGIN_VERSION, true );
         wp_register_script( 'kz-evenement-info', KZ_PLUGIN_URL . 'assets/js/kz-evenement-info.js', array(), KZ_PLUGIN_VERSION, true );
         wp_register_script( 'kz-tab-widget', KZ_PLUGIN_URL . 'assets/js/kz-tab-widget.js', array(), KZ_PLUGIN_VERSION, true );
+        wp_register_script( 'kz-pagina', KZ_PLUGIN_URL . 'assets/js/kz-pagina.js', array(), KZ_PLUGIN_VERSION, true );
     }
 
     public function enqueue_admin_assets() {
