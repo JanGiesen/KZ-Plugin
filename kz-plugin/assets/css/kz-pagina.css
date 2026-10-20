@@ -1,5 +1,5 @@
 /* KZ-Pagina — een hele pagina uit vaste secties (kop, intro, dag, tekst + foto,
-   tickets, vragen, motto), beheerd in KZ-Studio (Website → Pagina's).
+   evenementen, vragen, motto), beheerd in KZ-Studio (Website → Pagina's).
 
    Huisstijl: rood #E83F35 en wit als volle vlakken, koppen in Roboto Condensed
    (vet, hoofdletters, 80% breed, -0.04em), tekst in Work Sans, geen schaduwen
@@ -93,10 +93,16 @@ html:has(.kzp--vol){overflow-x:clip}
    zelf (KZ_Element_Button::render(): KZ-KNOP-ROOD op wit, KZ-KNOP-WIT op
    rood), dus ze zijn gelijk aan elke andere KZ-Knop op de site. */
 
-/* Tickets */
-.kzp .kzp__tickets{display:flex;flex-wrap:wrap;justify-content:center;gap:24px;margin:0;padding:0}
-.kzp .kzp__ticket{flex:0 1 340px;min-width:0}
-.kzp .kzp__tickets-titel{text-align:center;color:var(--kzp-red)}
+/* Evenementen: 1, 2 of 3 blokken KZ-Evenement Info naast elkaar. De blokken
+   zelf zijn het element (kz-evenement-info.css); kz-evenement-info.js maakt
+   blokken naast elkaar even hoog. */
+.kzp .kzp__evenementen{background:var(--kzp-white)}
+.kzp .kzp__evenementen-titel{color:var(--kzp-red)}
+.kzp .kzp__evenementen-rij{display:grid;grid-template-columns:minmax(0,1fr);gap:28px;align-items:stretch}
+.kzp .kzp__evenementen--2 .kzp__evenementen-rij{grid-template-columns:repeat(2,minmax(0,1fr))}
+.kzp .kzp__evenementen--3 .kzp__evenementen-rij{grid-template-columns:repeat(3,minmax(0,1fr))}
+.kzp .kzp__evenement{min-width:0}
+.kzp .kzp__evenement > .kz-evt{height:100%}
 
 /* Vragen */
 .kzp .kzp__faq{background:var(--kzp-white);color:var(--kzp-red)}
@@ -143,4 +149,6 @@ html:has(.kzp--vol){overflow-x:clip}
   .kzp .kzp__dag .kzp__fotos{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .kzp .kzp__dag .kzp__foto--heel{grid-column:1/-1}
   .kzp .kzp__vraag summary{font-size:21px}
+  .kzp .kzp__evenementen--2 .kzp__evenementen-rij,
+  .kzp .kzp__evenementen--3 .kzp__evenementen-rij{grid-template-columns:minmax(0,1fr)}
 }
