@@ -3,7 +3,7 @@
  * KZ-Pagina — shortcode [kz_pagina pagina="5dd"]
  *
  * Tekent een hele pagina uit vaste secties: kop, intro, dag, tekst, tekst + foto,
- * route, tickets (KZ-Evenement Info), uitslagen, vragen en motto. De inhoud (teksten, knoppen, foto's) beheer je in
+ * route, tickets (KZ-Evenement Info), uitslagen, video, vragen en motto. De inhoud (teksten, knoppen, foto's) beheer je in
  * KZ-Studio (Website → Pagina's); de opmaak staat hier vast, zodat er niets
  * verspringt zoals bij losse WPBakery-blokken.
  *
@@ -86,7 +86,7 @@ class KZ_Element_Pagina {
     );
 
     /** "tickets" (tot 8.15) bestaat niet meer: zo'n sectie wordt overgeslagen. */
-    const SJABLONEN = array( 'kop', 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'faq', 'motto' );
+    const SJABLONEN = array( 'kop', 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'faq', 'motto' );
 
     public static function register_shortcode() {
         add_shortcode( self::SHORTCODE, array( __CLASS__, 'render' ) );
@@ -221,7 +221,7 @@ class KZ_Element_Pagina {
         foreach ( $secties as $n => $s ) {
             $achtergrond = 'wit';
             $fotokant    = 'links';
-            if ( in_array( $s['sjabloon'], array( 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'faq', 'motto' ), true ) ) {
+            if ( in_array( $s['sjabloon'], array( 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'faq', 'motto' ), true ) ) {
                 $k           = isset( $s['inhoud']['kleur'] ) ? $s['inhoud']['kleur'] : 'auto';
                 $achtergrond = 'auto' === $k ? ( 0 === $band % 2 ? 'rood' : 'wit' ) : $k;
                 $band++;
@@ -355,6 +355,20 @@ class KZ_Element_Pagina {
                     . ( '' !== $foto ? '<div class="kzp__beeldkolom">' . $foto . '</div>' : '' )
                     . '</div></div></section>';
 
+            case 'video':
+                $id = self::youtube_id( $i['url'] );
+                if ( '' === $id ) {
+                    return '';
+                }
+                // youtube-nocookie: geen cookies tot iemand op afspelen drukt.
+                return '<section class="' . esc_attr( $band . ' kzp__video-sectie' ) . '"><div class="kzp__binnen">'
+                    . self::titel( $i['titel'] )
+                    . '<div class="kzp__video"><iframe src="' . esc_url( 'https://www.youtube-nocookie.com/embed/' . $id ) . '"'
+                    . ' title="' . esc_attr( '' !== trim( $i['titel'] ) ? $i['titel'] : 'Video' ) . '" loading="lazy"'
+                    . ' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"'
+                    . ' referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>'
+                    . '</div></section>';
+
             case 'tekst_foto':
                 $foto = self::foto( $i['foto'] );
                 return '<section class="' . esc_attr( $band . ' kzp__tekst-foto ' . $kant ) . '"><div class="kzp__binnen kzp__raster kzp__raster--6-6">'
@@ -429,6 +443,15 @@ class KZ_Element_Pagina {
                 return '<section class="' . esc_attr( $band . ' kzp__motto' ) . '">' . $filter . '<div class="kzp__binnen">' . $motto . '</div></section>';
         }
         return '';
+    }
+
+    /**
+     * Het id van een YouTube-video uit een link (watch?v=, youtu.be/, /embed/,
+     * /shorts/, /live/), of ''. Gelijk aan youtubeId() in KZ-Studio.
+     */
+    public static function youtube_id( $url ) {
+        $patroon = '~^https?://(?:(?:www\.|m\.)?youtube(?:-nocookie)?\.com/(?:watch\?(?:[^#]*&)?v=|embed/|shorts/|live/)|youtu\.be/)([A-Za-z0-9_-]{11})(?![A-Za-z0-9_-])~';
+        return preg_match( $patroon, trim( (string) $url ), $m ) ? $m[1] : '';
     }
 
     private static function route_icoon( $richting ) {
@@ -929,6 +952,13 @@ class KZ_Element_Pagina {
                     'jaren'    => $jaren,
                     'kleur'    => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
                     'fotokant' => self::keuze( $r, 'fotokant', array( 'auto', 'links', 'rechts' ), 'auto' ),
+                );
+
+            case 'video':
+                return array(
+                    'titel' => self::tekst( $r, 'titel', $l['titel'] ),
+                    'url'   => self::tekst( $r, 'url', $l['url'] ),
+                    'kleur' => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
                 );
 
             case 'tekst_foto':
