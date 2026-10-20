@@ -3,7 +3,7 @@
  * KZ-Pagina — shortcode [kz_pagina pagina="5dd"]
  *
  * Tekent een hele pagina uit vaste secties: kop, intro, dag, tekst + foto,
- * tickets, vragen en motto. De inhoud (teksten, knoppen, foto's) beheer je in
+ * evenementen (KZ-Evenement Info), vragen en motto. De inhoud (teksten, knoppen, foto's) beheer je in
  * KZ-Studio (Website → Pagina's); de opmaak staat hier vast, zodat er niets
  * verspringt zoals bij losse WPBakery-blokken.
  *
@@ -43,20 +43,27 @@ class KZ_Element_Pagina {
         'tijd'           => 20,
         'knopTekst'      => 40,
         'url'            => 2000,
-        'hoofdtekst'     => 30,
-        'ondertitel'     => 40,
-        'popup'          => 300,
+        'label'          => 40,
+        'omschrijving'   => 2000,
+        'feitLabel'      => 20,
+        'feitWaarde'     => 120,
+        'dagTekst'       => 40,
+        'seizoen'        => 9,
+        'categorie'      => 60,
+        'kleineTekst'    => 300,
         'vraag'          => 200,
         'antwoord'       => 2000,
         'slottekst'      => 600,
         'onderdelen'     => 12,
         'fotos'          => 8,
-        'tickets'        => 6,
+        'feiten'         => 8,
+        'blokken'        => 6,
         'groepen'        => 8,
         'vragen'         => 20,
     );
 
-    const SJABLONEN = array( 'kop', 'intro', 'dag', 'tekst_foto', 'tickets', 'faq', 'motto' );
+    /** "tickets" (tot 8.15) bestaat niet meer: zo'n sectie wordt overgeslagen. */
+    const SJABLONEN = array( 'kop', 'intro', 'dag', 'tekst_foto', 'evenementen', 'faq', 'motto' );
 
     public static function register_shortcode() {
         add_shortcode( self::SHORTCODE, array( __CLASS__, 'render' ) );
@@ -240,6 +247,9 @@ class KZ_Element_Pagina {
             case 'dag':
                 $onderdelen = '';
                 foreach ( $i['onderdelen'] as $o ) {
+                    if ( $o['verborgen'] ) {
+                        continue;
+                    }
                     // De tijd als klein contrastlabel boven de titel.
                     $kop = '' !== trim( $o['tijd'] ) ? '<p class="kzp__tijd"><span>' . esc_html( trim( $o['tijd'] ) ) . '</span></p>' : '';
                     if ( '' !== trim( $o['titel'] ) ) {
@@ -263,25 +273,37 @@ class KZ_Element_Pagina {
                     . ( '' !== $foto ? '<div class="kzp__beeldkolom">' . $foto . '</div>' : '' )
                     . '</div></section>';
 
-            case 'tickets':
-                $tickets = '';
-                foreach ( $i['tickets'] as $t ) {
-                    $tickets .= '<div class="kzp__ticket">' . self::ticket( $t ) . '</div>';
+            case 'evenementen':
+                $blokken = '';
+                foreach ( $i['blokken'] as $b ) {
+                    if ( $b['verborgen'] ) {
+                        continue;
+                    }
+                    $blok = self::evenement( $b, 1 === $i['kolommen'] ? '820px' : '100%' );
+                    if ( '' !== $blok ) {
+                        $blokken .= '<div class="kzp__evenement">' . $blok . '</div>';
+                    }
                 }
-                return '<section class="kzp__sectie kzp__tickets-sectie"><div class="kzp__binnen">'
-                    . self::titel( $i['titel'], 'kzp__titel kzp__tickets-titel' )
-                    . '<div class="kzp__tickets">' . $tickets . '</div>'
+                if ( '' === $blokken ) {
+                    return '';
+                }
+                return '<section class="' . esc_attr( 'kzp__sectie kzp__evenementen kzp__evenementen--' . $i['kolommen'] ) . '"><div class="kzp__binnen">'
+                    . self::titel( $i['titel'], 'kzp__titel kzp__evenementen-titel' )
+                    . '<div class="kzp__evenementen-rij">' . $blokken . '</div>'
                     . '</div></section>';
 
             case 'faq':
                 $groepen = '';
                 foreach ( $i['groepen'] as $g ) {
+                    if ( $g['verborgen'] ) {
+                        continue;
+                    }
                     $groepen .= '<div class="kzp__groep">';
                     if ( '' !== trim( $g['titel'] ) ) {
                         $groepen .= '<h3 class="kzp__groep-titel"><span>' . esc_html( $g['titel'] ) . '</span></h3>';
                     }
                     foreach ( $g['vragen'] as $v ) {
-                        if ( '' === trim( $v['vraag'] ) ) {
+                        if ( $v['verborgen'] || '' === trim( $v['vraag'] ) ) {
                             continue;
                         }
                         $groepen .= '<details class="kzp__vraag"><summary><span>' . esc_html( $v['vraag'] ) . '</span></summary>'
@@ -369,25 +391,65 @@ class KZ_Element_Pagina {
         return '<figure class="kzp__foto"><img src="' . esc_url( $url ) . '" alt="" loading="lazy" decoding="async" style="object-position:' . esc_attr( $positie ) . '"></figure>';
     }
 
-    /** Een ticket via het bestaande element KZ-Ticket, met dezelfde vorm en kleuren. */
-    private static function ticket( array $t ) {
-        if ( ! class_exists( 'KZ_Element_Ticket' ) ) {
+    /**
+     * Eén blok via het element KZ-Evenement Info zelf, dus precies gelijk aan
+     * dat element elders op de site. Automatisch: het eerstvolgende evenement
+     * (eventueel uit één categorie), zoals het element dat ook kiest; leeg als
+     * er geen is.
+     */
+    private static function evenement( array $b, $max_breedte ) {
+        if ( ! class_exists( 'KZ_Element_Event_Info' ) ) {
             return '';
         }
-        $url = self::veilige_url( $t['url'] );
-        // KZ-Ticket leest zijn link met vc_build_link() als WPBakery er is
-        // (url:…|target:…), en anders als gewoon adres.
-        $link = '' === $url ? '' : ( function_exists( 'vc_build_link' ) ? 'url:' . rawurlencode( html_entity_decode( $url ) ) : $url );
-        return KZ_Element_Ticket::render(
+        if ( 'automatisch' === $b['bron'] ) {
+            return KZ_Element_Event_Info::render(
+                array(
+                    'bron'      => 'automatisch',
+                    'categorie' => $b['categorie'],
+                    'max_width' => $max_breedte,
+                )
+            );
+        }
+
+        $link = '';
+        $url  = self::veilige_url( $b['linkUrl'] );
+        if ( '' !== $url ) {
+            $url = html_entity_decode( $url );
+            // KZ-Evenement Info leest zijn link met vc_build_link() (url:…|target:…)
+            // als WPBakery er is, en anders als gewoon adres.
+            if ( function_exists( 'vc_build_link' ) ) {
+                $link = 'url:' . rawurlencode( $url ) . ( $b['nieuwVenster'] ? '|target:' . rawurlencode( '_blank' ) : '' );
+            } else {
+                $link = $url;
+            }
+        }
+        $feiten = array();
+        foreach ( $b['feiten'] as $f ) {
+            $feiten[] = array(
+                'label'  => $f['label'],
+                'waarde' => $f['waarde'],
+            );
+        }
+
+        return KZ_Element_Event_Info::render(
             array(
-                'logo_type'    => 'kzh',
-                'main_text'    => $t['hoofdtekst'],
-                'subtitle'     => $t['ondertitel'],
-                'color_preset' => $t['kleur'],
-                'link'         => $link,
-                'enable_popup' => '' !== $link && '' !== trim( $t['popup'] ) ? 'true' : '',
-                'popup_text'   => esc_html( $t['popup'] ),
-            )
+                'label'         => $b['label'],
+                'titel'         => $b['titel'],
+                'feiten'        => $feiten ? rawurlencode( wp_json_encode( $feiten ) ) : '',
+                'show_logo'     => $b['toonLogo'] ? 'true' : 'false',
+                'variant'       => $b['variant'],
+                'seizoen'       => $b['seizoen'],
+                'datum'         => $b['datum'],
+                'dag_tekst'     => $b['dagTekst'],
+                'tijd'          => $b['tijd'],
+                'link'          => $link,
+                'knop_tekst'    => $b['knopTekst'],
+                'status'        => $b['status'],
+                'verkoop_start' => $b['verkoopStart'],
+                'kleine_tekst'  => $b['kleineTekst'],
+                'max_width'     => $max_breedte,
+            ),
+            self::tekst_html( $b['omschrijving'] )
         );
     }
 
@@ -610,6 +672,7 @@ class KZ_Element_Pagina {
                         'tijd'  => self::tekst( $o, 'tijd', $l['tijd'] ),
                         'tekst' => self::tekst( $o, 'tekst', $l['tekst'] ),
                         'knop'  => self::schoon_knop( $o ),
+                        'verborgen' => self::verborgen( $o ),
                     );
                 }
                 $fotos = array();
@@ -634,20 +697,42 @@ class KZ_Element_Pagina {
                     'fotokant' => self::keuze( $r, 'fotokant', array( 'auto', 'links', 'rechts' ), 'auto' ),
                 );
 
-            case 'tickets':
-                $tickets = array();
-                foreach ( self::lijst( $r, 'tickets', $l['tickets'] ) as $t ) {
-                    $tickets[] = array(
-                        'hoofdtekst' => self::tekst( $t, 'hoofdtekst', $l['hoofdtekst'] ),
-                        'ondertitel' => self::tekst( $t, 'ondertitel', $l['ondertitel'] ),
-                        'url'        => self::tekst( $t, 'url', $l['url'] ),
-                        'kleur'      => self::keuze( $t, 'kleur', array( 'rood', 'wit', 'hjc' ), 'rood' ),
-                        'popup'      => self::tekst( $t, 'popup', $l['popup'] ),
+            case 'evenementen':
+                $blokken = array();
+                foreach ( self::lijst( $r, 'blokken', $l['blokken'] ) as $b ) {
+                    $feiten = array();
+                    foreach ( self::lijst( $b, 'feiten', $l['feiten'] ) as $f ) {
+                        $feiten[] = array(
+                            'label'  => self::tekst( $f, 'label', $l['feitLabel'] ),
+                            'waarde' => self::tekst( $f, 'waarde', $l['feitWaarde'] ),
+                        );
+                    }
+                    $blokken[] = array(
+                        'verborgen'    => self::verborgen( $b ),
+                        'bron'         => self::keuze( $b, 'bron', array( 'handmatig', 'automatisch' ), 'automatisch' ),
+                        'categorie'    => self::tekst( $b, 'categorie', $l['categorie'] ),
+                        'label'        => self::tekst( $b, 'label', $l['label'] ),
+                        'titel'        => self::tekst( $b, 'titel', $l['titel'] ),
+                        'omschrijving' => self::tekst( $b, 'omschrijving', $l['omschrijving'] ),
+                        'feiten'       => $feiten,
+                        'toonLogo'     => ! isset( $b['toonLogo'] ) || false !== $b['toonLogo'],
+                        'variant'      => self::keuze( $b, 'variant', array( 'normaal', 'seizoen' ), 'normaal' ),
+                        'seizoen'      => self::tekst( $b, 'seizoen', $l['seizoen'] ),
+                        'datum'        => self::datum( $b, 'datum' ),
+                        'dagTekst'     => self::tekst( $b, 'dagTekst', $l['dagTekst'] ),
+                        'tijd'         => self::tekst( $b, 'tijd', $l['tijd'] ),
+                        'linkUrl'      => self::tekst( $b, 'linkUrl', $l['url'] ),
+                        'nieuwVenster' => isset( $b['nieuwVenster'] ) && true === $b['nieuwVenster'],
+                        'knopTekst'    => self::tekst( $b, 'knopTekst', $l['knopTekst'] ),
+                        'status'       => self::keuze( $b, 'status', array( 'open', 'binnenkort', 'uitverkocht' ), 'open' ),
+                        'verkoopStart' => self::datum( $b, 'verkoopStart' ),
+                        'kleineTekst'  => self::tekst( $b, 'kleineTekst', $l['kleineTekst'] ),
                     );
                 }
                 return array(
-                    'titel'   => self::tekst( $r, 'titel', $l['titel'] ),
-                    'tickets' => $tickets,
+                    'titel'    => self::tekst( $r, 'titel', $l['titel'] ),
+                    'kolommen' => isset( $r['kolommen'] ) && in_array( $r['kolommen'], array( 2, 3 ), true ) ? $r['kolommen'] : 1,
+                    'blokken'  => $blokken,
                 );
 
             case 'motto':
@@ -664,11 +749,13 @@ class KZ_Element_Pagina {
                         $vragen[] = array(
                             'vraag'    => self::tekst( $v, 'vraag', $l['vraag'] ),
                             'antwoord' => self::tekst( $v, 'antwoord', $l['antwoord'] ),
+                            'verborgen' => self::verborgen( $v ),
                         );
                     }
                     $groepen[] = array(
                         'titel'  => self::tekst( $g, 'titel', $l['titel'] ),
                         'vragen' => $vragen,
+                        'verborgen' => self::verborgen( $g ),
                     );
                 }
                 return array(
@@ -685,6 +772,16 @@ class KZ_Element_Pagina {
             return '';
         }
         return mb_substr( $r[ $sleutel ], 0, $max );
+    }
+
+    /** Alleen "jjjj-mm-dd", anders leeg. */
+    private static function datum( array $r, $sleutel ) {
+        return isset( $r[ $sleutel ] ) && is_string( $r[ $sleutel ] ) && preg_match( '/^\d{4}-\d{2}-\d{2}$/', $r[ $sleutel ] ) ? $r[ $sleutel ] : '';
+    }
+
+    /** Een onderdeel, evenementblok, groep of vraag die in KZ-Studio is verborgen. */
+    private static function verborgen( array $r ) {
+        return isset( $r['verborgen'] ) && true === $r['verborgen'];
     }
 
     private static function lijst( array $r, $sleutel, $max ) {
