@@ -1,5 +1,5 @@
-/* KZ-Pagina — een hele pagina uit vaste secties (kop, intro, dag, tekst + foto,
-   tickets, vragen, motto), beheerd in KZ-Studio (Website → Pagina's).
+/* KZ-Pagina — een hele pagina uit vaste secties (kop, intro, dag, tekst,
+   tekst + foto, route, tickets, uitslagen, vragen, motto), beheerd in KZ-Studio (Website → Pagina's).
 
    Huisstijl: rood #E83F35 en wit als volle vlakken, koppen in Roboto Condensed
    (vet, hoofdletters, 80% breed, -0.04em), tekst in Work Sans, geen schaduwen
@@ -31,8 +31,8 @@ html:has(.kzp--vol){overflow-x:clip}
 /* Koppen in Roboto Condensed 700, gewone hoofd- en kleine letters. De grote
    kop (en die boven de vragen) is precies de WPBakery-kop KZ-HEAD van de
    andere pagina's: 48px, regelhoogte 60px, #e83f35, in hoofdletters. */
-.kzp .kzp__kop-titel,.kzp .kzp__titel,.kzp .kzp__groep-titel,.kzp .kzp__onderdeel-titel{font-family:var(--kzp-display);font-weight:700;letter-spacing:0;line-height:1.1;margin:0;padding:0;border:0;background:none;text-transform:none;color:inherit}
-.kzp .kzp__kop-titel{font-size:48px;line-height:60px;font-style:normal;text-transform:uppercase;text-align:center;color:#e83f35}
+.kzp .kzp__kop-titel,.kzp .kzp__titel,.kzp .kzp__groep-titel,.kzp .kzp__onderdeel-titel,.kzp .kzp__blok-titel,.kzp .kzp__stap-titel{font-family:var(--kzp-display);font-weight:700;letter-spacing:0;line-height:1.1;margin:0;padding:0;border:0;background:none;text-transform:none;color:inherit}
+.kzp .kzp__kop-titel{font-size:48px;line-height:60px;font-style:normal;text-transform:uppercase;text-align:center;color:#e83f35;overflow-wrap:break-word;hyphens:auto}
 .kzp .kzp__band--rood .kzp__kop-titel{color:var(--kzp-white)}
 .kzp .kzp__titel{font-size:54px;margin-bottom:28px}
 .kzp .kzp__groep-titel{font-size:44px;margin:48px 0 12px}
@@ -51,7 +51,8 @@ html:has(.kzp--vol){overflow-x:clip}
 .kzp .kzp__tekstkolom{min-width:0}
 .kzp .kzp__beeldkolom{min-width:0}
 .kzp--foto-links .kzp__beeldkolom{order:-1}
-.kzp--foto-rechts.kzp__dag .kzp__raster--4-8{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
+.kzp--foto-rechts.kzp__dag .kzp__raster--4-8,.kzp--foto-rechts.kzp__tekstsectie .kzp__raster--4-8,
+.kzp--foto-rechts.kzp__uitslagen-sectie .kzp__raster--4-8{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
 
 /* Tekst uit KZ-Studio: alinea's, tussenkopjes, opsommingen, vet, cursief, links */
 .kzp .kzp__tekst{font-size:17px;line-height:1.5;color:inherit}
@@ -79,6 +80,58 @@ html:has(.kzp--vol){overflow-x:clip}
   font-family:var(--kzp-display);font-weight:700;font-size:18px;line-height:1;letter-spacing:-0.04em;text-transform:uppercase;white-space:nowrap;
   transform:scaleX(.8);transform-origin:left center}
 .kzp .kzp__band--rood .kzp__tijd{background:var(--kzp-white);color:var(--kzp-red)}
+
+/* Tekst: blokken met een tussenkop, zoals de onderdelen van een dag */
+.kzp .kzp__blok + .kzp__blok{margin-top:40px}
+.kzp .kzp__blok-titel{font-size:34px;margin:0 0 18px}
+.kzp .kzp__intro-tekst + .kzp__blok{margin-top:36px}
+
+/* Route: een tijdlijn. Een doorlopende lijn met bolletjes; een punt (start,
+   tussenstop, einde) is een groot bolletje met een kop, een stap een klein
+   bolletje met een pijltje. De afstand staat er klein onder. */
+.kzp .kzp__stappen{list-style:none;margin:0;padding:0}
+.kzp .kzp__stap{position:relative;display:grid;grid-template-columns:40px minmax(0,1fr);column-gap:18px;margin:0;padding:0 0 22px;list-style:none}
+.kzp .kzp__stap::before{content:"";position:absolute;left:19px;top:0;bottom:0;width:2px;background:currentColor;opacity:.35}
+.kzp .kzp__stap:first-child::before{top:20px}
+.kzp .kzp__stap:last-child{padding-bottom:0}
+.kzp .kzp__stap:last-child::before{bottom:auto;height:20px}
+.kzp .kzp__stap:only-child::before{display:none}
+.kzp .kzp__stap-teken{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:var(--kzp-red);color:var(--kzp-white)}
+.kzp .kzp__stap--punt .kzp__stap-teken::after{content:"";width:12px;height:12px;border-radius:50%;background:var(--kzp-white)}
+.kzp .kzp__stap--stap .kzp__stap-teken{width:30px;height:30px;margin:5px;background:var(--kzp-white);color:var(--kzp-red);border:2px solid var(--kzp-red)}
+.kzp .kzp__stap-teken svg{display:block;width:18px;height:18px}
+.kzp .kzp__band--rood .kzp__stap-teken{background:var(--kzp-white);color:var(--kzp-red)}
+.kzp .kzp__band--rood .kzp__stap--punt .kzp__stap-teken::after{background:var(--kzp-red)}
+.kzp .kzp__band--rood .kzp__stap--stap .kzp__stap-teken{background:var(--kzp-red);color:var(--kzp-white);border-color:var(--kzp-white)}
+.kzp .kzp__stap-inhoud{min-width:0;padding-top:6px}
+.kzp .kzp__stap--punt .kzp__stap-inhoud{padding-top:4px}
+.kzp .kzp__stap-titel{font-size:26px;line-height:1.15;margin:0 0 6px}
+.kzp .kzp__stap-tekst{margin:0 0 4px;padding:0;font-size:17px;line-height:1.4;color:inherit}
+.kzp .kzp__stap-afstand{display:inline-block;font-family:var(--kzp-display);font-weight:700;font-size:14px;line-height:1.2;letter-spacing:.02em;text-transform:uppercase;opacity:.7}
+.kzp .kzp__route .kzp__raster--6-6{align-items:start}
+.kzp .kzp__kaart{display:block}
+.kzp .kzp__kaart img{display:block;width:100%;height:auto;max-width:none;margin:0;border:0}
+
+/* Uitslagen: zoals het KZ-Tab Widget. Jaren als pillen, categorieën als tabs
+   en de uitslag in een rood vlak; op een rode band omgekeerd. */
+.kzp .kzp__uitslagen{font-family:var(--kzp-display);font-weight:700;--kzp-u-voor:var(--kzp-red);--kzp-u-achter:var(--kzp-white)}
+.kzp .kzp__band--rood .kzp__uitslagen{--kzp-u-voor:var(--kzp-white);--kzp-u-achter:var(--kzp-red)}
+.kzp .kzp__jaren,.kzp .kzp__categorieen{display:flex;flex-wrap:wrap;gap:10px}
+.kzp .kzp__jaren{margin:0 0 28px}
+.kzp .kzp__categorieen{gap:4px}
+.kzp .kzp__jaar,.kzp .kzp__categorie{appearance:none;margin:0;font-family:var(--kzp-display);font-weight:700;font-size:18px;line-height:1;letter-spacing:0;text-transform:uppercase;cursor:pointer;box-shadow:none;text-shadow:none}
+.kzp .kzp__jaar{padding:12px 24px;border:2px solid var(--kzp-u-voor);border-radius:999px;background:var(--kzp-u-achter);color:var(--kzp-u-voor)}
+.kzp .kzp__jaar[aria-pressed="true"]{background:var(--kzp-u-voor);color:var(--kzp-u-achter)}
+.kzp .kzp__categorie{padding:14px 22px 12px;border:0;border-radius:8px 8px 0 0;background:transparent;color:var(--kzp-u-voor)}
+.kzp .kzp__categorie[aria-pressed="true"]{background:var(--kzp-u-voor);color:var(--kzp-u-achter)}
+.kzp .kzp__jaar:focus-visible,.kzp .kzp__categorie:focus-visible{outline:3px solid var(--kzp-black);outline-offset:2px}
+.kzp .kzp__jaar-paneel[hidden],.kzp .kzp__uitslag[hidden]{display:none}
+.kzp .kzp__uitslag{list-style:none;margin:0;padding:22px 26px;border-radius:0 0 8px 8px;background:var(--kzp-u-voor);color:var(--kzp-u-achter)}
+.kzp .kzp__uitslag-rij{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin:0;padding:5px 0;font-size:19px;line-height:1.3;list-style:none}
+.kzp .kzp__uitslag-rij::before{content:none}
+.kzp .kzp__uitslag-rij:first-child{font-size:25px}
+.kzp .kzp__uitslag-punten{flex:0 0 auto}
+.kzp .kzp__uitslagen-sectie .kzp__raster--4-8{align-items:start}
 
 /* Foto's: vaste verhouding 3:2, uitsnede rond het focuspunt */
 .kzp .kzp__fotos{display:grid;grid-template-columns:minmax(0,1fr);gap:40px}
@@ -148,11 +201,21 @@ html:has(.kzp--vol){overflow-x:clip}
   .kzp .kzp__sectie + .kzp__kop{padding-top:28px}
   .kzp .kzp__binnen{padding:0 18px}
   .kzp .kzp__raster,.kzp .kzp__raster--8-4,.kzp .kzp__raster--4-8,.kzp .kzp__raster--6-6,
-  .kzp--foto-rechts.kzp__dag .kzp__raster--4-8{grid-template-columns:minmax(0,1fr);gap:28px}
+  .kzp--foto-rechts.kzp__dag .kzp__raster--4-8,.kzp--foto-rechts.kzp__tekstsectie .kzp__raster--4-8,
+  .kzp--foto-rechts.kzp__uitslagen-sectie .kzp__raster--4-8{grid-template-columns:minmax(0,1fr);gap:28px}
   .kzp--foto-links .kzp__beeldkolom{order:0}
   .kzp .kzp__titel{font-size:38px;margin-bottom:20px}
   .kzp .kzp__groep-titel{font-size:32px;margin-top:36px}
   .kzp .kzp__onderdeel-titel{font-size:27px;margin-bottom:16px}
+  .kzp .kzp__blok-titel{font-size:27px;margin-bottom:14px}
+  .kzp .kzp__blok + .kzp__blok{margin-top:30px}
+  .kzp .kzp__stap-titel{font-size:22px}
+  .kzp .kzp__jaren{gap:6px;margin-bottom:20px}
+  .kzp .kzp__jaar{padding:9px 16px;font-size:16px}
+  .kzp .kzp__categorie{padding:11px 12px 9px;font-size:15px}
+  .kzp .kzp__uitslag{padding:16px 18px}
+  .kzp .kzp__uitslag-rij{font-size:17px}
+  .kzp .kzp__uitslag-rij:first-child{font-size:21px}
   .kzp .kzp__onderdeel + .kzp__onderdeel{margin-top:32px}
   .kzp .kzp__tekst{font-size:16px}
   .kzp .kzp__tekst h4{font-size:22px}
@@ -163,4 +226,9 @@ html:has(.kzp--vol){overflow-x:clip}
   .kzp .kzp__vraag summary{font-size:21px}
   .kzp .kzp__evenementen--2 .kzp__evenementen-rij,
   .kzp .kzp__evenementen--3 .kzp__evenementen-rij{grid-template-columns:minmax(0,1fr)}
+}
+/* Heel smal (kleine telefoon): de grote kop iets kleiner, zodat een lang woord
+   als CARNAVALSOPTOCHT binnen beeld blijft. */
+@container kzp (max-width: 420px){
+  .kzp .kzp__kop-titel{font-size:38px;line-height:46px}
 }

@@ -2,8 +2,8 @@
 /**
  * KZ-Pagina — shortcode [kz_pagina pagina="5dd"]
  *
- * Tekent een hele pagina uit vaste secties: kop, intro, dag, tekst + foto,
- * tickets (KZ-Evenement Info), vragen en motto. De inhoud (teksten, knoppen, foto's) beheer je in
+ * Tekent een hele pagina uit vaste secties: kop, intro, dag, tekst, tekst + foto,
+ * route, tickets (KZ-Evenement Info), uitslagen, vragen en motto. De inhoud (teksten, knoppen, foto's) beheer je in
  * KZ-Studio (Website → Pagina's); de opmaak staat hier vast, zodat er niets
  * verspringt zoals bij losse WPBakery-blokken.
  *
@@ -60,10 +60,33 @@ class KZ_Element_Pagina {
         'blokken'        => 6,
         'groepen'        => 8,
         'vragen'         => 20,
+        'tekstIntro'     => 1000,
+        'tekstBlokken'   => 12,
+        'stap'           => 200,
+        'afstand'        => 40,
+        'stappen'        => 40,
+        'jaar'           => 20,
+        'jaren'          => 20,
+        'categorieen'    => 6,
+        'rijen'          => 60,
+        'uitslagNaam'    => 120,
+    );
+
+    /**
+     * De pijltjes bij een routestap: paden in een 24×24-viewBox, met een lijn
+     * in de tekstkleur. Gelijk aan ROUTE_ICONEN in KZ-Studio.
+     */
+    const ROUTE_ICONEN = array(
+        'rechtdoor'    => 'M12 20V4M6 10l6-6 6 6',
+        'links'        => 'M18 20v-7a4 4 0 0 0-4-4H5M9 5 5 9l4 4',
+        'rechts'       => 'M6 20v-7a4 4 0 0 1 4-4h9M15 5l4 4-4 4',
+        'bocht-links'  => 'M16 20c0-6-2-11-9-14M7 6h5M7 6v5',
+        'bocht-rechts' => 'M8 20c0-6 2-11 9-14M17 6h-5M17 6v5',
+        'keren'        => 'M8 20V9a4 4 0 0 1 8 0v5M12 11l4 4 4-4',
     );
 
     /** "tickets" (tot 8.15) bestaat niet meer: zo'n sectie wordt overgeslagen. */
-    const SJABLONEN = array( 'kop', 'intro', 'dag', 'tekst_foto', 'evenementen', 'faq', 'motto' );
+    const SJABLONEN = array( 'kop', 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'faq', 'motto' );
 
     public static function register_shortcode() {
         add_shortcode( self::SHORTCODE, array( __CLASS__, 'render' ) );
@@ -132,6 +155,7 @@ class KZ_Element_Pagina {
 
         wp_enqueue_style( 'kz-evenement-info-fonts' );
         wp_enqueue_style( 'kz-pagina-style' );
+        wp_enqueue_script( 'kz-pagina' );
 
         $secties = $data['secties'];
         $opmaak  = self::kleuren( $secties );
@@ -197,12 +221,12 @@ class KZ_Element_Pagina {
         foreach ( $secties as $n => $s ) {
             $achtergrond = 'wit';
             $fotokant    = 'links';
-            if ( in_array( $s['sjabloon'], array( 'intro', 'dag', 'tekst_foto', 'evenementen', 'faq', 'motto' ), true ) ) {
+            if ( in_array( $s['sjabloon'], array( 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'faq', 'motto' ), true ) ) {
                 $k           = isset( $s['inhoud']['kleur'] ) ? $s['inhoud']['kleur'] : 'auto';
                 $achtergrond = 'auto' === $k ? ( 0 === $band % 2 ? 'rood' : 'wit' ) : $k;
                 $band++;
             }
-            if ( in_array( $s['sjabloon'], array( 'dag', 'tekst_foto' ), true ) ) {
+            if ( in_array( $s['sjabloon'], array( 'dag', 'tekst', 'tekst_foto', 'route', 'uitslagen' ), true ) ) {
                 $k        = isset( $s['inhoud']['fotokant'] ) ? $s['inhoud']['fotokant'] : 'auto';
                 $fotokant = 'auto' === $k ? ( 0 === $fotos % 2 ? 'links' : 'rechts' ) : $k;
                 $fotos++;
@@ -265,6 +289,71 @@ class KZ_Element_Pagina {
                     . '<div class="kzp__tekstkolom">' . self::titel( $i['titel'] ) . $onderdelen . '</div>'
                     . ( '' !== $fotos ? '<div class="kzp__beeldkolom kzp__fotos">' . $fotos . '</div>' : '' )
                     . '</div></section>';
+
+            case 'tekst':
+                $blokken = '';
+                foreach ( $i['blokken'] as $b ) {
+                    if ( $b['verborgen'] ) {
+                        continue;
+                    }
+                    $blok = ( '' !== trim( $b['titel'] ) ? '<h3 class="kzp__blok-titel">' . esc_html( $b['titel'] ) . '</h3>' : '' )
+                        . self::tekst_blok( $b['tekst'], 'kzp__tekst' )
+                        . self::knop( $b['knop'], $opmaak['achtergrond'] );
+                    if ( '' !== $blok ) {
+                        $blokken .= '<div class="kzp__blok">' . $blok . '</div>';
+                    }
+                }
+                $fotos = '';
+                foreach ( $i['fotos'] as $f ) {
+                    $fotos .= self::foto( $f );
+                }
+                // Zonder foto's over de volle breedte, met foto's een kolom ernaast (zoals Dag).
+                return '<section class="' . esc_attr( $band . ' kzp__tekstsectie ' . $kant ) . '"><div class="kzp__binnen' . ( '' !== $fotos ? ' kzp__raster kzp__raster--4-8' : '' ) . '">'
+                    . '<div class="kzp__tekstkolom">'
+                    . self::titel( $i['titel'] )
+                    . ( '' !== trim( $i['intro'] ) ? '<p class="kzp__intro-tekst">' . esc_html( $i['intro'] ) . '</p>' : '' )
+                    . $blokken
+                    . '</div>'
+                    . ( '' !== $fotos ? '<div class="kzp__beeldkolom kzp__fotos">' . $fotos . '</div>' : '' )
+                    . '</div></section>';
+
+            case 'route':
+                $stappen = '';
+                foreach ( $i['stappen'] as $st ) {
+                    if ( $st['verborgen'] || '' === trim( $st['tekst'] ) ) {
+                        continue;
+                    }
+                    $punt     = 'punt' === $st['soort'];
+                    $afstand  = '' !== trim( $st['afstand'] ) ? '<span class="kzp__stap-afstand">' . esc_html( $st['afstand'] ) . '</span>' : '';
+                    $stappen .= '<li class="kzp__stap kzp__stap--' . ( $punt ? 'punt' : 'stap' ) . '">'
+                        . '<span class="kzp__stap-teken" aria-hidden="true">' . ( $punt ? '' : self::route_icoon( $st['richting'] ) ) . '</span>'
+                        . '<div class="kzp__stap-inhoud">'
+                        . ( $punt ? '<h3 class="kzp__stap-titel">' . esc_html( $st['tekst'] ) . '</h3>' : '<p class="kzp__stap-tekst">' . esc_html( $st['tekst'] ) . '</p>' )
+                        . $afstand
+                        . '</div></li>';
+                }
+                $kaart = self::veilige_foto( $i['kaart'] );
+                return '<section class="' . esc_attr( $band . ' kzp__route ' . $kant ) . '"><div class="kzp__binnen' . ( '' !== $kaart ? ' kzp__raster kzp__raster--6-6' : '' ) . '">'
+                    . '<div class="kzp__tekstkolom">'
+                    . self::titel( $i['titel'] )
+                    . ( '' !== $stappen ? '<ol class="kzp__stappen">' . $stappen . '</ol>' : '' )
+                    . self::knop( $i['knop'], $opmaak['achtergrond'] )
+                    . '</div>'
+                    . ( '' !== $kaart ? '<div class="kzp__beeldkolom"><a class="kzp__kaart" href="' . esc_url( $kaart ) . '" target="_blank" rel="noopener"><img src="' . esc_url( $kaart ) . '" alt="' . esc_attr__( 'Kaart van de route', 'kz-plugin' ) . '" loading="lazy" decoding="async"></a></div>' : '' )
+                    . '</div></section>';
+
+            case 'uitslagen':
+                $uitslagen = self::uitslagen( $i['jaren'] );
+                if ( '' === $uitslagen ) {
+                    return '';
+                }
+                $foto = self::foto( $i['foto'] );
+                return '<section class="' . esc_attr( $band . ' kzp__uitslagen-sectie ' . $kant ) . '"><div class="kzp__binnen">'
+                    . self::titel( $i['titel'] )
+                    . '<div class="' . ( '' !== $foto ? 'kzp__raster kzp__raster--4-8' : '' ) . '">'
+                    . '<div class="kzp__tekstkolom">' . $uitslagen . '</div>'
+                    . ( '' !== $foto ? '<div class="kzp__beeldkolom">' . $foto . '</div>' : '' )
+                    . '</div></div></section>';
 
             case 'tekst_foto':
                 $foto = self::foto( $i['foto'] );
@@ -340,6 +429,83 @@ class KZ_Element_Pagina {
                 return '<section class="' . esc_attr( $band . ' kzp__motto' ) . '">' . $filter . '<div class="kzp__binnen">' . $motto . '</div></section>';
         }
         return '';
+    }
+
+    private static function route_icoon( $richting ) {
+        $pad = isset( self::ROUTE_ICONEN[ $richting ] ) ? self::ROUTE_ICONEN[ $richting ] : self::ROUTE_ICONEN['rechtdoor'];
+        return '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="' . esc_attr( $pad ) . '"/></svg>';
+    }
+
+    /**
+     * De uitslagen zoals het KZ-Tab Widget ze toont (jaren als pillen,
+     * categorieën als tabs, de uitslag in een vlak), maar hier helemaal op de
+     * server getekend en ge-escapet: kz-pagina.js wisselt alleen welk paneel
+     * zichtbaar is. Zonder JavaScript staat het laatste jaar open. Een jaar of
+     * categorie zonder regels valt weg. Gelijk aan zichtbareUitslagen() en het
+     * voorbeeld in KZ-Studio.
+     */
+    private static function uitslagen( array $jaren ) {
+        $zichtbaar = array();
+        foreach ( $jaren as $j ) {
+            if ( $j['verborgen'] || '' === trim( $j['jaar'] ) ) {
+                continue;
+            }
+            $categorieen = array();
+            foreach ( $j['categorieen'] as $c ) {
+                $heeft_regels = false;
+                foreach ( $c['rijen'] as $rij ) {
+                    if ( '' !== trim( $rij['naam'] ) ) {
+                        $heeft_regels = true;
+                    }
+                }
+                if ( ! $c['verborgen'] && '' !== trim( $c['naam'] ) && $heeft_regels ) {
+                    $categorieen[] = $c;
+                }
+            }
+            if ( $categorieen ) {
+                $zichtbaar[] = array(
+                    'jaar'        => $j['jaar'],
+                    'categorieen' => $categorieen,
+                );
+            }
+        }
+        if ( ! $zichtbaar ) {
+            return '';
+        }
+
+        $actief  = count( $zichtbaar ) - 1;
+        $knoppen = '';
+        $panelen = '';
+        foreach ( $zichtbaar as $n => $j ) {
+            $aan      = $n === $actief;
+            $knoppen .= '<button type="button" class="kzp__jaar" data-jaar="' . $n . '" aria-pressed="' . ( $aan ? 'true' : 'false' ) . '">' . esc_html( $j['jaar'] ) . '</button>';
+            $tabs     = '';
+            $lijsten  = '';
+            foreach ( $j['categorieen'] as $m => $c ) {
+                $tabs .= '<button type="button" class="kzp__categorie" data-categorie="' . $m . '" aria-pressed="' . ( 0 === $m ? 'true' : 'false' ) . '">' . esc_html( $c['naam'] ) . '</button>';
+                $regels = '';
+                $plek   = 0;
+                foreach ( $c['rijen'] as $rij ) {
+                    if ( '' === trim( $rij['naam'] ) ) {
+                        continue;
+                    }
+                    $met_punten = null !== $rij['punten'];
+                    if ( $met_punten ) {
+                        $plek++;
+                    }
+                    $regels .= '<li class="kzp__uitslag-rij">'
+                        . '<span class="kzp__uitslag-naam">' . ( $met_punten ? $plek . '. ' : '' ) . esc_html( $rij['naam'] ) . '</span>'
+                        . ( $met_punten ? '<span class="kzp__uitslag-punten">' . (int) $rij['punten'] . '</span>' : '' )
+                        . '</li>';
+                }
+                $lijsten .= '<ul class="kzp__uitslag" data-categorie="' . $m . '"' . ( 0 === $m ? '' : ' hidden' ) . '>' . $regels . '</ul>';
+            }
+            $panelen .= '<div class="kzp__jaar-paneel" data-jaar="' . $n . '"' . ( $aan ? '' : ' hidden' ) . '>'
+                . '<div class="kzp__categorieen">' . $tabs . '</div>'
+                . $lijsten
+                . '</div>';
+        }
+        return '<div class="kzp__uitslagen" data-kzp-uitslagen><div class="kzp__jaren">' . $knoppen . '</div>' . $panelen . '</div>';
     }
 
     /** Een onzichtbaar SVG-filter dat alles wat niet doorzichtig is #E83F35 maakt. */
@@ -687,6 +853,82 @@ class KZ_Element_Pagina {
                     'fotos'      => $fotos,
                     'kleur'      => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
                     'fotokant'   => self::keuze( $r, 'fotokant', array( 'auto', 'links', 'rechts' ), 'auto' ),
+                );
+
+            case 'tekst':
+                $blokken = array();
+                foreach ( self::lijst( $r, 'blokken', $l['tekstBlokken'] ) as $b ) {
+                    $blokken[] = array(
+                        'titel'     => self::tekst( $b, 'titel', $l['onderdeelTitel'] ),
+                        'tekst'     => self::tekst( $b, 'tekst', $l['tekst'] ),
+                        'knop'      => self::schoon_knop( $b ),
+                        'verborgen' => self::verborgen( $b ),
+                    );
+                }
+                $fotos = array();
+                foreach ( self::lijst( $r, 'fotos', $l['fotos'] ) as $f ) {
+                    $fotos[] = self::schoon_foto( $f );
+                }
+                return array(
+                    'titel'    => self::tekst( $r, 'titel', $l['titel'] ),
+                    'intro'    => self::tekst( $r, 'intro', $l['tekstIntro'] ),
+                    'blokken'  => $blokken,
+                    'fotos'    => $fotos,
+                    'kleur'    => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
+                    'fotokant' => self::keuze( $r, 'fotokant', array( 'auto', 'links', 'rechts' ), 'auto' ),
+                );
+
+            case 'route':
+                $stappen = array();
+                foreach ( self::lijst( $r, 'stappen', $l['stappen'] ) as $st ) {
+                    $stappen[] = array(
+                        'soort'     => self::keuze( $st, 'soort', array( 'punt', 'stap' ), 'stap' ),
+                        'richting'  => self::keuze( $st, 'richting', array_keys( self::ROUTE_ICONEN ), 'rechtdoor' ),
+                        'tekst'     => self::tekst( $st, 'tekst', $l['stap'] ),
+                        'afstand'   => self::tekst( $st, 'afstand', $l['afstand'] ),
+                        'verborgen' => self::verborgen( $st ),
+                    );
+                }
+                return array(
+                    'titel'    => self::tekst( $r, 'titel', $l['titel'] ),
+                    'stappen'  => $stappen,
+                    'kaart'    => self::tekst( $r, 'kaart', $l['url'] ),
+                    'knop'     => self::schoon_knop( $r ),
+                    'kleur'    => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
+                    'fotokant' => self::keuze( $r, 'fotokant', array( 'auto', 'links', 'rechts' ), 'auto' ),
+                );
+
+            case 'uitslagen':
+                $jaren = array();
+                foreach ( self::lijst( $r, 'jaren', $l['jaren'] ) as $j ) {
+                    $categorieen = array();
+                    foreach ( self::lijst( $j, 'categorieen', $l['categorieen'] ) as $c ) {
+                        $rijen = array();
+                        foreach ( self::lijst( $c, 'rijen', $l['rijen'] ) as $rij ) {
+                            $p       = isset( $rij['punten'] ) ? $rij['punten'] : null;
+                            $rijen[] = array(
+                                'naam'   => self::tekst( $rij, 'naam', $l['uitslagNaam'] ),
+                                'punten' => is_int( $p ) && abs( $p ) < 1000000 ? $p : null,
+                            );
+                        }
+                        $categorieen[] = array(
+                            'naam'      => self::tekst( $c, 'naam', $l['titel'] ),
+                            'rijen'     => $rijen,
+                            'verborgen' => self::verborgen( $c ),
+                        );
+                    }
+                    $jaren[] = array(
+                        'jaar'        => self::tekst( $j, 'jaar', $l['jaar'] ),
+                        'categorieen' => $categorieen,
+                        'verborgen'   => self::verborgen( $j ),
+                    );
+                }
+                return array(
+                    'titel'    => self::tekst( $r, 'titel', $l['titel'] ),
+                    'foto'     => self::schoon_foto( isset( $r['foto'] ) && is_array( $r['foto'] ) ? $r['foto'] : array() ),
+                    'jaren'    => $jaren,
+                    'kleur'    => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
+                    'fotokant' => self::keuze( $r, 'fotokant', array( 'auto', 'links', 'rechts' ), 'auto' ),
                 );
 
             case 'tekst_foto':
