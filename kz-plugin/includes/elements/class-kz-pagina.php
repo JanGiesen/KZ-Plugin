@@ -3,7 +3,7 @@
  * KZ-Pagina — shortcode [kz_pagina pagina="5dd"]
  *
  * Tekent een hele pagina uit vaste secties: kop, intro, dag, tekst, tekst + foto,
- * route, tickets (KZ-Evenement Info), uitslagen, video, vragen en motto. De inhoud (teksten, knoppen, foto's) beheer je in
+ * route, tickets (KZ-Evenement Info), uitslagen, video, vakken (KZ-Vindt Grid), vragen en motto. De inhoud (teksten, knoppen, foto's) beheer je in
  * KZ-Studio (Website → Pagina's); de opmaak staat hier vast, zodat er niets
  * verspringt zoals bij losse WPBakery-blokken.
  *
@@ -70,6 +70,11 @@ class KZ_Element_Pagina {
         'categorieen'    => 6,
         'rijen'          => 60,
         'uitslagNaam'    => 120,
+        'vakken'         => 24,
+        'vakTekst'       => 40,
+        'kolomKop'       => 30,
+        'ondertitel'     => 120,
+        'adres'          => 200,
     );
 
     /**
@@ -86,7 +91,7 @@ class KZ_Element_Pagina {
     );
 
     /** "tickets" (tot 8.15) bestaat niet meer: zo'n sectie wordt overgeslagen. */
-    const SJABLONEN = array( 'kop', 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'faq', 'motto' );
+    const SJABLONEN = array( 'kop', 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'vakken', 'faq', 'motto' );
 
     public static function register_shortcode() {
         add_shortcode( self::SHORTCODE, array( __CLASS__, 'render' ) );
@@ -221,7 +226,7 @@ class KZ_Element_Pagina {
         foreach ( $secties as $n => $s ) {
             $achtergrond = 'wit';
             $fotokant    = 'links';
-            if ( in_array( $s['sjabloon'], array( 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'faq', 'motto' ), true ) ) {
+            if ( in_array( $s['sjabloon'], array( 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'vakken', 'faq', 'motto' ), true ) ) {
                 $k           = isset( $s['inhoud']['kleur'] ) ? $s['inhoud']['kleur'] : 'auto';
                 $achtergrond = 'auto' === $k ? ( 0 === $band % 2 ? 'rood' : 'wit' ) : $k;
                 $band++;
@@ -369,6 +374,25 @@ class KZ_Element_Pagina {
                     . ' referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>'
                     . '</div></section>';
 
+            case 'vakken':
+                $grid  = self::vakken_grid( $i, 'rood' === $opmaak['achtergrond'] );
+                $kaart = self::kaart( $i['adres'], $opmaak['achtergrond'] );
+                $tekst = self::tekst_blok( $i['tekst'], 'kzp__tekst' ) . self::knop( $i['knop'], $opmaak['achtergrond'] );
+                if ( '' === $grid && '' === $kaart && '' === $tekst && '' === trim( $i['titel'] ) ) {
+                    return '';
+                }
+                $kop   = ( '' !== trim( $i['vakkenTitel'] ) ? '<h3 class="kzp__vakken-titel">' . esc_html( $i['vakkenTitel'] )
+                    . ( '' !== trim( $i['vakkenOndertitel'] ) ? ' <small>' . esc_html( $i['vakkenOndertitel'] ) . '</small>' : '' ) . '</h3>' : '' );
+                $beide = '' !== $tekst && '' !== $grid;
+                return '<section class="' . esc_attr( $band . ' kzp__vakken-sectie' ) . '"><div class="kzp__binnen">'
+                    . self::titel( $i['titel'] )
+                    . '<div class="' . ( $beide ? 'kzp__raster kzp__raster--6-6' : '' ) . '">'
+                    . ( '' !== $tekst ? '<div class="kzp__tekstkolom">' . $tekst . '</div>' : '' )
+                    . ( '' !== $grid ? '<div class="kzp__beeldkolom kzp__vakken">' . $kop . $grid . '</div>' : '' )
+                    . '</div>'
+                    . $kaart
+                    . '</div></section>';
+
             case 'tekst_foto':
                 $foto = self::foto( $i['foto'] );
                 return '<section class="' . esc_attr( $band . ' kzp__tekst-foto ' . $kant ) . '"><div class="kzp__binnen kzp__raster kzp__raster--6-6">'
@@ -452,6 +476,73 @@ class KZ_Element_Pagina {
     public static function youtube_id( $url ) {
         $patroon = '~^https?://(?:(?:www\.|m\.)?youtube(?:-nocookie)?\.com/(?:watch\?(?:[^#]*&)?v=|embed/|shorts/|live/)|youtu\.be/)([A-Za-z0-9_-]{11})(?![A-Za-z0-9_-])~';
         return preg_match( $patroon, trim( (string) $url ), $m ) ? $m[1] : '';
+    }
+
+    /**
+     * Het grid van het sjabloon Vakken via het element KZ-Vindt Grid zelf, dus
+     * precies gelijk aan dat element elders op de site. Op een rode band
+     * omgekeerd: witte vakken met rode tekst. Verborgen vakken vallen weg;
+     * '' als er niets overblijft.
+     */
+    private static function vakken_grid( array $i, $op_rood ) {
+        if ( ! class_exists( 'KZ_Element_Vindt_Grid' ) ) {
+            return '';
+        }
+        $vakken = array();
+        $gevuld = false;
+        foreach ( $i['vakken'] as $v ) {
+            if ( $v['verborgen'] ) {
+                continue;
+            }
+            $vakken[] = array(
+                'leeg'  => $v['leeg'],
+                'datum' => $v['datum'],
+                'label' => $v['label'],
+                'tijd'  => $v['tijd'],
+                'link'  => $v['leeg'] ? '' : self::veilige_url( $v['url'] ),
+            );
+            if ( ! $v['leeg'] ) {
+                $gevuld = true;
+            }
+        }
+        if ( ! $gevuld ) {
+            return '';
+        }
+        $koppen = array();
+        foreach ( array_slice( $i['koppen'], 0, $i['kolommen'] ) as $kop ) {
+            $koppen[] = trim( $kop );
+        }
+        // Alleen koppen als er minstens één is ingevuld; anders schuift het grid niet.
+        if ( '' === implode( '', $koppen ) ) {
+            $koppen = array();
+        }
+        return KZ_Element_Vindt_Grid::html( $i['kolommen'], $koppen, $op_rood, $vakken );
+    }
+
+    /**
+     * Een kaart van Google Maps met het adres, met eronder een balk met het
+     * adres en een knop om de route te plannen. De balk heeft de kleur van de
+     * tekst (rood op een witte band), dus de knop is omgekeerd. Gelijk aan
+     * kaartUrl() en routeUrl() in KZ-Studio.
+     */
+    private static function kaart( $adres, $achtergrond ) {
+        $adres = trim( (string) $adres );
+        if ( '' === $adres ) {
+            return '';
+        }
+        $kaart = 'https://www.google.com/maps?q=' . rawurlencode( $adres ) . '&z=16&output=embed';
+        $route = 'https://www.google.com/maps/dir/?api=1&destination=' . rawurlencode( $adres );
+        return '<div class="kzp__kaartblok">'
+            . '<div class="kzp__kaartvenster"><iframe src="' . esc_url( $kaart ) . '" title="' . esc_attr( 'Kaart: ' . $adres ) . '" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe></div>'
+            . '<div class="kzp__kaartbalk"><p class="kzp__adres">' . esc_html( $adres ) . '</p>'
+            . self::knop(
+                array(
+                    'tekst' => 'Route plannen',
+                    'url'   => $route,
+                ),
+                'rood' === $achtergrond ? 'wit' : 'rood'
+            )
+            . '</div></div>';
     }
 
     private static function route_icoon( $richting ) {
@@ -959,6 +1050,37 @@ class KZ_Element_Pagina {
                     'titel' => self::tekst( $r, 'titel', $l['titel'] ),
                     'url'   => self::tekst( $r, 'url', $l['url'] ),
                     'kleur' => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
+                );
+
+            case 'vakken':
+                $vakken = array();
+                foreach ( self::lijst( $r, 'vakken', $l['vakken'] ) as $v ) {
+                    $vakken[] = array(
+                        'leeg'      => isset( $v['leeg'] ) && true === $v['leeg'],
+                        'datum'     => self::tekst( $v, 'datum', $l['vakTekst'] ),
+                        'label'     => self::tekst( $v, 'label', $l['label'] ),
+                        'tijd'      => self::tekst( $v, 'tijd', $l['vakTekst'] ),
+                        'url'       => self::tekst( $v, 'url', $l['url'] ),
+                        'verborgen' => self::verborgen( $v ),
+                    );
+                }
+                $koppen = array();
+                if ( isset( $r['koppen'] ) && is_array( $r['koppen'] ) ) {
+                    foreach ( array_slice( array_values( $r['koppen'] ), 0, 4 ) as $kop ) {
+                        $koppen[] = is_string( $kop ) ? mb_substr( $kop, 0, $l['kolomKop'] ) : '';
+                    }
+                }
+                return array(
+                    'titel'            => self::tekst( $r, 'titel', $l['titel'] ),
+                    'tekst'            => self::tekst( $r, 'tekst', $l['tekst'] ),
+                    'knop'             => self::schoon_knop( $r ),
+                    'vakkenTitel'      => self::tekst( $r, 'vakkenTitel', $l['titel'] ),
+                    'vakkenOndertitel' => self::tekst( $r, 'vakkenOndertitel', $l['ondertitel'] ),
+                    'kolommen'         => isset( $r['kolommen'] ) && in_array( $r['kolommen'], array( 2, 4 ), true ) ? $r['kolommen'] : 3,
+                    'koppen'           => $koppen,
+                    'vakken'           => $vakken,
+                    'adres'            => self::tekst( $r, 'adres', $l['adres'] ),
+                    'kleur'            => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
                 );
 
             case 'tekst_foto':

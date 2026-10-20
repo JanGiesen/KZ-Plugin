@@ -86,3 +86,24 @@
         grid-template-columns: 1fr !important;
     }
 }
+
+/* Een vak met een link (bijv. naar Google Maps) */
+a.kz-vindt-item.kz-vindt-link {
+    text-decoration: none;
+    color: white;
+    transition: opacity 0.15s ease;
+}
+
+a.kz-vindt-item.kz-vindt-link:hover,
+a.kz-vindt-item.kz-vindt-link:focus-visible {
+    opacity: 0.85;
+}
+
+a.kz-vindt-item.kz-vindt-link .kz-vindt-time {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.kz-vindt-grid.kz-vindt-inverted a.kz-vindt-item.kz-vindt-link {
+    color: #E83A30;
+}
