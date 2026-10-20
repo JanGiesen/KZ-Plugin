@@ -240,6 +240,9 @@ class KZ_Element_Pagina {
             case 'dag':
                 $onderdelen = '';
                 foreach ( $i['onderdelen'] as $o ) {
+                    if ( $o['verborgen'] ) {
+                        continue;
+                    }
                     // De tijd als klein contrastlabel boven de titel.
                     $kop = '' !== trim( $o['tijd'] ) ? '<p class="kzp__tijd"><span>' . esc_html( trim( $o['tijd'] ) ) . '</span></p>' : '';
                     if ( '' !== trim( $o['titel'] ) ) {
@@ -266,6 +269,9 @@ class KZ_Element_Pagina {
             case 'tickets':
                 $tickets = '';
                 foreach ( $i['tickets'] as $t ) {
+                    if ( $t['verborgen'] ) {
+                        continue;
+                    }
                     $tickets .= '<div class="kzp__ticket">' . self::ticket( $t ) . '</div>';
                 }
                 return '<section class="kzp__sectie kzp__tickets-sectie"><div class="kzp__binnen">'
@@ -276,12 +282,15 @@ class KZ_Element_Pagina {
             case 'faq':
                 $groepen = '';
                 foreach ( $i['groepen'] as $g ) {
+                    if ( $g['verborgen'] ) {
+                        continue;
+                    }
                     $groepen .= '<div class="kzp__groep">';
                     if ( '' !== trim( $g['titel'] ) ) {
                         $groepen .= '<h3 class="kzp__groep-titel"><span>' . esc_html( $g['titel'] ) . '</span></h3>';
                     }
                     foreach ( $g['vragen'] as $v ) {
-                        if ( '' === trim( $v['vraag'] ) ) {
+                        if ( $v['verborgen'] || '' === trim( $v['vraag'] ) ) {
                             continue;
                         }
                         $groepen .= '<details class="kzp__vraag"><summary><span>' . esc_html( $v['vraag'] ) . '</span></summary>'
@@ -610,6 +619,7 @@ class KZ_Element_Pagina {
                         'tijd'  => self::tekst( $o, 'tijd', $l['tijd'] ),
                         'tekst' => self::tekst( $o, 'tekst', $l['tekst'] ),
                         'knop'  => self::schoon_knop( $o ),
+                        'verborgen' => self::verborgen( $o ),
                     );
                 }
                 $fotos = array();
@@ -643,6 +653,7 @@ class KZ_Element_Pagina {
                         'url'        => self::tekst( $t, 'url', $l['url'] ),
                         'kleur'      => self::keuze( $t, 'kleur', array( 'rood', 'wit', 'hjc' ), 'rood' ),
                         'popup'      => self::tekst( $t, 'popup', $l['popup'] ),
+                        'verborgen'  => self::verborgen( $t ),
                     );
                 }
                 return array(
@@ -664,11 +675,13 @@ class KZ_Element_Pagina {
                         $vragen[] = array(
                             'vraag'    => self::tekst( $v, 'vraag', $l['vraag'] ),
                             'antwoord' => self::tekst( $v, 'antwoord', $l['antwoord'] ),
+                            'verborgen' => self::verborgen( $v ),
                         );
                     }
                     $groepen[] = array(
                         'titel'  => self::tekst( $g, 'titel', $l['titel'] ),
                         'vragen' => $vragen,
+                        'verborgen' => self::verborgen( $g ),
                     );
                 }
                 return array(
@@ -685,6 +698,11 @@ class KZ_Element_Pagina {
             return '';
         }
         return mb_substr( $r[ $sleutel ], 0, $max );
+    }
+
+    /** Een onderdeel, ticket, groep of vraag die in KZ-Studio is verborgen. */
+    private static function verborgen( array $r ) {
+        return isset( $r['verborgen'] ) && true === $r['verborgen'];
     }
 
     private static function lijst( array $r, $sleutel, $max ) {
