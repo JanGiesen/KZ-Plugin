@@ -3,7 +3,7 @@
  * KZ-Pagina — shortcode [kz_pagina pagina="5dd"]
  *
  * Tekent een hele pagina uit vaste secties: kop, intro, dag, tekst, tekst + foto,
- * route, tickets (KZ-Evenement Info), uitslagen, video, vakken (KZ-Vindt Grid), kaart, vragen en motto. De inhoud (teksten, knoppen, foto's) beheer je in
+ * route, tickets (KZ-Evenement Info), uitslagen, video, vakken (KZ-Vindt Grid), kaart, datum + sync, vragen en motto. De inhoud (teksten, knoppen, foto's) beheer je in
  * KZ-Studio (Website → Pagina's); de opmaak staat hier vast, zodat er niets
  * verspringt zoals bij losse WPBakery-blokken.
  *
@@ -75,6 +75,7 @@ class KZ_Element_Pagina {
         'kolomKop'       => 30,
         'ondertitel'     => 120,
         'adres'          => 200,
+        'datumTekst'     => 60,
     );
 
     /**
@@ -91,7 +92,7 @@ class KZ_Element_Pagina {
     );
 
     /** "tickets" (tot 8.15) bestaat niet meer: zo'n sectie wordt overgeslagen. */
-    const SJABLONEN = array( 'kop', 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'vakken', 'kaart', 'faq', 'motto' );
+    const SJABLONEN = array( 'kop', 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'vakken', 'kaart', 'datum_sync', 'faq', 'motto' );
 
     public static function register_shortcode() {
         add_shortcode( self::SHORTCODE, array( __CLASS__, 'render' ) );
@@ -226,12 +227,12 @@ class KZ_Element_Pagina {
         foreach ( $secties as $n => $s ) {
             $achtergrond = 'wit';
             $fotokant    = 'links';
-            if ( in_array( $s['sjabloon'], array( 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'vakken', 'kaart', 'faq', 'motto' ), true ) ) {
+            if ( in_array( $s['sjabloon'], array( 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'vakken', 'kaart', 'datum_sync', 'faq', 'motto' ), true ) ) {
                 $k           = isset( $s['inhoud']['kleur'] ) ? $s['inhoud']['kleur'] : 'auto';
                 $achtergrond = 'auto' === $k ? ( 0 === $band % 2 ? 'rood' : 'wit' ) : $k;
                 $band++;
             }
-            if ( in_array( $s['sjabloon'], array( 'dag', 'tekst', 'tekst_foto', 'route', 'uitslagen' ), true ) ) {
+            if ( in_array( $s['sjabloon'], array( 'dag', 'tekst', 'tekst_foto', 'route', 'uitslagen', 'datum_sync' ), true ) ) {
                 $k        = isset( $s['inhoud']['fotokant'] ) ? $s['inhoud']['fotokant'] : 'auto';
                 $fotokant = 'auto' === $k ? ( 0 === $fotos % 2 ? 'links' : 'rechts' ) : $k;
                 $fotos++;
@@ -399,6 +400,30 @@ class KZ_Element_Pagina {
                 return '<section class="' . esc_attr( $band . ' kzp__kaart-sectie' ) . '"><div class="kzp__binnen">'
                     . self::titel( $i['titel'] )
                     . $kaart
+                    . '</div></section>';
+
+            case 'datum_sync':
+                // De Intro van een andere pagina (ingevuld door website_pagina_ophalen()),
+                // met de datum erboven en een knop naar die pagina.
+                $intro = $i['intro'];
+                $beeld = self::veilige_foto( $intro['afbeelding'] );
+                if ( '' === $beeld ) {
+                    $beeld = KZ_PLUGIN_URL . 'assets/img/' . ( 'rood' === $opmaak['achtergrond'] ? 'kz-logo-wit.svg' : 'kz-logo-rood.svg' );
+                }
+                $datum = self::datum_label( $i );
+                $knop  = array(
+                    'tekst' => $i['knopTekst'],
+                    'url'   => '' !== $i['slug'] ? home_url( '/' . $i['slug'] . '/' ) : '',
+                );
+                return '<section class="' . esc_attr( $band . ' kzp__intro kzp__datum-sync ' . $kant ) . '"><div class="kzp__binnen kzp__raster kzp__raster--8-4">'
+                    . '<div class="kzp__tekstkolom">'
+                    . ( '' !== $datum ? '<p class="kzp__tijd kzp__datum"><span>' . esc_html( $datum ) . '</span></p>' : '' )
+                    . self::titel( $intro['titel'] )
+                    . ( '' !== trim( $intro['intro'] ) ? '<p class="kzp__intro-tekst">' . esc_html( $intro['intro'] ) . '</p>' : '' )
+                    . self::tekst_blok( $intro['tekst'], 'kzp__tekst' )
+                    . self::knop( $knop, $opmaak['achtergrond'] )
+                    . '</div>'
+                    . '<div class="kzp__beeldkolom"><img class="kzp__logo" src="' . esc_url( $beeld ) . '" alt="" decoding="async"></div>'
                     . '</div></section>';
 
             case 'tekst_foto':
@@ -628,6 +653,46 @@ class KZ_Element_Pagina {
                 . '</div>';
         }
         return '<div class="kzp__uitslagen" data-kzp-uitslagen><div class="kzp__jaren">' . $knoppen . '</div>' . $panelen . '</div>';
+    }
+
+    /**
+     * De datum boven een Datum + Sync: "zaterdag 14 november 2026", of een
+     * periode ("vrijdag 12 tot en met dinsdag 16 februari 2027"; maand en
+     * jaar alleen waar ze verschillen). datumTekst gaat voor. Gelijk aan
+     * datumLabel() in KZ-Studio.
+     */
+    public static function datum_label( array $i ) {
+        if ( '' !== trim( $i['datumTekst'] ) ) {
+            return trim( $i['datumTekst'] );
+        }
+        if ( '' === $i['datum'] ) {
+            return '';
+        }
+        $dagen   = array( 'zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag' );
+        $maanden = array( 'januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december' );
+        $deel    = function ( $iso ) use ( $dagen ) {
+            list( $j, $m, $d ) = array_map( 'intval', explode( '-', $iso ) );
+            return array(
+                'j'       => $j,
+                'm'       => $m,
+                'dag'     => $d,
+                'weekdag' => $dagen[ (int) gmdate( 'w', gmmktime( 0, 0, 0, $m, $d, $j ) ) ],
+            );
+        };
+        $van    = $deel( $i['datum'] );
+        $voluit = $van['weekdag'] . ' ' . $van['dag'] . ' ' . $maanden[ $van['m'] - 1 ] . ' ' . $van['j'];
+        if ( '' === $i['datumTot'] || $i['datumTot'] <= $i['datum'] ) {
+            return $voluit;
+        }
+        $tot = $deel( $i['datumTot'] );
+        if ( $tot['j'] !== $van['j'] ) {
+            $begin = $voluit;
+        } elseif ( $tot['m'] !== $van['m'] ) {
+            $begin = $van['weekdag'] . ' ' . $van['dag'] . ' ' . $maanden[ $van['m'] - 1 ];
+        } else {
+            $begin = $van['weekdag'] . ' ' . $van['dag'];
+        }
+        return $begin . ' tot en met ' . $tot['weekdag'] . ' ' . $tot['dag'] . ' ' . $maanden[ $tot['m'] - 1 ] . ' ' . $tot['j'];
     }
 
     /** Een onzichtbaar SVG-filter dat alles wat niet doorzichtig is #E83F35 maakt. */
@@ -924,9 +989,14 @@ class KZ_Element_Pagina {
                 if ( ! is_array( $s ) || ! isset( $s['sjabloon'] ) || ! in_array( $s['sjabloon'], self::SJABLONEN, true ) ) {
                     continue;
                 }
+                $inhoud = self::schoon_inhoud( $s['sjabloon'], isset( $s['inhoud'] ) && is_array( $s['inhoud'] ) ? $s['inhoud'] : array() );
+                // Een Datum + Sync zonder Intro telt niet mee in het om en om.
+                if ( 'datum_sync' === $s['sjabloon'] && null === $inhoud['intro'] ) {
+                    continue;
+                }
                 $secties[] = array(
                     'sjabloon' => $s['sjabloon'],
-                    'inhoud'   => self::schoon_inhoud( $s['sjabloon'], isset( $s['inhoud'] ) && is_array( $s['inhoud'] ) ? $s['inhoud'] : array() ),
+                    'inhoud'   => $inhoud,
                 );
             }
         }
@@ -1095,6 +1165,21 @@ class KZ_Element_Pagina {
                     'titel' => self::tekst( $r, 'titel', $l['titel'] ),
                     'adres' => self::tekst( $r, 'adres', $l['adres'] ),
                     'kleur' => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
+                );
+
+            case 'datum_sync':
+                // `slug` en `intro` zet website_pagina_ophalen() erin (KZ-Studio 0051);
+                // zonder intro tekent sectie() niets.
+                $slug = self::tekst( $r, 'slug', 60 );
+                return array(
+                    'datum'      => self::datum( $r, 'datum' ),
+                    'datumTot'   => self::datum( $r, 'datumTot' ),
+                    'datumTekst' => self::tekst( $r, 'datumTekst', $l['datumTekst'] ),
+                    'knopTekst'  => self::tekst( $r, 'knopTekst', $l['knopTekst'] ),
+                    'kleur'      => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
+                    'fotokant'   => self::keuze( $r, 'fotokant', array( 'auto', 'links', 'rechts' ), 'auto' ),
+                    'slug'       => preg_match( '/^[a-z0-9]+(-[a-z0-9]+)*$/', $slug ) ? $slug : '',
+                    'intro'      => isset( $r['intro'] ) && is_array( $r['intro'] ) ? self::schoon_inhoud( 'intro', $r['intro'] ) : null,
                 );
 
             case 'tekst_foto':

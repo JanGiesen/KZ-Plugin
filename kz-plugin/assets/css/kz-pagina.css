@@ -69,6 +69,13 @@ html:has(.kzp--vol){overflow-x:clip}
 .kzp .kzp__intro-tekst{font-weight:700;font-size:19px;line-height:1.5;margin:0 0 1em}
 .kzp .kzp__logo{display:block;width:100%;max-width:300px;height:auto;margin:0 0 0 auto}
 
+/* Datum + Sync: een Intro van een andere pagina met de datum erboven (als de
+   tijd van een Dag, maar mag over twee regels), het beeld om en om links en
+   rechts */
+.kzp .kzp__datum{white-space:normal}
+.kzp--foto-links.kzp__datum-sync .kzp__raster--8-4{grid-template-columns:minmax(0,1fr) minmax(0,2fr)}
+.kzp--foto-links.kzp__datum-sync .kzp__logo{margin:0 auto 0 0}
+
 /* Dag: onderdelen onder elkaar, zonder lijnen, met lucht ertussen */
 .kzp .kzp__onderdeel{margin:0;padding:0;border:0}
 .kzp .kzp__onderdeel + .kzp__onderdeel{margin-top:44px}
@@ -239,7 +246,8 @@ html:has(.kzp--vol){overflow-x:clip}
   .kzp .kzp__binnen{padding:0 18px}
   .kzp .kzp__raster,.kzp .kzp__raster--8-4,.kzp .kzp__raster--4-8,.kzp .kzp__raster--6-6,
   .kzp--foto-rechts.kzp__dag .kzp__raster--4-8,.kzp--foto-rechts.kzp__tekstsectie .kzp__raster--4-8,
-  .kzp--foto-rechts.kzp__uitslagen-sectie .kzp__raster--4-8{grid-template-columns:minmax(0,1fr);gap:28px}
+  .kzp--foto-rechts.kzp__uitslagen-sectie .kzp__raster--4-8,
+  .kzp--foto-links.kzp__datum-sync .kzp__raster--8-4{grid-template-columns:minmax(0,1fr);gap:28px}
   .kzp--foto-links .kzp__beeldkolom{order:0}
   .kzp .kzp__titel{font-size:38px;margin-bottom:20px}
   .kzp .kzp__groep-titel{font-size:32px;margin-top:36px}
@@ -257,7 +265,7 @@ html:has(.kzp--vol){overflow-x:clip}
   .kzp .kzp__tekst{font-size:16px}
   .kzp .kzp__tekst h4{font-size:22px}
   .kzp .kzp__intro-tekst{font-size:17px}
-  .kzp .kzp__logo{max-width:180px;margin:0 auto}
+  .kzp .kzp__logo,.kzp--foto-links.kzp__datum-sync .kzp__logo{max-width:180px;margin:0 auto}
   .kzp .kzp__dag .kzp__fotos{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .kzp .kzp__dag .kzp__foto--heel{grid-column:1/-1}
   .kzp .kzp__vraag summary{font-size:21px}
