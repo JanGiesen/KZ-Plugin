@@ -3,7 +3,7 @@
  * KZ-Pagina — shortcode [kz_pagina pagina="5dd"]
  *
  * Tekent een hele pagina uit vaste secties: kop, intro, dag, tekst, tekst + foto,
- * route, tickets (KZ-Evenement Info), uitslagen, video, vakken (KZ-Vindt Grid), vragen en motto. De inhoud (teksten, knoppen, foto's) beheer je in
+ * route, tickets (KZ-Evenement Info), uitslagen, video, vakken (KZ-Vindt Grid), kaart, vragen en motto. De inhoud (teksten, knoppen, foto's) beheer je in
  * KZ-Studio (Website → Pagina's); de opmaak staat hier vast, zodat er niets
  * verspringt zoals bij losse WPBakery-blokken.
  *
@@ -91,7 +91,7 @@ class KZ_Element_Pagina {
     );
 
     /** "tickets" (tot 8.15) bestaat niet meer: zo'n sectie wordt overgeslagen. */
-    const SJABLONEN = array( 'kop', 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'vakken', 'faq', 'motto' );
+    const SJABLONEN = array( 'kop', 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'vakken', 'kaart', 'faq', 'motto' );
 
     public static function register_shortcode() {
         add_shortcode( self::SHORTCODE, array( __CLASS__, 'render' ) );
@@ -226,7 +226,7 @@ class KZ_Element_Pagina {
         foreach ( $secties as $n => $s ) {
             $achtergrond = 'wit';
             $fotokant    = 'links';
-            if ( in_array( $s['sjabloon'], array( 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'vakken', 'faq', 'motto' ), true ) ) {
+            if ( in_array( $s['sjabloon'], array( 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'vakken', 'kaart', 'faq', 'motto' ), true ) ) {
                 $k           = isset( $s['inhoud']['kleur'] ) ? $s['inhoud']['kleur'] : 'auto';
                 $achtergrond = 'auto' === $k ? ( 0 === $band % 2 ? 'rood' : 'wit' ) : $k;
                 $band++;
@@ -376,9 +376,8 @@ class KZ_Element_Pagina {
 
             case 'vakken':
                 $grid  = self::vakken_grid( $i, 'rood' === $opmaak['achtergrond'] );
-                $kaart = self::kaart( $i['adres'], $opmaak['achtergrond'] );
                 $tekst = self::tekst_blok( $i['tekst'], 'kzp__tekst' ) . self::knop( $i['knop'], $opmaak['achtergrond'] );
-                if ( '' === $grid && '' === $kaart && '' === $tekst && '' === trim( $i['titel'] ) ) {
+                if ( '' === $grid && '' === $tekst && '' === trim( $i['titel'] ) ) {
                     return '';
                 }
                 $kop   = ( '' !== trim( $i['vakkenTitel'] ) ? '<h3 class="kzp__vakken-titel">' . esc_html( $i['vakkenTitel'] )
@@ -390,6 +389,15 @@ class KZ_Element_Pagina {
                     . ( '' !== $tekst ? '<div class="kzp__tekstkolom">' . $tekst . '</div>' : '' )
                     . ( '' !== $grid ? '<div class="kzp__beeldkolom kzp__vakken">' . $kop . $grid . '</div>' : '' )
                     . '</div>'
+                    . '</div></section>';
+
+            case 'kaart':
+                $kaart = self::kaart( $i['adres'], $opmaak['achtergrond'] );
+                if ( '' === $kaart ) {
+                    return '';
+                }
+                return '<section class="' . esc_attr( $band . ' kzp__kaart-sectie' ) . '"><div class="kzp__binnen">'
+                    . self::titel( $i['titel'] )
                     . $kaart
                     . '</div></section>';
 
@@ -1079,8 +1087,14 @@ class KZ_Element_Pagina {
                     'kolommen'         => isset( $r['kolommen'] ) && in_array( $r['kolommen'], array( 2, 4 ), true ) ? $r['kolommen'] : 3,
                     'koppen'           => $koppen,
                     'vakken'           => $vakken,
-                    'adres'            => self::tekst( $r, 'adres', $l['adres'] ),
                     'kleur'            => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
+                );
+
+            case 'kaart':
+                return array(
+                    'titel' => self::tekst( $r, 'titel', $l['titel'] ),
+                    'adres' => self::tekst( $r, 'adres', $l['adres'] ),
+                    'kleur' => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
                 );
 
             case 'tekst_foto':

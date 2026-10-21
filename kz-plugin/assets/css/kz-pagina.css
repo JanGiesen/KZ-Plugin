@@ -1,5 +1,5 @@
 /* KZ-Pagina — een hele pagina uit vaste secties (kop, intro, dag, tekst,
-   tekst + foto, route, tickets, uitslagen, video, vakken, vragen, motto), beheerd in KZ-Studio (Website → Pagina's).
+   tekst + foto, route, tickets, uitslagen, video, vakken, kaart, vragen, motto), beheerd in KZ-Studio (Website → Pagina's).
 
    Huisstijl: rood #E83F35 en wit als volle vlakken, koppen in Roboto Condensed
    (vet, hoofdletters, 80% breed, -0.04em), tekst in Work Sans, geen schaduwen
@@ -159,8 +159,9 @@ html:has(.kzp--vol){overflow-x:clip}
 .kzp a.kz-vindt-item.kz-vindt-link:focus-visible{outline:3px solid var(--kzp-black);outline-offset:3px}
 
 /* Kaart: Google Maps in een vlak met een balk eronder (adres + Route plannen),
-   over de volle breedte van de sectie, onder de tekst en de vakken. */
-.kzp .kzp__kaartblok{margin-top:44px;border:3px solid var(--kzp-red);background:var(--kzp-red)}
+   over de volle breedte van de sectie. */
+.kzp .kzp__kaart-sectie .kzp__titel{text-align:center}
+.kzp .kzp__kaartblok{border:3px solid var(--kzp-red);background:var(--kzp-red)}
 .kzp .kzp__band--rood .kzp__kaartblok{border-color:var(--kzp-white);background:var(--kzp-white)}
 .kzp .kzp__kaartvenster{position:relative;aspect-ratio:21/9;min-height:280px;background:rgba(17,17,17,.08)}
 .kzp .kzp__kaartvenster iframe{position:absolute;inset:0;display:block;width:100%;height:100%;margin:0;border:0}
@@ -269,7 +270,6 @@ html:has(.kzp--vol){overflow-x:clip}
   .kzp .kz-vindt-label{font-size:12px}
   .kzp .kz-vindt-time{font-size:clamp(12px,3.6cqi,18px)}
   .kzp .kzp__vakken-titel{font-size:24px}
-  .kzp .kzp__kaartblok{margin-top:28px}
   .kzp .kzp__kaartvenster{aspect-ratio:4/3;min-height:0}
   .kzp .kzp__adres{font-size:21px}
 }
