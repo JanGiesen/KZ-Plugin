@@ -2,7 +2,7 @@
 /**
  * KZ-Pagina — shortcode [kz_pagina pagina="5dd"]
  *
- * Tekent een hele pagina uit vaste secties: kop, intro, dag, tekst, tekst + foto,
+ * Tekent een hele pagina uit vaste secties: kop, geleding-kop, intro, dag, tekst, tekst + foto,
  * route, tickets (KZ-Evenement Info), uitslagen, video, vakken (KZ-Vindt Grid), kaart, datum + sync, vragen en motto. De inhoud (teksten, knoppen, foto's) beheer je in
  * KZ-Studio (Website → Pagina's); de opmaak staat hier vast, zodat er niets
  * verspringt zoals bij losse WPBakery-blokken.
@@ -92,7 +92,16 @@ class KZ_Element_Pagina {
     );
 
     /** "tickets" (tot 8.15) bestaat niet meer: zo'n sectie wordt overgeslagen. */
-    const SJABLONEN = array( 'kop', 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'vakken', 'kaart', 'datum_sync', 'faq', 'motto' );
+    const SJABLONEN = array( 'kop', 'geleding', 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'vakken', 'kaart', 'datum_sync', 'faq', 'motto' );
+
+    /**
+     * De knop boven een Geleding-kop, terug naar het overzicht van alle
+     * geledingen. Gelijk aan GELEDING_KNOP in KZ-Studio.
+     */
+    const GELEDING_KNOP = array(
+        'tekst' => 'Geledingen, partners & commissies',
+        'pad'   => '/groeperingen/',
+    );
 
     public static function register_shortcode() {
         add_shortcode( self::SHORTCODE, array( __CLASS__, 'render' ) );
@@ -242,8 +251,9 @@ class KZ_Element_Pagina {
         foreach ( $secties as $n => $s ) {
             $achtergrond = 'wit';
             $fotokant    = 'links';
-            if ( in_array( $s['sjabloon'], array( 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'vakken', 'kaart', 'datum_sync', 'faq', 'motto' ), true ) ) {
-                $k           = isset( $s['inhoud']['kleur'] ) ? $s['inhoud']['kleur'] : 'auto';
+            if ( in_array( $s['sjabloon'], array( 'geleding', 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'vakken', 'kaart', 'datum_sync', 'faq', 'motto' ), true ) ) {
+                // De Geleding-kop is altijd rood; de band erna dus wit.
+                $k           = 'geleding' === $s['sjabloon'] ? 'rood' : ( isset( $s['inhoud']['kleur'] ) ? $s['inhoud']['kleur'] : 'auto' );
                 $achtergrond = 'auto' === $k ? ( 0 === $band % 2 ? 'rood' : 'wit' ) : $k;
                 $band++;
             }
@@ -278,6 +288,31 @@ class KZ_Element_Pagina {
                 return '<section class="kzp__sectie kzp__kop"><div class="kzp__binnen">'
                     . self::titel( $i['titel'], 'kzp__kop-titel', 'h1' )
                     . '</div></section>';
+
+            case 'geleding':
+                // Zonder afbeelding het logo, zodat de cirkel niet leeg is.
+                $beeld = self::veilige_foto( $i['afbeelding'] );
+                $cirkel = 'kzp__geleding-beeld';
+                if ( '' === $beeld ) {
+                    $cirkel .= ' kzp__geleding-beeld--logo';
+                    $beeld   = KZ_PLUGIN_URL . 'assets/img/kz-logo-rood.svg';
+                }
+                $knop = class_exists( 'KZ_Element_Button' )
+                    ? KZ_Element_Button::render(
+                        array(
+                            'text'   => self::GELEDING_KNOP['tekst'],
+                            'link'   => 'url:' . rawurlencode( home_url( self::GELEDING_KNOP['pad'] ) ),
+                            'color'  => 'rood',
+                            'align'  => 'center',
+                            'margin' => '0 0 12px',
+                        )
+                    )
+                    : '';
+                return '<section class="' . esc_attr( 'kzp__sectie kzp__geleding kzp--accent-' . $opmaak['accent'] ) . '">'
+                    . '<div class="kzp__binnen kzp__geleding-kop">' . $knop . self::titel( $i['titel'], 'kzp__kop-titel', 'h1' ) . '</div>'
+                    . '<div class="kzp__band kzp__band--rood kzp__geleding-band"><div class="kzp__binnen">'
+                    . '<div class="' . esc_attr( $cirkel ) . '"><img src="' . esc_url( $beeld ) . '" alt="" decoding="async"></div>'
+                    . '</div></div></section>';
 
             case 'intro':
                 $beeld = self::veilige_foto( $i['afbeelding'] );
@@ -1037,6 +1072,12 @@ class KZ_Element_Pagina {
         switch ( $sjabloon ) {
             case 'kop':
                 return array( 'titel' => self::tekst( $r, 'titel', $l['titel'] ) );
+
+            case 'geleding':
+                return array(
+                    'titel'      => self::tekst( $r, 'titel', $l['titel'] ),
+                    'afbeelding' => self::tekst( $r, 'afbeelding', $l['url'] ),
+                );
 
             case 'intro':
                 return array(
