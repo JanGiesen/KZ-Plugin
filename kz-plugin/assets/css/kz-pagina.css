@@ -1,4 +1,4 @@
-/* KZ-Pagina — een hele pagina uit vaste secties (kop, intro, dag, tekst,
+/* KZ-Pagina — een hele pagina uit vaste secties (kop, geleding-kop, intro, dag, tekst,
    tekst + foto, route, tickets, uitslagen, video, vakken, kaart, vragen, motto), beheerd in KZ-Studio (Website → Pagina's).
 
    Huisstijl: rood #E83F35 en wit als volle vlakken, koppen in Roboto Condensed
@@ -42,6 +42,17 @@ html:has(.kzp--vol){overflow-x:clip}
    Staat er een sectie boven (kop midden op de pagina), dan meer. */
 .kzp .kzp__kop{padding:16px 0;background:var(--kzp-white)}
 .kzp .kzp__sectie + .kzp__kop{padding-top:40px}
+
+/* Geleding-kop: bovenaan elke pagina van een geleding, zoals de oude pagina's
+   (Het Hof, de Raad van Elf …). Op wit de knop terug naar het overzicht en de
+   titel (KZ-HEAD), daaronder een rode band met de afbeelding van de geleding
+   in een witte cirkel van 200px (kz-groep-afbeelding). */
+.kzp .kzp__geleding{padding:0}
+.kzp .kzp__geleding-kop{padding-top:16px;padding-bottom:35px;text-align:center}
+.kzp .kzp__geleding-band{padding:30px 0}
+.kzp .kzp__geleding-beeld{display:block;width:200px;height:200px;margin:0 auto;border:2px solid var(--kzp-white);border-radius:50%;background:var(--kzp-white);overflow:hidden}
+.kzp .kzp__geleding-beeld img{display:block;width:100%;height:100%;max-width:none;object-fit:cover;margin:0}
+.kzp .kzp__geleding-beeld--logo img{object-fit:contain;padding:30px}
 
 /* Rasters: tekst + beeld naast elkaar, op smal onder elkaar */
 .kzp .kzp__raster{display:grid;gap:44px;align-items:start}
@@ -262,6 +273,9 @@ html:has(.kzp--vol){overflow-x:clip}
   .kzp .kzp__sectie{padding:36px 0}
   .kzp .kzp__kop{padding:8px 0}
   .kzp .kzp__sectie + .kzp__kop{padding-top:28px}
+  .kzp .kzp__geleding{padding:0}
+  .kzp .kzp__geleding-kop{padding-top:8px;padding-bottom:24px}
+  .kzp .kzp__geleding-band{padding:24px 0}
   .kzp .kzp__binnen{padding:0 18px}
   .kzp .kzp__raster,.kzp .kzp__raster--8-4,.kzp .kzp__raster--4-8,.kzp .kzp__raster--6-6,
   .kzp--foto-rechts.kzp__dag .kzp__raster--4-8,.kzp--foto-rechts.kzp__tekstsectie .kzp__raster--4-8,
