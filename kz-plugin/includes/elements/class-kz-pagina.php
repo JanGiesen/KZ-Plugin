@@ -171,8 +171,17 @@ class KZ_Element_Pagina {
             $html .= self::sectie( $sectie, $opmaak[ $n ] );
         }
 
-        $klasse = 'kz-pagina kzp' . ( 'kolom' === $atts['breedte'] ? '' : ' kzp--vol' );
+        $klasse = 'kz-pagina kzp' . ( 'kolom' === $atts['breedte'] ? '' : ' kzp--vol' ) . ( self::is_hjc( $slug ) ? ' kzp--hjc' : '' );
         return '<div class="' . esc_attr( $klasse ) . '">' . $html . '</div>';
+    }
+
+    /**
+     * Een pagina van de jeugdafdeling HJC De Krössels: de naam is "hjc" of
+     * begint met "hjc-". Die krijgt kzp--hjc: geel en groen in plaats van rood,
+     * en zwarte tekst. Gelijk aan isHjc() in KZ-Studio.
+     */
+    public static function is_hjc( $slug ) {
+        return 'hjc' === $slug || 0 === strpos( $slug, 'hjc-' );
     }
 
     /**
@@ -219,11 +228,17 @@ class KZ_Element_Pagina {
      * Kleur en fotokant per sectie: bij "auto" om en om (de eerste band rood,
      * de eerste foto's links), geteld over de banden en de fotosecties. Gelijk
      * aan kleurenVan() in KZ-Studio.
+     *
+     * Het accent is de kleur die op een HJC-pagina (kzp--hjc) de plaats van rood
+     * inneemt: om en om geel en groen, geteld over de rode banden. Een witte band
+     * krijgt het accent van de eerstvolgende rode, zodat hij afsteekt tegen de
+     * rode band ervoor.
      */
     public static function kleuren( array $secties ) {
         $uit   = array();
         $band  = 0;
         $fotos = 0;
+        $rood  = 0;
         foreach ( $secties as $n => $s ) {
             $achtergrond = 'wit';
             $fotokant    = 'links';
@@ -237,9 +252,14 @@ class KZ_Element_Pagina {
                 $fotokant = 'auto' === $k ? ( 0 === $fotos % 2 ? 'links' : 'rechts' ) : $k;
                 $fotos++;
             }
+            $accent = 0 === $rood % 2 ? 'geel' : 'groen';
+            if ( 'rood' === $achtergrond ) {
+                $rood++;
+            }
             $uit[ $n ] = array(
                 'achtergrond' => $achtergrond,
                 'fotokant'    => $fotokant,
+                'accent'      => $accent,
             );
         }
         return $uit;
@@ -247,7 +267,7 @@ class KZ_Element_Pagina {
 
     private static function sectie( array $s, array $opmaak ) {
         $i    = $s['inhoud'];
-        $band = 'kzp__sectie kzp__band kzp__band--' . $opmaak['achtergrond'];
+        $band = 'kzp__sectie kzp__band kzp__band--' . $opmaak['achtergrond'] . ' kzp--accent-' . $opmaak['accent'];
         $kant = 'kzp--foto-' . $opmaak['fotokant'];
 
         switch ( $s['sjabloon'] ) {
@@ -261,7 +281,9 @@ class KZ_Element_Pagina {
 
             case 'intro':
                 $beeld = self::veilige_foto( $i['afbeelding'] );
+                $logo  = 'kzp__logo';
                 if ( '' === $beeld ) {
+                    $logo .= ' kzp__logo--standaard';
                     $beeld = KZ_PLUGIN_URL . 'assets/img/' . ( 'rood' === $opmaak['achtergrond'] ? 'kz-logo-wit.svg' : 'kz-logo-rood.svg' );
                 }
                 return '<section class="' . esc_attr( $band . ' kzp__intro' ) . '"><div class="kzp__binnen kzp__raster kzp__raster--8-4">'
@@ -271,7 +293,7 @@ class KZ_Element_Pagina {
                     . self::tekst_blok( $i['tekst'], 'kzp__tekst' )
                     . self::knop( $i['knop'], $opmaak['achtergrond'] )
                     . '</div>'
-                    . '<div class="kzp__beeldkolom"><img class="kzp__logo" src="' . esc_url( $beeld ) . '" alt="" decoding="async"></div>'
+                    . '<div class="kzp__beeldkolom"><img class="' . esc_attr( $logo ) . '" src="' . esc_url( $beeld ) . '" alt="" decoding="async"></div>'
                     . '</div></section>';
 
             case 'dag':
@@ -407,7 +429,9 @@ class KZ_Element_Pagina {
                 // met de datum erboven en een knop naar die pagina.
                 $intro = $i['intro'];
                 $beeld = self::veilige_foto( $intro['afbeelding'] );
+                $logo  = 'kzp__logo';
                 if ( '' === $beeld ) {
+                    $logo .= ' kzp__logo--standaard';
                     $beeld = KZ_PLUGIN_URL . 'assets/img/' . ( 'rood' === $opmaak['achtergrond'] ? 'kz-logo-wit.svg' : 'kz-logo-rood.svg' );
                 }
                 $datum = self::datum_label( $i );
@@ -423,7 +447,7 @@ class KZ_Element_Pagina {
                     . self::tekst_blok( $intro['tekst'], 'kzp__tekst' )
                     . self::knop( $knop, $opmaak['achtergrond'] )
                     . '</div>'
-                    . '<div class="kzp__beeldkolom"><img class="kzp__logo" src="' . esc_url( $beeld ) . '" alt="" decoding="async"></div>'
+                    . '<div class="kzp__beeldkolom"><img class="' . esc_attr( $logo ) . '" src="' . esc_url( $beeld ) . '" alt="" decoding="async"></div>'
                     . '</div></section>';
 
             case 'tekst_foto':
