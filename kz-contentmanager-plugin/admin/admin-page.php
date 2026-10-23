@@ -453,7 +453,7 @@ jQuery(document).ready(function($) {
                 if (response.success) {
                     displayDocuments(response.data);
                 } else {
-                    $('#kz-documents-list').html('<p>Fout bij het laden van documenten.</p>');
+                    $('#kz-documents-list').empty().append($('<p>').text('Fout bij het laden van documenten' + (response.data ? ': ' + response.data : '.')));
                 }
             },
             error: function() {

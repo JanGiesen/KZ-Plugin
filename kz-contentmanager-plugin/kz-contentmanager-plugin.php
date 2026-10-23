@@ -3,7 +3,7 @@
  * Plugin Name: KZ Contentmanager Plugin
  * Plugin URI: https://www.kraonigezwaone.nl/
  * Description: Haalt de content voor de site op vanuit Google Docs.
- * Version: 3.0.7
+ * Version: 3.0.8
  * Author: Kraonige Zwaone
  * License: GPL v2 or later
  * Text Domain: kz-contentmanager-plugin
@@ -19,13 +19,17 @@
  * 3.0.7: webhook-sync JSON-responses (list_documents, sync_all, sync_single)
  * bevatten nu ook de documentenlijst, zodat externe consumenten (zoals
  * kz-studio) die kunnen tonen zonder de HTML-dashboardpagina te parsen.
+ *
+ * 3.0.8: ontbrekende tabel `kz_documents` wordt vanzelf aangemaakt bij sync en
+ * bij het laden van de lijst (de activatie-hook draait niet bij updates), en
+ * mislukte database-opslag wordt als fout gemeld in plaats van stil genegeerd.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'KZ_CONTENTMANAGER_VERSION', '3.0.7' );
+define( 'KZ_CONTENTMANAGER_VERSION', '3.0.8' );
 define( 'KZ_CONTENTMANAGER_PLUGIN_FILE', __FILE__ );
 define( 'KZ_CONTENTMANAGER_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'KZ_CONTENTMANAGER_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
@@ -90,24 +94,7 @@ class KZ_ContentManager_Plugin {
     }
 
     private function create_tables() {
-        global $wpdb;
-
-        $charset_collate = $wpdb->get_charset_collate();
-        $table_name       = $wpdb->prefix . 'kz_documents';
-
-        $sql = "CREATE TABLE $table_name (
-            id mediumint(9) NOT NULL AUTO_INCREMENT,
-            document_id varchar(255) NOT NULL,
-            document_name varchar(255) NOT NULL,
-            last_modified datetime DEFAULT CURRENT_TIMESTAMP,
-            content longtext NOT NULL,
-            components longtext NOT NULL,
-            PRIMARY KEY (id),
-            UNIQUE KEY document_id (document_id)
-        ) $charset_collate;";
-
-        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-        dbDelta( $sql );
+        KZ_CM_Google_Drive_Handler::create_table();
     }
 
     public function add_admin_menu() {
@@ -176,7 +163,12 @@ class KZ_ContentManager_Plugin {
         global $wpdb;
         $table_name = $wpdb->prefix . 'kz_documents';
 
+        KZ_CM_Google_Drive_Handler::ensure_table();
         $documents = $wpdb->get_results( "SELECT * FROM $table_name ORDER BY document_name" );
+
+        if ( $wpdb->last_error ) {
+            wp_send_json_error( 'Databasefout: ' . $wpdb->last_error );
+        }
 
         wp_send_json_success( $documents );
     }
