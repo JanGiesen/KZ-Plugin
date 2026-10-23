@@ -243,7 +243,7 @@ html:has(.kzp--vol){overflow-x:clip}
    heeft een accent (kzp--accent-geel/-groen, zie kleuren()) dat de plaats van
    --kzp-red inneemt, ook in knoppen, ticketblokken en het Vakken-grid. Alle
    tekst is zwart, ook op geel en groen; het KZ-logo en het motto ook. */
-.kzp.kzp--hjc{--kzp-geel:#fedd19;--kzp-groen:#3aaa35;--kzp-black:#111}
+.kzp.kzp--hjc{--kzp-geel:#ffdd18;--kzp-groen:#0ea14b;--kzp-black:#111}
 .kzp--hjc .kzp--accent-geel{--kzp-red:var(--kzp-geel)}
 .kzp--hjc .kzp--accent-groen{--kzp-red:var(--kzp-groen)}
 .kzp--hjc .kzp__sectie{--kleur-rood:var(--kzp-red);--kleur-wit:#fff}
