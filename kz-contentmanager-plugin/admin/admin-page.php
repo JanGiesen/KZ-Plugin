@@ -516,6 +516,9 @@ jQuery(document).ready(function($) {
         loadDocuments();
     });
 
+    // De Documenten-tab is standaard open, dus laad de lijst meteen.
+    loadDocuments();
+
     $('#kz-copy-all-shortcodes').click(function() {
         if (window.kzAllShortcodes) {
             copyToClipboard(window.kzAllShortcodes);

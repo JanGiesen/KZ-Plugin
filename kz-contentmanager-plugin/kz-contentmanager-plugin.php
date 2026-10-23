@@ -23,6 +23,7 @@
  * 3.0.8: ontbrekende tabel `kz_documents` wordt vanzelf aangemaakt bij sync en
  * bij het laden van de lijst (de activatie-hook draait niet bij updates), en
  * mislukte database-opslag wordt als fout gemeld in plaats van stil genegeerd.
+ * De documentenlijst laadt nu meteen bij het openen van de pagina.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
