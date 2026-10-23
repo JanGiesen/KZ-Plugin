@@ -238,6 +238,25 @@ html:has(.kzp--vol){overflow-x:clip}
 .kzp .kzp__band--wit.kzp__motto .kz-motto img{filter:url(#kzp-rood)}
 .kzp .kzp__filter{position:absolute;width:0;height:0;overflow:hidden}
 
+/* HJC: een pagina van de jeugdafdeling De Krössels (naam "hjc" of "hjc-…")
+   krijgt kzp--hjc. Wat rood is wordt om en om geel en groen: elke sectie
+   heeft een accent (kzp--accent-geel/-groen, zie kleuren()) dat de plaats van
+   --kzp-red inneemt, ook in knoppen, ticketblokken en het Vakken-grid. Alle
+   tekst is zwart, ook op geel en groen; het KZ-logo en het motto ook. */
+.kzp.kzp--hjc{--kzp-geel:#ffdd18;--kzp-groen:#0ea14b;--kzp-black:#111}
+.kzp--hjc .kzp--accent-geel{--kzp-red:var(--kzp-geel)}
+.kzp--hjc .kzp--accent-groen{--kzp-red:var(--kzp-groen)}
+.kzp--hjc .kzp__sectie{--kleur-rood:var(--kzp-red);--kleur-wit:#fff}
+.kzp.kzp--hjc,.kzp.kzp--hjc *,.kzp.kzp--hjc *::before,.kzp.kzp--hjc *::after,
+.kzp.kzp--hjc .kz-evt .kz-evt__knop{color:var(--kzp-black)!important}
+.kzp--hjc .kzp__logo--standaard,.kzp--hjc .kz-evt__logo,.kzp--hjc .kzp__motto .kz-motto img{filter:brightness(0)!important}
+.kzp.kzp--hjc .kz-vindt-item.kz-vindt-empty{border-color:rgba(17,17,17,.3)}
+.kzp--hjc .kz-evt{--kz-evt-red:var(--kzp-red);--kz-evt-red-dark:color-mix(in srgb,var(--kzp-red) 85%,#000);--kz-evt-red-darker:color-mix(in srgb,var(--kzp-red) 70%,#000)}
+.kzp--hjc .kzp__band--rood .kz-evt{--kz-evt-red:#fff;--kz-evt-white:var(--kzp-red);--kz-evt-red-dark:#f2f2f2;--kz-evt-red-darker:#e6e6e6}
+.kzp.kzp--hjc .kzp__band--rood .kz-evt.kz-evt--seizoen .kz-evt__feiten li{border-bottom-color:rgba(17,17,17,.4)}
+.kzp.kzp--hjc .kzp__band--rood .kz-evt.kz-evt--seizoen .kz-evt__knop:hover{background:color-mix(in srgb,var(--kzp-red) 85%,#000);border-color:color-mix(in srgb,var(--kzp-red) 85%,#000)}
+.kzp.kzp--hjc .kzp__band--rood .kz-evt.kz-evt--seizoen .kz-evt__knop:active{background:color-mix(in srgb,var(--kzp-red) 70%,#000);border-color:color-mix(in srgb,var(--kzp-red) 70%,#000)}
+
 /* Smal (telefoon): alles onder elkaar, tekst eerst en de foto's eronder */
 @container kzp (max-width: 760px){
   .kzp .kzp__sectie{padding:36px 0}
