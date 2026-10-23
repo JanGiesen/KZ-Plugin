@@ -20,6 +20,45 @@ class KZ_CM_Google_Drive_Handler {
         $this->folder_id = get_option( 'kz_google_drive_folder_id' );
     }
 
+    /**
+     * Maakt de tabel `{prefix}kz_documents` aan als die ontbreekt.
+     *
+     * De activatie-hook draait niet bij een (automatische) update, en na een
+     * database-restore of -verhuizing kan de tabel weg zijn terwijl de plugin
+     * actief blijft. Zonder tabel faalt elke opslag stil en blijft de lijst leeg.
+     */
+    public static function ensure_table() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'kz_documents';
+
+        if ( $table_name === $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table_name ) ) ) ) {
+            return;
+        }
+
+        self::create_table();
+    }
+
+    public static function create_table() {
+        global $wpdb;
+
+        $charset_collate = $wpdb->get_charset_collate();
+        $table_name      = $wpdb->prefix . 'kz_documents';
+
+        $sql = "CREATE TABLE $table_name (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            document_id varchar(255) NOT NULL,
+            document_name varchar(255) NOT NULL,
+            last_modified datetime DEFAULT CURRENT_TIMESTAMP,
+            content longtext NOT NULL,
+            components longtext NOT NULL,
+            PRIMARY KEY (id),
+            UNIQUE KEY document_id (document_id)
+        ) $charset_collate;";
+
+        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+        dbDelta( $sql );
+    }
+
     private function is_debug() {
         return (bool) get_option( 'kz_cm_debug', false );
     }
@@ -40,7 +79,19 @@ class KZ_CM_Google_Drive_Handler {
 
             $documents = $this->get_documents_from_drive();
 
-            $this->save_documents( $documents );
+            self::ensure_table();
+            $errors = $this->save_documents( $documents );
+            if ( ! empty( $errors ) ) {
+                return array(
+                    'success' => false,
+                    'message' => sprintf(
+                        '%d van de %d documenten konden niet worden opgeslagen in de database: %s',
+                        count( $errors ),
+                        count( $documents ),
+                        implode( '; ', $errors )
+                    ),
+                );
+            }
             update_option( 'kz_last_sync', current_time( 'mysql' ) );
 
             $message = count( $documents ) . ' documenten gesynchroniseerd';
@@ -70,7 +121,14 @@ class KZ_CM_Google_Drive_Handler {
 
             $document = $this->get_document_from_drive( $document_id );
 
-            $this->save_document( $document );
+            self::ensure_table();
+            $error = $this->save_document( $document );
+            if ( null !== $error ) {
+                return array(
+                    'success' => false,
+                    'message' => 'Document kon niet worden opgeslagen in de database: ' . $error,
+                );
+            }
             update_option( 'kz_last_sync', current_time( 'mysql' ) );
 
             $message = 'Document gesynchroniseerd';
@@ -317,30 +375,30 @@ class KZ_CM_Google_Drive_Handler {
         return $components;
     }
 
+    /**
+     * @return string[] Foutmeldingen per document dat niet kon worden opgeslagen.
+     */
     private function save_documents( $documents ) {
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'kz_documents';
+        $errors = array();
 
         foreach ( $documents as $document ) {
-            $wpdb->replace(
-                $table_name,
-                array(
-                    'document_id'   => $document['id'],
-                    'document_name' => $document['name'],
-                    'last_modified' => $document['modified'],
-                    'content'       => $document['content'],
-                    'components'    => wp_json_encode( $document['components'] ),
-                ),
-                array( '%s', '%s', '%s', '%s', '%s' )
-            );
+            $error = $this->save_document( $document );
+            if ( null !== $error ) {
+                $errors[] = $document['name'] . ': ' . $error;
+            }
         }
+
+        return $errors;
     }
 
+    /**
+     * @return string|null Foutmelding, of null als het opslaan gelukt is.
+     */
     private function save_document( $document ) {
         global $wpdb;
         $table_name = $wpdb->prefix . 'kz_documents';
 
-        $wpdb->replace(
+        $result = $wpdb->replace(
             $table_name,
             array(
                 'document_id'   => $document['id'],
@@ -351,6 +409,12 @@ class KZ_CM_Google_Drive_Handler {
             ),
             array( '%s', '%s', '%s', '%s', '%s' )
         );
+
+        if ( false === $result ) {
+            return $wpdb->last_error ? $wpdb->last_error : 'onbekende databasefout';
+        }
+
+        return null;
     }
 
     private function clean_google_docs_html( $html ) {
