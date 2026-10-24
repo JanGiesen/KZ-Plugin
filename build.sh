@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
-# Bouwt installeerbare zip-bestanden voor beide KZ-plugins.
+# Bouwt het installeerbare zip-bestand van KZ Plugin.
 # Gebruik: ./build.sh
-# Output: dist/kz-plugin.zip en dist/kz-contentmanager-plugin.zip
+# Output: dist/kz-plugin.zip
 #
 set -euo pipefail
 
@@ -28,6 +28,5 @@ build_plugin() {
 }
 
 build_plugin "kz-plugin" "kz-plugin.zip"
-build_plugin "kz-contentmanager-plugin" "kz-contentmanager-plugin.zip"
 
-echo "Klaar. Zips staan in $DIST_DIR/"
+echo "Klaar. De zip staat in $DIST_DIR/"

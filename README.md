@@ -2,14 +2,13 @@
 
 WordPress-plugins voor [kraonigezwaone.nl](https://kraonigezwaone.nl/) (WordPress 7.1, Pressville-thema, WPBakery Page Builder).
 
-Deze monorepo bevat twee plugins:
+Deze repo bevat één plugin:
 
 | Map | Plugin | Doel |
 |---|---|---|
 | `kz-plugin/` | **KZ Plugin** | WPBakery-elementen: post carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, recente galerijen, winkel producten, evenement info, evenementen overzicht, motto (+ post type `kz_evenement` voor KZ-Studio), en de Link-In-Bio-pagina op link.kraonigezwaone.nl |
-| `kz-contentmanager-plugin/` | **KZ Contentmanager Plugin** | Haalt content op uit Google Docs en toont die via de shortcode `[kz-content]` |
 
-Beide plugins zijn samenvoegingen/opvolgers van eerder losse plugins (KZ-Kraonige Zwaone Plugin 7.1, KZ Vindt, KZH Ticket Element, KZ-Kraonige Zwaone Contentmanager 2.0.0). Alle shortcode-namen en parameters zijn ongewijzigd overgenomen zodat bestaande content op de site blijft werken. Bij activatie deactiveren de nieuwe plugins automatisch de oude losse plugins (met een melding in het dashboard) om dubbele shortcode-registratie te voorkomen.
+KZ Plugin is de samenvoeging/opvolger van eerder losse plugins (KZ-Kraonige Zwaone Plugin 7.1, KZ Vindt, KZH Ticket Element). Alle shortcode-namen en parameters zijn ongewijzigd overgenomen zodat bestaande content op de site blijft werken. Bij activatie deactiveert hij automatisch de oude losse plugins (met een melding in het dashboard) om dubbele shortcode-registratie te voorkomen.
 
 ## Installatie
 
@@ -20,9 +19,9 @@ Beide plugins zijn samenvoegingen/opvolgers van eerder losse plugins (KZ-Kraonig
 ## Instellingenpagina's
 
 - **KZ Plugin**: menu "KZ Plugin" — overzicht van alle elementen met shortcode en parameters, per element aan/uit-schakelaar (uitschakelen zet de render leeg maar houdt de shortcode geregistreerd, zodat content nooit een kale shortcode-tekst toont), updatestatus + "Nu controleren op updates", en de Supabase-koppeling voor de Link-In-Bio.
-- **KZ Contentmanager Plugin**: menu "KZ Contentmanager" — documentenoverzicht met shortcodes, synchronisatie, instellingen (Google API key, Drive-map, webhook-URL, rate limit), en een Updates-tab.
+De optie `kz_github_token` geeft toegang tot een private GitHub-repo (zie hieronder).
 
-Beide plugins delen de optie `kz_github_token` voor toegang tot een private GitHub-repo (zie hieronder).
+De vroegere **KZ Contentmanager Plugin** (`kz-contentmanager-plugin/`, Google Docs via de shortcode `[kz-content]`) is uitgefaseerd en uit deze repo gehaald; hij staat gedeactiveerd in WordPress en kan daar verwijderd worden. De oude releases met tag `kz-contentmanager-v…` blijven op GitHub staan.
 
 ## Link-In-Bio (link.kraonigezwaone.nl)
 
@@ -69,20 +68,18 @@ Sinds 8.23.0 heeft de jeugdafdeling HJC De Krössels een eigen kleurenschema: ee
 
 ## Automatische updates
 
-Beide plugins bevatten een lichte, eigen updater (`includes/class-kz-updater.php`, identiek in beide plugins) die gebruikmaakt van WordPress' `Update URI`-mechanisme (sinds WP 5.8). Zolang de plugin-header `Update URI: https://github.com/JanGiesen/KZ-Plugin` bevat, checkt WordPress via de hook `update_plugins_github.com` periodiek of er een nieuwe release is — en toont/voert die update net als bij een plugin uit de WordPress-directory, inclusief **automatische updates**.
+KZ Plugin bevat een lichte, eigen updater (`includes/class-kz-updater.php`) die gebruikmaakt van WordPress' `Update URI`-mechanisme (sinds WP 5.8). Zolang de plugin-header `Update URI: https://github.com/JanGiesen/KZ-Plugin` bevat, checkt WordPress via de hook `update_plugins_github.com` periodiek of er een nieuwe release is — en toont/voert die update net als bij een plugin uit de WordPress-directory, inclusief **automatische updates**.
 
 De updater:
 
 - Haalt `https://api.github.com/repos/JanGiesen/KZ-Plugin/releases` op (gecached, 6 uur).
-- Filtert op een tag-prefix per plugin:
-  - KZ Plugin: tags die beginnen met `kz-plugin-v` (bijv. `kz-plugin-v8.0.1`), asset `kz-plugin.zip`.
-  - KZ Contentmanager Plugin: tags die beginnen met `kz-contentmanager-v` (bijv. `kz-contentmanager-v3.0.1`), asset `kz-contentmanager-plugin.zip`.
+- Filtert op tags die beginnen met `kz-plugin-v` (bijv. `kz-plugin-v8.0.1`), asset `kz-plugin.zip`.
 - Vergelijkt de versie uit de tag met de huidige plugin-versie; is er een nieuwere, dan levert het die aan WordPress.
 
 ### Repository publiek of privé?
 
 - **Publiek** (aanbevolen, simpelst): geen extra configuratie nodig, updates werken direct.
-- **Privé**: vul op de KZ Plugin-instellingenpagina (of de Updates-tab van Contentmanager) een GitHub **fine-grained personal access token** in met alleen leestoegang tot deze repo (`Contents: Read-only`). De updater gebruikt dit token zowel om releases op te vragen als om de release-zip te downloaden.
+- **Privé**: vul op de KZ Plugin-instellingenpagina een GitHub **fine-grained personal access token** in met alleen leestoegang tot deze repo (`Contents: Read-only`). De updater gebruikt dit token zowel om releases op te vragen als om de release-zip te downloaden.
 
 ## Releases maken
 
@@ -92,11 +89,9 @@ Elke release is een GitHub Release met een tag in het juiste formaat en de juist
 
 **Belangrijk:** maak een nieuwe release altijd via de GitHub-website, niet via `git tag` + `git push` vanuit een Claude Code-sessie — die sessies mogen (bewust, vanuit het toegangsbeleid van de omgeving) geen git-tags naar deze repo pushen; dat commando faalt met een HTTP 403. Vanaf je eigen machine kan `git push origin <tag>` overigens wel gewoon.
 
-1. Versie ophogen in de plugin-header (`Version:` in `kz-plugin.php` of `kz-contentmanager-plugin.php`) én in de bijbehorende `define()`-constante bovenin dat bestand. Commit en push die wijziging (gewoon via een PR, dat werkt wel).
+1. Versie ophogen in de plugin-header (`Version:` in `kz-plugin.php`) én in de `define()`-constante bovenin dat bestand. Commit en push die wijziging (gewoon via een PR, dat werkt wel).
 2. Ga naar **Releases → "Draft a new release"** op GitHub: https://github.com/JanGiesen/KZ-Plugin/releases/new
-3. Bij **"Choose a tag"**: typ de nieuwe tag en kies **"Create new tag: ... on publish"**:
-   - KZ Plugin: `kz-plugin-v8.1.0` (formaat: `kz-plugin-v` + versienummer)
-   - KZ Contentmanager Plugin: `kz-contentmanager-v3.0.1` (formaat: `kz-contentmanager-v` + versienummer)
+3. Bij **"Choose a tag"**: typ de nieuwe tag en kies **"Create new tag: ... on publish"**, bijv. `kz-plugin-v8.1.0` (formaat: `kz-plugin-v` + versienummer).
 4. Zorg dat **target** op `main` staat.
 5. Klik **"Publish release"**. Dit maakt en pusht de tag; het aanmaken van een release-zip-asset kun je aan de zip zelf overlaten (zie hierna) — een titel/omschrijving invullen is niet nodig, want de workflow overschrijft/vult de zip-asset toch aan.
 6. De workflow `.github/workflows/release.yml` start automatisch op de tag-push, bouwt de juiste zip en **uploadt die als asset aan de zojuist gepubliceerde release** (de workflow herkent dat de release al bestaat en maakt 'm niet nogmaals aan — dat zou falen).
@@ -110,11 +105,11 @@ Alternatief, als je liever vanaf je eigen machine werkt: `git tag <tag>` + `git 
 ./build.sh
 ```
 
-Bouwt `dist/kz-plugin.zip` en `dist/kz-contentmanager-plugin.zip`, klaar om handmatig te uploaden of als release-asset toe te voegen.
+Bouwt `dist/kz-plugin.zip`, klaar om handmatig te uploaden of als release-asset toe te voegen.
 
 ## Ontwikkelen
 
-- Beide plugins zijn class-based, met per WPBakery-element een eigen bestand onder `kz-plugin/includes/elements/`.
+- De plugin is class-based, met per WPBakery-element een eigen bestand onder `kz-plugin/includes/elements/`.
 - Nieuwe elementen: maak een class met `register_shortcode()`, `register_vc_map()` en `render($atts)`, registreer die in `$element_classes` in `kz-plugin.php`, en voeg 'm toe aan de `$elements`-array in `includes/class-kz-admin.php` voor het instellingenoverzicht.
 - Swiper (voor de post carrousel) wordt lokaal meegeleverd in `kz-plugin/assets/vendor/swiper/` — geen CDN-afhankelijkheid.
 - `php -l` alle gewijzigde bestanden vóór het maken van een release.
