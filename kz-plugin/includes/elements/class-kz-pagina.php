@@ -290,8 +290,13 @@ class KZ_Element_Pagina {
                     . '</div></section>';
 
             case 'geleding':
-                // Zonder afbeelding het logo, zodat de cirkel niet leeg is.
+                // De afbeelding uit KZ-Studio; anders de uitgelichte afbeelding
+                // van het WordPress-bericht waar de pagina op staat; anders het
+                // logo, zodat de cirkel nooit leeg is.
                 $beeld = self::veilige_foto( $i['afbeelding'] );
+                if ( '' === $beeld ) {
+                    $beeld = self::uitgelichte_afbeelding();
+                }
                 $cirkel = 'kzp__geleding-beeld';
                 if ( '' === $beeld ) {
                     $cirkel .= ' kzp__geleding-beeld--logo';
@@ -752,6 +757,23 @@ class KZ_Element_Pagina {
             $begin = $van['weekdag'] . ' ' . $van['dag'];
         }
         return $begin . ' tot en met ' . $tot['weekdag'] . ' ' . $tot['dag'] . ' ' . $maanden[ $tot['m'] - 1 ] . ' ' . $tot['j'];
+    }
+
+    /**
+     * De uitgelichte afbeelding van het bericht of de pagina waar
+     * [kz_pagina] op staat (volle grootte), of '' als die er niet is. Alleen
+     * https, net als de foto's uit KZ-Studio.
+     */
+    private static function uitgelichte_afbeelding() {
+        $id = get_the_ID();
+        if ( ! $id ) {
+            $id = get_queried_object_id();
+        }
+        if ( ! $id || ! has_post_thumbnail( $id ) ) {
+            return '';
+        }
+        $url = get_the_post_thumbnail_url( $id, 'full' );
+        return $url ? self::veilige_foto( set_url_scheme( $url, 'https' ) ) : '';
     }
 
     /** Een onzichtbaar SVG-filter dat alles wat niet doorzichtig is #E83F35 maakt. */
