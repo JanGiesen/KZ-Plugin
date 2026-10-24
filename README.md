@@ -1,6 +1,6 @@
 # KZ-Plugin
 
-WordPress-plugins voor [dekraonigezwaone.nl](https://www.kraonigezwaone.nl/) (WordPress 7.1, Pressville-thema, WPBakery Page Builder).
+WordPress-plugins voor [kraonigezwaone.nl](https://kraonigezwaone.nl/) (WordPress 7.1, Pressville-thema, WPBakery Page Builder).
 
 Deze monorepo bevat twee plugins:
 
