@@ -871,7 +871,8 @@ class KZ_Element_Pagina {
      * Zet de tekst van een veld om naar HTML, precies zoals tekstNaarHtml() in
      * KZ-Studio. Een witregel begint een nieuwe alinea, een losse enter wordt
      * een <br>; verder ### tussenkop, - opsomming, **vet**, *cursief* en
-     * [tekst](https://…). Alles wordt eerst ge-escapet.
+     * [tekst](https://…), en tabellen zonder lijnen: regels die met | beginnen
+     * of een tab bevatten (zie tabel_cellen()). Alles wordt eerst ge-escapet.
      */
     public static function tekst_html( $invoer ) {
         // Een harde spatie (uit geplakte tekst) telt als gewone spatie.
@@ -886,19 +887,36 @@ class KZ_Element_Pagina {
             }
             $alinea = array();
             $lijst  = array();
+            $tabel  = array();
             foreach ( explode( "\n", $blok ) as $regel ) {
-                if ( preg_match( '/^\s*###\s+(.+)$/u', $regel, $m ) ) {
-                    $uit   .= self::sluit_alinea( $alinea ) . self::sluit_lijst( $lijst );
-                    $uit   .= '<h4>' . self::regel( trim( $m[1] ) ) . '</h4>';
-                } elseif ( preg_match( '/^\s*[-•]\s+(.+)$/u', $regel, $m ) ) {
-                    $uit    .= self::sluit_alinea( $alinea );
-                    $lijst[] = self::regel( trim( $m[1] ) );
+                $kop    = preg_match( '/^\s*###\s+(.+)$/u', $regel, $m_kop );
+                $punt   = ! $kop && preg_match( '/^\s*[-•]\s+(.+)$/u', $regel, $m_punt );
+                $cellen = $kop || $punt ? null : self::tabel_cellen( $regel );
+                if ( $kop ) {
+                    $uit .= self::sluit_alinea( $alinea ) . self::sluit_lijst( $lijst ) . self::sluit_tabel( $tabel );
+                    $uit .= '<h4>' . self::regel( trim( $m_kop[1] ) ) . '</h4>';
+                } elseif ( $punt ) {
+                    $uit    .= self::sluit_alinea( $alinea ) . self::sluit_tabel( $tabel );
+                    $lijst[] = self::regel( trim( $m_punt[1] ) );
+                } elseif ( null !== $cellen ) {
+                    $uit .= self::sluit_alinea( $alinea ) . self::sluit_lijst( $lijst );
+                    if ( self::is_scheiding( $cellen ) ) {
+                        // Alleen direct onder de eerste regel maakt hij daar een kop van.
+                        if ( 1 === count( $tabel ) ) {
+                            $tabel[0]['kop'] = true;
+                        }
+                    } else {
+                        $tabel[] = array(
+                            'kop'    => false,
+                            'cellen' => $cellen,
+                        );
+                    }
                 } elseif ( '' !== trim( $regel ) ) {
-                    $uit     .= self::sluit_lijst( $lijst );
+                    $uit     .= self::sluit_lijst( $lijst ) . self::sluit_tabel( $tabel );
                     $alinea[] = self::regel( trim( $regel ) );
                 }
             }
-            $uit .= self::sluit_alinea( $alinea ) . self::sluit_lijst( $lijst );
+            $uit .= self::sluit_alinea( $alinea ) . self::sluit_lijst( $lijst ) . self::sluit_tabel( $tabel );
         }
         return $uit;
     }
@@ -913,6 +931,56 @@ class KZ_Element_Pagina {
         $html  = $lijst ? '<ul><li>' . implode( '</li><li>', $lijst ) . '</li></ul>' : '';
         $lijst = array();
         return $html;
+    }
+
+    /**
+     * Een regel van een tabel: hij begint met "|" (Markdown), of er staat een
+     * tab tussen twee stukken tekst. Geeft de cellen, of null. Gelijk aan
+     * tabelCellen() in KZ-Studio.
+     */
+    private static function tabel_cellen( $regel ) {
+        if ( preg_match( '/^\s*\|/u', $regel ) ) {
+            $r = preg_replace( '/\|$/', '', preg_replace( '/^\|/', '', trim( $regel ) ) );
+            return array_map( 'trim', explode( '|', $r ) );
+        }
+        if ( preg_match( '/\S[ ]*\t[\t ]*\S/u', $regel ) ) {
+            return preg_split( '/[ ]*\t[\t ]*/', trim( $regel ) );
+        }
+        return null;
+    }
+
+    /** De streepjesregel onder de kop van een Markdown-tabel: | --- | :---: | */
+    private static function is_scheiding( array $cellen ) {
+        foreach ( $cellen as $c ) {
+            if ( ! preg_match( '/^:?-{3,}:?$/', $c ) ) {
+                return false;
+            }
+        }
+        return count( $cellen ) > 0;
+    }
+
+    /** Een tabel zonder zichtbare lijnen; de kop (als die er is) vet. */
+    private static function sluit_tabel( array &$tabel ) {
+        if ( ! $tabel ) {
+            return '';
+        }
+        $kop  = '';
+        $rest = '';
+        foreach ( $tabel as $rij ) {
+            $tag = $rij['kop'] ? 'th' : 'td';
+            $tr  = '<tr>';
+            foreach ( $rij['cellen'] as $c ) {
+                $tr .= '<' . $tag . '>' . self::regel( $c ) . '</' . $tag . '>';
+            }
+            $tr .= '</tr>';
+            if ( $rij['kop'] ) {
+                $kop .= $tr;
+            } else {
+                $rest .= $tr;
+            }
+        }
+        $tabel = array();
+        return '<div class="kzp__tabel"><table>' . ( '' !== $kop ? '<thead>' . $kop . '</thead>' : '' ) . ( '' !== $rest ? '<tbody>' . $rest . '</tbody>' : '' ) . '</table></div>';
     }
 
     private static function regel( $s ) {

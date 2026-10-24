@@ -80,6 +80,16 @@ html:has(.kzp--vol){overflow-x:clip}
 .kzp .kzp__tekst li{margin:0 0 .3em;padding:0;color:inherit}
 .kzp .kzp__tekst a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 .kzp .kzp__tekst strong{font-weight:700;color:inherit}
+/* Tabellen in tekst (| … | of tabs): zonder zichtbare lijnen of vlakken,
+   ook als het thema tabellen randen of zebrastrepen geeft. Te breed op een
+   telefoon? Dan schuift de tabel zelf, niet de pagina. */
+.kzp .kzp__tabel{margin:0 0 1.2em;padding:0;overflow-x:auto;max-width:100%}
+.kzp .kzp__tabel:last-child{margin-bottom:0}
+.kzp .kzp__tabel table{border:0!important;border-collapse:collapse;border-spacing:0;width:auto;max-width:none;margin:0;background:none!important;color:inherit;font-size:inherit;line-height:inherit}
+.kzp .kzp__tabel thead,.kzp .kzp__tabel tbody,.kzp .kzp__tabel tr{border:0!important;background:none!important}
+.kzp .kzp__tabel th,.kzp .kzp__tabel td{border:0!important;background:none!important;box-shadow:none!important;padding:.2em 2em .2em 0;margin:0;text-align:left;vertical-align:top;color:inherit;font-size:inherit;line-height:inherit;font-weight:400;text-transform:none;letter-spacing:0}
+.kzp .kzp__tabel th{font-weight:700}
+.kzp .kzp__tabel th:last-child,.kzp .kzp__tabel td:last-child{padding-right:0}
 
 /* Intro */
 .kzp .kzp__intro-tekst{font-weight:700;font-size:19px;line-height:1.5;margin:0 0 1em}
