@@ -97,6 +97,14 @@ class KZ_Element_Pagina {
     const SJABLONEN = array( 'kop', 'geleding', 'intro', 'dag', 'tekst', 'fotos', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'vakken', 'kaart', 'datum_sync', 'faq', 'html', 'motto' );
 
     /**
+     * De verhouding van foto's (Foto's, en de fotokolom van Dag, Tekst en
+     * Uitslagen): eigen (niets bijgesneden), liggend 3:2, staand 2:3 of
+     * vierkant 1:1. In de CSS: kzp--verhouding-…; gelijk aan Verhouding in
+     * KZ-Studio.
+     */
+    const VERHOUDINGEN = array( 'eigen', 'liggend', 'staand', 'vierkant' );
+
+    /**
      * De knop boven een Geleding-kop, terug naar het overzicht van alle
      * geledingen. Gelijk aan GELEDING_KNOP in KZ-Studio.
      */
@@ -357,7 +365,7 @@ class KZ_Element_Pagina {
                 }
                 return '<section class="' . esc_attr( $band . ' kzp__dag ' . $kant ) . '"><div class="kzp__binnen kzp__raster kzp__raster--4-8">'
                     . '<div class="kzp__tekstkolom">' . self::titel( $i['titel'] ) . $onderdelen . '</div>'
-                    . ( '' !== $fotos ? '<div class="kzp__beeldkolom kzp__fotos">' . $fotos . '</div>' : '' )
+                    . ( '' !== $fotos ? '<div class="' . esc_attr( 'kzp__beeldkolom kzp__fotos kzp--verhouding-' . $i['verhouding'] ) . '">' . $fotos . '</div>' : '' )
                     . '</div></section>';
 
             case 'tekst':
@@ -384,7 +392,7 @@ class KZ_Element_Pagina {
                     . ( '' !== trim( $i['intro'] ) ? '<p class="kzp__intro-tekst">' . esc_html( $i['intro'] ) . '</p>' : '' )
                     . $blokken
                     . '</div>'
-                    . ( '' !== $fotos ? '<div class="kzp__beeldkolom kzp__fotos">' . $fotos . '</div>' : '' )
+                    . ( '' !== $fotos ? '<div class="' . esc_attr( 'kzp__beeldkolom kzp__fotos kzp--verhouding-' . $i['verhouding'] ) . '">' . $fotos . '</div>' : '' )
                     . '</div></section>';
 
             case 'route':
@@ -422,7 +430,7 @@ class KZ_Element_Pagina {
                     . self::titel( $i['titel'] )
                     . '<div class="' . ( '' !== $foto ? 'kzp__raster kzp__raster--4-8' : '' ) . '">'
                     . '<div class="kzp__tekstkolom">' . $uitslagen . '</div>'
-                    . ( '' !== $foto ? '<div class="kzp__beeldkolom">' . $foto . '</div>' : '' )
+                    . ( '' !== $foto ? '<div class="' . esc_attr( 'kzp__beeldkolom kzp--verhouding-' . $i['verhouding'] ) . '">' . $foto . '</div>' : '' )
                     . '</div></div></section>';
 
             case 'video':
@@ -504,7 +512,7 @@ class KZ_Element_Pagina {
                 }
                 return '<section class="' . esc_attr( $band . ' kzp__fotosectie' ) . '"><div class="kzp__binnen">'
                     . self::titel( $i['titel'] )
-                    . ( '' !== $fotos ? '<div class="' . esc_attr( 'kzp__galerij kzp__galerij--' . $i['perRij'] . ' kzp__galerij--' . $i['verhouding'] ) . '">' . $fotos . '</div>' : '' )
+                    . ( '' !== $fotos ? '<div class="' . esc_attr( 'kzp__galerij kzp__galerij--' . $i['perRij'] . ' kzp--verhouding-' . $i['verhouding'] ) . '">' . $fotos . '</div>' : '' )
                     . '</div></section>';
 
             case 'html':
@@ -1229,6 +1237,8 @@ class KZ_Element_Pagina {
                     'onderdelen' => $onderdelen,
                     'fotos'      => $fotos,
                     'kleur'      => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
+                    // Tot 8.28.0 altijd 3:2: zonder keuze blijft het liggend.
+                    'verhouding' => self::keuze( $r, 'verhouding', self::VERHOUDINGEN, 'liggend' ),
                     'fotokant'   => self::keuze( $r, 'fotokant', array( 'auto', 'links', 'rechts' ), 'auto' ),
                 );
 
@@ -1247,12 +1257,14 @@ class KZ_Element_Pagina {
                     $fotos[] = self::schoon_foto( $f );
                 }
                 return array(
-                    'titel'    => self::tekst( $r, 'titel', $l['titel'] ),
-                    'intro'    => self::tekst( $r, 'intro', $l['tekstIntro'] ),
-                    'blokken'  => $blokken,
-                    'fotos'    => $fotos,
-                    'kleur'    => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
-                    'fotokant' => self::keuze( $r, 'fotokant', array( 'auto', 'links', 'rechts' ), 'auto' ),
+                    'titel'      => self::tekst( $r, 'titel', $l['titel'] ),
+                    'intro'      => self::tekst( $r, 'intro', $l['tekstIntro'] ),
+                    'blokken'    => $blokken,
+                    'fotos'      => $fotos,
+                    'kleur'      => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
+                    // Tot 8.28.0 altijd 3:2: zonder keuze blijft het liggend.
+                    'verhouding' => self::keuze( $r, 'verhouding', self::VERHOUDINGEN, 'liggend' ),
+                    'fotokant'   => self::keuze( $r, 'fotokant', array( 'auto', 'links', 'rechts' ), 'auto' ),
                 );
 
             case 'route':
@@ -1301,11 +1313,13 @@ class KZ_Element_Pagina {
                     );
                 }
                 return array(
-                    'titel'    => self::tekst( $r, 'titel', $l['titel'] ),
-                    'foto'     => self::schoon_foto( isset( $r['foto'] ) && is_array( $r['foto'] ) ? $r['foto'] : array() ),
-                    'jaren'    => $jaren,
-                    'kleur'    => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
-                    'fotokant' => self::keuze( $r, 'fotokant', array( 'auto', 'links', 'rechts' ), 'auto' ),
+                    'titel'      => self::tekst( $r, 'titel', $l['titel'] ),
+                    'foto'       => self::schoon_foto( isset( $r['foto'] ) && is_array( $r['foto'] ) ? $r['foto'] : array() ),
+                    'jaren'      => $jaren,
+                    'kleur'      => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
+                    // Tot 8.28.0 altijd 3:2: zonder keuze blijft het liggend.
+                    'verhouding' => self::keuze( $r, 'verhouding', self::VERHOUDINGEN, 'liggend' ),
+                    'fotokant'   => self::keuze( $r, 'fotokant', array( 'auto', 'links', 'rechts' ), 'auto' ),
                 );
 
             case 'video':
@@ -1377,7 +1391,7 @@ class KZ_Element_Pagina {
                     'fotos'      => $fotos,
                     'perRij'     => self::keuze( $r, 'perRij', array( 1, 2, 3, 4 ), 2 ),
                     // Eigen verhouding (niets bijgesneden), of liggend 3:2, staand 2:3 of vierkant 1:1.
-                    'verhouding' => self::keuze( $r, 'verhouding', array( 'eigen', 'liggend', 'staand', 'vierkant' ), 'eigen' ),
+                    'verhouding' => self::keuze( $r, 'verhouding', self::VERHOUDINGEN, 'eigen' ),
                     'kleur'      => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
                 );
 
