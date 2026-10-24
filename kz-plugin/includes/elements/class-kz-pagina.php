@@ -493,7 +493,8 @@ class KZ_Element_Pagina {
                     . '</div></section>';
 
             case 'fotos':
-                // 1 tot 12 foto's in een band, per_rij naast elkaar.
+                // 1 tot 12 foto's in een band, perRij naast elkaar, in hun eigen
+                // verhouding of allemaal liggend, staand of vierkant.
                 $fotos = '';
                 foreach ( $i['fotos'] as $f ) {
                     $fotos .= self::foto( $f );
@@ -503,7 +504,7 @@ class KZ_Element_Pagina {
                 }
                 return '<section class="' . esc_attr( $band . ' kzp__fotosectie' ) . '"><div class="kzp__binnen">'
                     . self::titel( $i['titel'] )
-                    . ( '' !== $fotos ? '<div class="' . esc_attr( 'kzp__galerij kzp__galerij--' . $i['perRij'] ) . '">' . $fotos . '</div>' : '' )
+                    . ( '' !== $fotos ? '<div class="' . esc_attr( 'kzp__galerij kzp__galerij--' . $i['perRij'] . ' kzp__galerij--' . $i['verhouding'] ) . '">' . $fotos . '</div>' : '' )
                     . '</div></section>';
 
             case 'html':
@@ -1372,10 +1373,12 @@ class KZ_Element_Pagina {
                     $fotos[] = self::schoon_foto( $f );
                 }
                 return array(
-                    'titel'  => self::tekst( $r, 'titel', $l['titel'] ),
-                    'fotos'  => $fotos,
-                    'perRij' => self::keuze( $r, 'perRij', array( 1, 2, 3, 4 ), 2 ),
-                    'kleur'  => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
+                    'titel'      => self::tekst( $r, 'titel', $l['titel'] ),
+                    'fotos'      => $fotos,
+                    'perRij'     => self::keuze( $r, 'perRij', array( 1, 2, 3, 4 ), 2 ),
+                    // Eigen verhouding (niets bijgesneden), of liggend 3:2, staand 2:3 of vierkant 1:1.
+                    'verhouding' => self::keuze( $r, 'verhouding', array( 'eigen', 'liggend', 'staand', 'vierkant' ), 'eigen' ),
+                    'kleur'      => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
                 );
 
             case 'html':
