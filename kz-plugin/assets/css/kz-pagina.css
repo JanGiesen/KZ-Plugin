@@ -53,6 +53,11 @@ html:has(.kzp--vol){overflow-x:clip}
 .kzp .kzp__geleding-beeld{display:block;width:200px;height:200px;margin:0 auto;border:2px solid var(--kzp-white);border-radius:50%;background:var(--kzp-white);overflow:hidden}
 .kzp .kzp__geleding-beeld img{display:block;width:100%;height:100%;max-width:none;object-fit:cover;margin:0}
 .kzp .kzp__geleding-beeld--logo img{object-fit:contain;padding:30px}
+/* Op een bericht van het type Groeperingen zet het thema ruimte boven de
+   inhoud (de verborgen titel, padding van .columns__main). Net als de oude
+   WPBakery-pagina's trekken we de kop daar omhoog. Alleen op de site
+   (kzp--vol, body.single-groeperingen), niet in het voorbeeld van KZ-Studio. */
+.single-groeperingen .kzp--vol > .kzp__geleding:first-child{margin-top:-40px}
 
 /* Rasters: tekst + beeld naast elkaar, op smal onder elkaar */
 .kzp .kzp__raster{display:grid;gap:44px;align-items:start}
