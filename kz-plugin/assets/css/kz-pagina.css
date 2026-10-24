@@ -1,5 +1,5 @@
-/* KZ-Pagina — een hele pagina uit vaste secties (kop, geleding-kop, intro, dag, tekst,
-   tekst + foto, route, tickets, uitslagen, video, vakken, kaart, vragen, motto), beheerd in KZ-Studio (Website → Pagina's).
+/* KZ-Pagina — een hele pagina uit vaste secties (kop, geleding-kop, intro, dag, tekst, foto's,
+   tekst + foto, route, tickets, uitslagen, video, vakken, kaart, vragen, html, motto), beheerd in KZ-Studio (Website → Pagina's).
 
    Huisstijl: rood #E83F35 en wit als volle vlakken, koppen in Roboto Condensed
    (vet, hoofdletters, 80% breed, -0.04em), tekst in Work Sans, geen schaduwen
@@ -213,6 +213,21 @@ html:has(.kzp--vol){overflow-x:clip}
 .kzp .kzp__foto--heel a{display:block}
 .kzp .kzp__foto--heel img{height:auto;object-fit:contain}
 
+/* Foto's: 1 tot 12 foto's in een raster, 1 tot 4 naast elkaar */
+.kzp .kzp__fotosectie .kzp__titel{margin-bottom:28px}
+.kzp .kzp__galerij{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:start}
+.kzp .kzp__galerij--1{grid-template-columns:minmax(0,1fr)}
+.kzp .kzp__galerij--3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.kzp .kzp__galerij--4{grid-template-columns:repeat(4,minmax(0,1fr))}
+
+/* HTML: eigen HTML (door wp_kses_post). Alleen een basis, zodat wat erin
+   staat er net zo uitziet als tekst elders op de pagina. */
+.kzp .kzp__vrij{font-size:17px;line-height:1.5;color:inherit}
+.kzp .kzp__vrij > :first-child{margin-top:0}
+.kzp .kzp__vrij > :last-child{margin-bottom:0}
+.kzp .kzp__vrij a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.kzp .kzp__vrij img{max-width:100%;height:auto}
+
 /* Knoppen: geen eigen opmaak. KZ-Pagina tekent ze met het element KZ-Knop
    zelf (KZ_Element_Button::render(): KZ-KNOP-ROOD op wit, KZ-KNOP-WIT op
    rood), dus ze zijn gelijk aan elke andere KZ-Knop op de site. */
@@ -291,6 +306,8 @@ html:has(.kzp--vol){overflow-x:clip}
 .kzp.kzp .kzp__sectie .kzp__kop-titel,
 .kzp.kzp .kzp__video-sectie .kzp__titel,
 .kzp.kzp .kzp__kaart-sectie .kzp__titel{text-align:center}
+/* In eigen HTML bepaalt de HTML zelf de uitlijning (bv. een div met text-align:center). */
+.kzp.kzp .kzp__vrij :is(h1,h2,h3){text-align:inherit}
 
 /* Smal (telefoon): alles onder elkaar, tekst eerst en de foto's eronder */
 @container kzp (max-width: 760px){
@@ -325,6 +342,8 @@ html:has(.kzp--vol){overflow-x:clip}
   .kzp .kzp__logo,.kzp--foto-links.kzp__datum-sync .kzp__logo{max-width:180px;margin:0 auto}
   .kzp .kzp__dag .kzp__fotos{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .kzp .kzp__dag .kzp__foto--heel{grid-column:1/-1}
+  .kzp .kzp__galerij{gap:10px}
+  .kzp .kzp__galerij--3,.kzp .kzp__galerij--4{grid-template-columns:repeat(2,minmax(0,1fr))}
   .kzp .kzp__vraag summary{font-size:21px}
   .kzp .kzp__evenementen--2 .kzp__evenementen-rij,
   .kzp .kzp__evenementen--3 .kzp__evenementen-rij{grid-template-columns:minmax(0,1fr)}
