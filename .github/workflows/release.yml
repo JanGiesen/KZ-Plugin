@@ -4,7 +4,6 @@ on:
   push:
     tags:
       - 'kz-plugin-v*'
-      - 'kz-contentmanager-v*'
   workflow_dispatch:
     inputs:
       tag:
@@ -40,9 +39,6 @@ jobs:
           if [[ "$TAG" == kz-plugin-v* ]]; then
             echo "plugin_dir=kz-plugin" >> "$GITHUB_OUTPUT"
             echo "zip_name=kz-plugin.zip" >> "$GITHUB_OUTPUT"
-          elif [[ "$TAG" == kz-contentmanager-v* ]]; then
-            echo "plugin_dir=kz-contentmanager-plugin" >> "$GITHUB_OUTPUT"
-            echo "zip_name=kz-contentmanager-plugin.zip" >> "$GITHUB_OUTPUT"
           else
             echo "Onbekend tag-formaat: $TAG" >&2
             exit 1
