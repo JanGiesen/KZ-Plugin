@@ -283,6 +283,15 @@ html:has(.kzp--vol){overflow-x:clip}
 .kzp.kzp--hjc .kzp__band--rood .kz-evt.kz-evt--seizoen .kz-evt__knop:hover{background:color-mix(in srgb,var(--kzp-red) 85%,#000);border-color:color-mix(in srgb,var(--kzp-red) 85%,#000)}
 .kzp.kzp--hjc .kzp__band--rood .kz-evt.kz-evt--seizoen .kz-evt__knop:active{background:color-mix(in srgb,var(--kzp-red) 70%,#000);border-color:color-mix(in srgb,var(--kzp-red) 70%,#000)}
 
+/* Uitlijning van de koppen vastzetten. Eigen CSS van de site centreert h1-h3
+   op Groeperingen (.single-groeperingen .columns__main h2 {text-align:center});
+   met .kzp.kzp wint deze regel daarvan, wat er ook in het thema staat. De
+   koppen die bewust in het midden staan, staan hier opnieuw. */
+.kzp.kzp .kzp__sectie :is(h1,h2,h3){text-align:left}
+.kzp.kzp .kzp__sectie .kzp__kop-titel,
+.kzp.kzp .kzp__video-sectie .kzp__titel,
+.kzp.kzp .kzp__kaart-sectie .kzp__titel{text-align:center}
+
 /* Smal (telefoon): alles onder elkaar, tekst eerst en de foto's eronder */
 @container kzp (max-width: 760px){
   .kzp .kzp__sectie{padding:36px 0}
