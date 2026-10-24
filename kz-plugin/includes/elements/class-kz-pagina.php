@@ -2,8 +2,8 @@
 /**
  * KZ-Pagina — shortcode [kz_pagina pagina="5dd"]
  *
- * Tekent een hele pagina uit vaste secties: kop, geleding-kop, intro, dag, tekst, tekst + foto,
- * route, tickets (KZ-Evenement Info), uitslagen, video, vakken (KZ-Vindt Grid), kaart, datum + sync, vragen en motto. De inhoud (teksten, knoppen, foto's) beheer je in
+ * Tekent een hele pagina uit vaste secties: kop, geleding-kop, intro, dag, tekst, foto's, tekst + foto,
+ * route, tickets (KZ-Evenement Info), uitslagen, video, vakken (KZ-Vindt Grid), kaart, datum + sync, vragen, HTML en motto. De inhoud (teksten, knoppen, foto's) beheer je in
  * KZ-Studio (Website → Pagina's); de opmaak staat hier vast, zodat er niets
  * verspringt zoals bij losse WPBakery-blokken.
  *
@@ -76,6 +76,8 @@ class KZ_Element_Pagina {
         'ondertitel'     => 120,
         'adres'          => 200,
         'datumTekst'     => 60,
+        'galerij'        => 12,
+        'html'           => 20000,
     );
 
     /**
@@ -92,7 +94,7 @@ class KZ_Element_Pagina {
     );
 
     /** "tickets" (tot 8.15) bestaat niet meer: zo'n sectie wordt overgeslagen. */
-    const SJABLONEN = array( 'kop', 'geleding', 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'vakken', 'kaart', 'datum_sync', 'faq', 'motto' );
+    const SJABLONEN = array( 'kop', 'geleding', 'intro', 'dag', 'tekst', 'fotos', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'vakken', 'kaart', 'datum_sync', 'faq', 'html', 'motto' );
 
     /**
      * De knop boven een Geleding-kop, terug naar het overzicht van alle
@@ -251,7 +253,7 @@ class KZ_Element_Pagina {
         foreach ( $secties as $n => $s ) {
             $achtergrond = 'wit';
             $fotokant    = 'links';
-            if ( in_array( $s['sjabloon'], array( 'geleding', 'intro', 'dag', 'tekst', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'vakken', 'kaart', 'datum_sync', 'faq', 'motto' ), true ) ) {
+            if ( in_array( $s['sjabloon'], array( 'geleding', 'intro', 'dag', 'tekst', 'fotos', 'tekst_foto', 'route', 'evenementen', 'uitslagen', 'video', 'vakken', 'kaart', 'datum_sync', 'faq', 'html', 'motto' ), true ) ) {
                 // De Geleding-kop is altijd rood; de band erna dus wit.
                 $k           = 'geleding' === $s['sjabloon'] ? 'rood' : ( isset( $s['inhoud']['kleur'] ) ? $s['inhoud']['kleur'] : 'auto' );
                 $achtergrond = 'auto' === $k ? ( 0 === $band % 2 ? 'rood' : 'wit' ) : $k;
@@ -488,6 +490,33 @@ class KZ_Element_Pagina {
                     . self::knop( $knop, $opmaak['achtergrond'] )
                     . '</div>'
                     . '<div class="kzp__beeldkolom"><img class="' . esc_attr( $logo ) . '" src="' . esc_url( $beeld ) . '" alt="" decoding="async"></div>'
+                    . '</div></section>';
+
+            case 'fotos':
+                // 1 tot 12 foto's in een band, per_rij naast elkaar.
+                $fotos = '';
+                foreach ( $i['fotos'] as $f ) {
+                    $fotos .= self::foto( $f );
+                }
+                if ( '' === $fotos && '' === trim( $i['titel'] ) ) {
+                    return '';
+                }
+                return '<section class="' . esc_attr( $band . ' kzp__fotosectie' ) . '"><div class="kzp__binnen">'
+                    . self::titel( $i['titel'] )
+                    . ( '' !== $fotos ? '<div class="' . esc_attr( 'kzp__galerij kzp__galerij--' . $i['perRij'] ) . '">' . $fotos . '</div>' : '' )
+                    . '</div></section>';
+
+            case 'html':
+                // Eigen HTML, met alleen wat WordPress in een bericht toestaat:
+                // geen script, iframe, style-blok of onclick. Shortcodes worden
+                // niet uitgevoerd.
+                $vrij = trim( wp_kses_post( $i['html'] ) );
+                if ( '' === $vrij && '' === trim( $i['titel'] ) ) {
+                    return '';
+                }
+                return '<section class="' . esc_attr( $band . ' kzp__html-sectie' ) . '"><div class="kzp__binnen">'
+                    . self::titel( $i['titel'] )
+                    . ( '' !== $vrij ? '<div class="kzp__vrij">' . $vrij . '</div>' : '' )
                     . '</div></section>';
 
             case 'tekst_foto':
@@ -1335,6 +1364,25 @@ class KZ_Element_Pagina {
                     'fotokant'   => self::keuze( $r, 'fotokant', array( 'auto', 'links', 'rechts' ), 'auto' ),
                     'slug'       => preg_match( '/^[a-z0-9]+(-[a-z0-9]+)*$/', $slug ) ? $slug : '',
                     'intro'      => isset( $r['intro'] ) && is_array( $r['intro'] ) ? self::schoon_inhoud( 'intro', $r['intro'] ) : null,
+                );
+
+            case 'fotos':
+                $fotos = array();
+                foreach ( self::lijst( $r, 'fotos', $l['galerij'] ) as $f ) {
+                    $fotos[] = self::schoon_foto( $f );
+                }
+                return array(
+                    'titel'  => self::tekst( $r, 'titel', $l['titel'] ),
+                    'fotos'  => $fotos,
+                    'perRij' => self::keuze( $r, 'perRij', array( 1, 2, 3, 4 ), 2 ),
+                    'kleur'  => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
+                );
+
+            case 'html':
+                return array(
+                    'titel' => self::tekst( $r, 'titel', $l['titel'] ),
+                    'html'  => self::tekst( $r, 'html', $l['html'] ),
+                    'kleur' => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
                 );
 
             case 'tekst_foto':
