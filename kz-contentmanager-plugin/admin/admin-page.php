@@ -453,7 +453,7 @@ jQuery(document).ready(function($) {
                 if (response.success) {
                     displayDocuments(response.data);
                 } else {
-                    $('#kz-documents-list').html('<p>Fout bij het laden van documenten.</p>');
+                    $('#kz-documents-list').empty().append($('<p>').text('Fout bij het laden van documenten' + (response.data ? ': ' + response.data : '.')));
                 }
             },
             error: function() {
@@ -515,6 +515,9 @@ jQuery(document).ready(function($) {
     $('.nav-tab-wrapper a[data-tab="documents-tab"]').click(function() {
         loadDocuments();
     });
+
+    // De Documenten-tab is standaard open, dus laad de lijst meteen.
+    loadDocuments();
 
     $('#kz-copy-all-shortcodes').click(function() {
         if (window.kzAllShortcodes) {
