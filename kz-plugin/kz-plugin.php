@@ -3,7 +3,7 @@
  * Plugin Name: KZ Plugin
  * Plugin URI: https://github.com/JanGiesen/KZ-Plugin
  * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, evenement info, evenementen overzicht, motto, pagina).
- * Version: 8.28.0
+ * Version: 8.29.0
  * Author: Kraonige Zwaone
  * Text Domain: kz-plugin
  * Update URI: https://github.com/JanGiesen/KZ-Plugin
@@ -183,13 +183,18 @@
  * KZ-Studio zelf in bij het ophalen (migratie 0051), uit de nieuwste
  * gepubliceerde versie van de bronpagina; zo blijft een overzicht als
  * /evenementen/ vanzelf gelijk aan de losse pagina's.
+ *
+ * 8.29.0: foto's uit KZ-Studio (Supabase Storage) van KZ-Pagina, Link-In-Bio
+ * en KZ-Motto krijgen een kopie in wp-content/uploads/kz-studio/ (KZ_Spiegel,
+ * via WP-Cron op de achtergrond). Die kopie wordt getekend zodra hij er is,
+ * dus bij een storing van Supabase blijven ook de foto's staan.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Directe toegang niet toegestaan.
 }
 
-define( 'KZ_PLUGIN_VERSION', '8.28.0' );
+define( 'KZ_PLUGIN_VERSION', '8.29.0' );
 define( 'KZ_PLUGIN_FILE', __FILE__ );
 define( 'KZ_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KZ_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -247,6 +252,10 @@ class KZ_Plugin {
 
         // Link-In-Bio op link.kraonigezwaone.nl (inhoud uit KZ-Studio).
         KZ_Link_In_Bio::init();
+
+        // Kopie op deze site van de foto's uit KZ-Studio.
+        KZ_Spiegel::init();
+        register_deactivation_hook( KZ_PLUGIN_FILE, array( 'KZ_Spiegel', 'deactiveren' ) );
     }
 
     private function load_dependencies() {
@@ -269,6 +278,7 @@ class KZ_Plugin {
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-pagina.php';
         require_once KZ_PLUGIN_PATH . 'includes/class-kz-evenementen.php';
         require_once KZ_PLUGIN_PATH . 'includes/class-kz-link-in-bio.php';
+        require_once KZ_PLUGIN_PATH . 'includes/class-kz-spiegel.php';
     }
 
     /**

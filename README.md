@@ -66,6 +66,17 @@ Sinds 8.23.0 heeft de jeugdafdeling HJC De Krössels een eigen kleurenschema: ee
 - Een pagina met KZ-Pagina vraagt LiteSpeed Cache om hem hooguit 2 minuten te bewaren (sinds 8.13.1), zodat bezoekers een publicatie uit KZ-Studio binnen een paar minuten zien. Ingelogd zie je hem meteen; LiteSpeed slaat ingelogde bezoekers over.
 - Staat er niets? Ingelogde redacteuren zien op de pagina zelf een geel blokje met de reden en de laatste ophaalstatus (sinds 8.12.1; daarvoor alleen een HTML-commentaar, en dat haalt LiteSpeed Cache weg). Bezoekers zien niets. Onder **KZ Plugin → Pagina's** staat per pagina wanneer hij voor het laatst is opgehaald, met een knop om de cache te legen.
 
+## Foto's uit KZ-Studio (kopie op de site)
+
+Sinds 8.29.0 bewaart de plugin een kopie van de foto's die KZ-Studio in Supabase Storage zet, in `wp-content/uploads/kz-studio/` (`includes/class-kz-spiegel.php`). Zonder kopie haalt de browser van de bezoeker elke foto zelf bij Supabase op, en bij een storing daar blijven de vlakken leeg — terwijl de tekst dankzij de "laatste goede versie" gewoon blijft staan.
+
+- Het geldt voor alles wat via `KZ_Link_In_Bio::veilige_foto()` getekend wordt (alle foto's van KZ-Pagina en de Link-In-Bio) en voor de .svg van KZ-Motto. Alleen adressen onder `<Supabase-adres>/storage/v1/object/public/` (of `/render/image/public/`) van het project dat onder Link-In-Bio is ingesteld; de fotobibliotheek op R2 en de rest blijven zoals ze zijn.
+- Bij het tekenen wordt nooit gedownload. Een foto zonder kopie komt in de wachtrij (optie `kz_spiegel`) en wordt voorlopig nog van Supabase getoond; WP-Cron (`kz_spiegel_kopieren`) kopieert de wachtrij op de achtergrond, 10 per ronde. Zo'n pagina vraagt LiteSpeed Cache om hem hooguit 5 minuten te bewaren, zodat de kopie er snel in komt. Mislukt een download, dan volgt een nieuwe poging na 10 minuten, 20, 40 … tot hooguit een dag.
+- Alleen echte afbeeldingen (jpg, png, gif, webp, avif — gecontroleerd op de inhoud, niet op de naam) en .svg's zonder script, event-handlers of `foreignObject`. Een .svg die daar niet doorheen komt, blijft van Supabase komen. De map krijgt een `.htaccess` die niets laat uitvoeren en een strenge Content-Security-Policy meestuurt.
+- Een adres in Supabase Storage verandert nooit van inhoud (KZ-Studio uploadt altijd onder een nieuwe naam), dus een kopie wordt nooit ververst. Kopieën die 90 dagen op geen enkele pagina meer getekend zijn, ruimt `kz_spiegel_opruimen` dagelijks op.
+- Onder **KZ Plugin → Foto's uit KZ-Studio** staat hoeveel er gekopieerd is, wat er nog wacht en wat er misging, met een knop om meteen een ronde te kopiëren (handig als WP-Cron op de host niet loopt).
+- Niet gekopieerd: foto's in de vrije HTML van het sjabloon HTML, en foto's in gewone nieuwsberichten (die staan in de berichtinhoud zelf).
+
 ## Automatische updates
 
 KZ Plugin bevat een lichte, eigen updater (`includes/class-kz-updater.php`) die gebruikmaakt van WordPress' `Update URI`-mechanisme (sinds WP 5.8). Zolang de plugin-header `Update URI: https://github.com/JanGiesen/KZ-Plugin` bevat, checkt WordPress via de hook `update_plugins_github.com` periodiek of er een nieuwe release is — en toont/voert die update net als bij een plugin uit de WordPress-directory, inclusief **automatische updates**.

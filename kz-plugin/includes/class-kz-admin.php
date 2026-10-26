@@ -94,6 +94,7 @@ class KZ_Admin {
         add_action( 'admin_post_kz_plugin_link_in_bio_verversen', array( $this, 'handle_link_in_bio_verversen' ) );
         add_action( 'admin_post_kz_plugin_motto_verversen', array( $this, 'handle_motto_verversen' ) );
         add_action( 'admin_post_kz_plugin_paginas_verversen', array( $this, 'handle_paginas_verversen' ) );
+        add_action( 'admin_post_kz_plugin_fotos_kopieren', array( $this, 'handle_fotos_kopieren' ) );
     }
 
     public static function get_disabled_elements() {
@@ -216,6 +217,29 @@ class KZ_Admin {
         exit;
     }
 
+    /** Kopieert meteen een ronde foto's, zonder op WP-Cron te wachten. */
+    public function handle_fotos_kopieren() {
+        check_admin_referer( 'kz_plugin_fotos_kopieren' );
+
+        if ( ! current_user_can( 'manage_options' ) ) {
+            wp_die( 'Geen toegang' );
+        }
+
+        $telling = KZ_Spiegel::kopieren( true );
+
+        wp_safe_redirect(
+            add_query_arg(
+                array(
+                    'page'             => 'kz-plugin',
+                    'kz_fotos_gelukt'  => (int) $telling['gelukt'],
+                    'kz_fotos_mislukt' => (int) $telling['mislukt'],
+                ),
+                admin_url( 'admin.php' )
+            ) . '#kz-fotos'
+        );
+        exit;
+    }
+
     public function render_page() {
         if ( ! current_user_can( 'manage_options' ) ) {
             return;
@@ -230,6 +254,7 @@ class KZ_Admin {
         $link_status       = get_option( KZ_Link_In_Bio::OPTIE_STATUS );
         $motto_status      = get_option( KZ_Element_Motto::OPTIE_STATUS );
         $pagina_status     = get_option( KZ_Element_Pagina::OPTIE_STATUS );
+        $fotos             = KZ_Spiegel::overzicht();
         ?>
         <div class="wrap kz-plugin-admin">
             <h1>KZ Plugin</h1>
@@ -245,6 +270,19 @@ class KZ_Admin {
             <?php endif; ?>
             <?php if ( isset( $_GET['kz_motto_ververst'] ) ) : ?>
                 <div class="notice notice-success is-dismissible"><p>Motto's opnieuw opgehaald.</p></div>
+            <?php endif; ?>
+            <?php if ( isset( $_GET['kz_fotos_gelukt'] ) ) : ?>
+                <div class="notice notice-success is-dismissible"><p>
+                    <?php
+                    echo esc_html(
+                        sprintf(
+                            'Foto\'s gekopieerd: %d gelukt, %d mislukt.',
+                            absint( $_GET['kz_fotos_gelukt'] ),
+                            isset( $_GET['kz_fotos_mislukt'] ) ? absint( $_GET['kz_fotos_mislukt'] ) : 0
+                        )
+                    );
+                    ?>
+                </p></div>
             <?php endif; ?>
             <?php if ( isset( $_GET['kz_paginas_ververst'] ) ) : ?>
                 <div class="notice notice-success is-dismissible"><p>Cache van de pagina's geleegd; het volgende bezoek haalt ze vers op.</p></div>
@@ -422,6 +460,35 @@ class KZ_Admin {
                 <?php wp_nonce_field( 'kz_plugin_paginas_verversen' ); ?>
                 <input type="hidden" name="action" value="kz_plugin_paginas_verversen" />
                 <button type="submit" class="button button-secondary">Pagina's nu opnieuw ophalen</button>
+            </form>
+
+            <h2 id="kz-fotos" style="margin-top: 30px;">Foto's uit KZ-Studio</h2>
+            <p>
+                De foto's van Pagina's, de Link-In-Bio en het Motto staan in Supabase. Deze site bewaart er een kopie van in
+                <code>wp-content/uploads/<?php echo esc_html( KZ_Spiegel::MAP ); ?>/</code> en toont die zodra hij er is,
+                zodat de foto's ook blijven staan als Supabase even plat ligt. Nieuwe foto's worden binnen een paar minuten
+                vanzelf gekopieerd; kopieën die <?php echo esc_html( KZ_Spiegel::BEWAAR_DAGEN ); ?> dagen nergens meer getoond zijn, worden opgeruimd.
+            </p>
+            <p>
+                <strong>Gekopieerd:</strong> <?php echo esc_html( $fotos['gekopieerd'] ); ?> (<?php echo esc_html( size_format( $fotos['bytes'] ) ? size_format( $fotos['bytes'] ) : '0 B' ); ?>)
+                &mdash; <strong>wacht nog:</strong> <?php echo esc_html( $fotos['wachtend'] ); ?>
+            </p>
+            <?php if ( $fotos['fouten'] ) : ?>
+                <table class="widefat" style="max-width: 700px;">
+                    <tbody>
+                        <?php foreach ( array_slice( $fotos['fouten'], 0, 10 ) as $fout ) : ?>
+                            <tr>
+                                <td style="word-break: break-all;"><code><?php echo esc_html( $fout['url'] ); ?></code></td>
+                                <td><span style="color:#d63638;">mislukt</span> (<?php echo esc_html( $fout['pogingen'] ); ?>&times;): <?php echo esc_html( $fout['fout'] ); ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php endif; ?>
+            <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin-top: 10px;">
+                <?php wp_nonce_field( 'kz_plugin_fotos_kopieren' ); ?>
+                <input type="hidden" name="action" value="kz_plugin_fotos_kopieren" />
+                <button type="submit" class="button button-secondary">Foto's nu kopiëren</button>
             </form>
         </div>
         <?php
