@@ -239,13 +239,18 @@ class KZ_Link_In_Bio {
         return esc_url( $url, array( 'http', 'https', 'mailto', 'tel' ) );
     }
 
-    /** Een foto-adres: alleen https://, anders ''. */
+    /**
+     * Een foto-adres: alleen https://, anders ''. Een foto uit Supabase
+     * Storage wordt de kopie op deze site zodra die er is (KZ_Spiegel), zodat
+     * hij ook bij een storing van Supabase blijft staan. Ook KZ-Pagina tekent
+     * zijn foto's hiermee.
+     */
     public static function veilige_foto( $url ) {
         $url = trim( (string) $url );
         if ( ! preg_match( '#^https://\S+$#i', $url ) ) {
             return '';
         }
-        return esc_url( $url, array( 'https' ) );
+        return esc_url( KZ_Spiegel::url( $url ), array( 'https' ) );
     }
 
     /** Een icoon als inline SVG, of '' bij een onbekende sleutel. */

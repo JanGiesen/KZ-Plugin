@@ -127,6 +127,9 @@ class KZ_Element_Motto {
         if ( '' === $url ) {
             return self::uitleg( 'bij ' . $soorten[ $soort ] . ' is nog geen .svg gekoppeld' );
         }
+        // De kopie op deze site als die er is, zodat het motto ook bij een
+        // storing van Supabase blijft staan.
+        $url = KZ_Spiegel::url( $url );
 
         $breedte = absint( $atts['breedte'] );
         if ( ! $breedte ) {
