@@ -75,7 +75,7 @@ Sinds 8.29.0 bewaart de plugin een kopie van de foto's die KZ-Studio in Supabase
 - Alleen echte afbeeldingen (jpg, png, gif, webp, avif — gecontroleerd op de inhoud, niet op de naam) en .svg's zonder script, event-handlers of `foreignObject`. Een .svg die daar niet doorheen komt, blijft van Supabase komen. De map krijgt een `.htaccess` die niets laat uitvoeren en een strenge Content-Security-Policy meestuurt.
 - Een adres in Supabase Storage verandert nooit van inhoud (KZ-Studio uploadt altijd onder een nieuwe naam), dus een kopie wordt nooit ververst. Kopieën die 90 dagen op geen enkele pagina meer getekend zijn, ruimt `kz_spiegel_opruimen` dagelijks op.
 - Onder **KZ Plugin → Foto's uit KZ-Studio** staat hoeveel er gekopieerd is, wat er nog wacht en wat er misging, met een knop om meteen een ronde te kopiëren (handig als WP-Cron op de host niet loopt).
-- Niet gekopieerd: foto's in de vrije HTML van het sjabloon HTML, en foto's in gewone nieuwsberichten (die staan in de berichtinhoud zelf).
+- Niet gekopieerd: foto's in de vrije HTML van het sjabloon HTML. Nieuwsberichten hoeven niet: de Edge Function `publiceren` van KZ-Studio zet hun slides al in de mediabibliotheek van WordPress (`/wp/v2/media`) en het bericht verwijst alleen naar die media-id's, dus daar staat geen adres van Supabase in.
 
 ## Automatische updates
 
