@@ -6,7 +6,7 @@ Deze repo bevat één plugin:
 
 | Map | Plugin | Doel |
 |---|---|---|
-| `kz-plugin/` | **KZ Plugin** | WPBakery-elementen: post carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, recente galerijen, winkel producten, evenement info, evenementen overzicht, motto (+ post type `kz_evenement` voor KZ-Studio), en de Link-In-Bio-pagina op link.kraonigezwaone.nl |
+| `kz-plugin/` | **KZ Plugin** | WPBakery-elementen: post carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, recente galerijen, winkel producten, evenement info, evenementen overzicht, motto, groeperingen, nieuws (+ post type `kz_evenement` voor KZ-Studio), en de Link-In-Bio-pagina op link.kraonigezwaone.nl |
 
 KZ Plugin is de samenvoeging/opvolger van eerder losse plugins (KZ-Kraonige Zwaone Plugin 7.1, KZ Vindt, KZH Ticket Element). Alle shortcode-namen en parameters zijn ongewijzigd overgenomen zodat bestaande content op de site blijft werken. Bij activatie deactiveert hij automatisch de oude losse plugins (met een melding in het dashboard) om dubbele shortcode-registratie te voorkomen.
 
@@ -76,6 +76,17 @@ Sinds 8.29.0 bewaart de plugin een kopie van de foto's die KZ-Studio in Supabase
 - Een adres in Supabase Storage verandert nooit van inhoud (KZ-Studio uploadt altijd onder een nieuwe naam), dus een kopie wordt nooit ververst. Kopieën die 90 dagen op geen enkele pagina meer getekend zijn, ruimt `kz_spiegel_opruimen` dagelijks op.
 - Onder **KZ Plugin → Foto's uit KZ-Studio** staat hoeveel er gekopieerd is, wat er nog wacht en wat er misging, met een knop om meteen een ronde te kopiëren (handig als WP-Cron op de host niet loopt).
 - Niet gekopieerd: foto's in de vrije HTML van het sjabloon HTML. Nieuwsberichten hoeven niet: de Edge Function `publiceren` van KZ-Studio zet hun slides al in de mediabibliotheek van WordPress (`/wp/v2/media`) en het bericht verwijst alleen naar die media-id's, dus daar staat geen adres van Supabase in.
+
+## KZ-Groeperingen en KZ-Nieuws (grids zonder AJAX)
+
+Sinds 8.30.0 zijn er twee elementen die de WPBakery Post Grids (`vc_basic_grid`) vervangen: **KZ-Groeperingen** (`[kz_groeperingen]`, ronde foto's, post type `groeperingen`) en **KZ-Nieuws** (`[kz_nieuws]`, met paginering).
+
+Waarom: een WPBakery Post Grid tekent een lege container en haalt de items pas in de browser op via `admin-ajax.php` (actie `vc_get_vc_grid_data`), met de nonce uit `data-vc-public-nonce`. LiteSpeed Cache bewaart pagina's tot 7 dagen, een nonce voor gasten is hooguit 24 uur geldig. Daarna geeft admin-ajax `0` en blijft de grid leeg; ingelogd zie je het niet, want dan is er geen cache. Deze twee elementen tekenen alles op de server, dus zonder AJAX, JavaScript of nonce.
+
+- Paginering van KZ-Nieuws gaat via de server: `/nieuws/?pagina=2` (ook `/nieuws/page/2/` wordt gelezen). Pagina 1 is de kale permalink.
+- Kolommen per scherm: `kolommen` (computer), `kolommen_tablet` (tot 1024px), `kolommen_mobiel` (tot 767px). Groeperingen standaard 6/4/3, nieuws 3/2/1. Daarmee is de Custom CSS (4 en 3 per rij) die in WPBakery op de oude grids stond overbodig.
+- Omdat de items nu in de gecachete HTML staan, krijgt elke pagina met zo'n grid een LiteSpeed-cachetag (`KZ_GRID_post`, `KZ_GRID_groeperingen`). Opslaan, publiceren of verwijderen van een bericht van dat type leegt die tag (`litespeed_purge`), dus een nieuw bericht staat meteen op /nieuws/. Zonder LiteSpeed doet dat niets.
+- Code: `includes/class-kz-berichten-grid.php` (gedeeld), `includes/elements/class-kz-groeperingen.php`, `includes/elements/class-kz-nieuws.php`, `assets/css/kz-berichten-grid.css`.
 
 ## Automatische updates
 

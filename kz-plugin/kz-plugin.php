@@ -2,8 +2,8 @@
 /**
  * Plugin Name: KZ Plugin
  * Plugin URI: https://github.com/JanGiesen/KZ-Plugin
- * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, evenement info, evenementen overzicht, motto, pagina).
- * Version: 8.29.0
+ * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, evenement info, evenementen overzicht, motto, pagina, groeperingen, nieuws).
+ * Version: 8.30.0
  * Author: Kraonige Zwaone
  * Text Domain: kz-plugin
  * Update URI: https://github.com/JanGiesen/KZ-Plugin
@@ -188,13 +188,22 @@
  * en KZ-Motto krijgen een kopie in wp-content/uploads/kz-studio/ (KZ_Spiegel,
  * via WP-Cron op de achtergrond). Die kopie wordt getekend zodra hij er is,
  * dus bij een storing van Supabase blijven ook de foto's staan.
+ *
+ * 8.30.0: twee nieuwe elementen, KZ-Groeperingen (shortcode kz_groeperingen,
+ * ronde foto's) en KZ-Nieuws (shortcode kz_nieuws, met paginering via
+ * ?pagina=2). Ze vervangen de WPBakery Post Grids, die hun items via
+ * admin-ajax ophalen met een nonce: in de LiteSpeed-cache (7 dagen) verloopt
+ * die nonce na hooguit een dag en bleven de grids voor gasten leeg. Deze
+ * staan meteen in de HTML. De pagina's krijgen een LiteSpeed-cachetag per post
+ * type (KZ_GRID_post, KZ_GRID_groeperingen) die geleegd wordt als een bericht
+ * van dat type verandert. Zie includes/class-kz-berichten-grid.php.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Directe toegang niet toegestaan.
 }
 
-define( 'KZ_PLUGIN_VERSION', '8.29.0' );
+define( 'KZ_PLUGIN_VERSION', '8.30.0' );
 define( 'KZ_PLUGIN_FILE', __FILE__ );
 define( 'KZ_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KZ_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -221,6 +230,8 @@ class KZ_Plugin {
         'event_overview'   => 'KZ_Element_Event_Overview',
         'motto'            => 'KZ_Element_Motto',
         'pagina'           => 'KZ_Element_Pagina',
+        'groeperingen'     => 'KZ_Element_Groeperingen',
+        'nieuws'           => 'KZ_Element_Nieuws',
     );
 
     public function __construct() {
@@ -253,6 +264,9 @@ class KZ_Plugin {
         // Link-In-Bio op link.kraonigezwaone.nl (inhoud uit KZ-Studio).
         KZ_Link_In_Bio::init();
 
+        // KZ-Groeperingen en KZ-Nieuws: cache legen als een bericht verandert.
+        KZ_Berichten_Grid::init();
+
         // Kopie op deze site van de foto's uit KZ-Studio.
         KZ_Spiegel::init();
         register_deactivation_hook( KZ_PLUGIN_FILE, array( 'KZ_Spiegel', 'deactiveren' ) );
@@ -276,6 +290,9 @@ class KZ_Plugin {
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-event-overview.php';
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-motto.php';
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-pagina.php';
+        require_once KZ_PLUGIN_PATH . 'includes/class-kz-berichten-grid.php';
+        require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-groeperingen.php';
+        require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-nieuws.php';
         require_once KZ_PLUGIN_PATH . 'includes/class-kz-evenementen.php';
         require_once KZ_PLUGIN_PATH . 'includes/class-kz-link-in-bio.php';
         require_once KZ_PLUGIN_PATH . 'includes/class-kz-spiegel.php';
@@ -346,6 +363,7 @@ class KZ_Plugin {
 
         wp_register_style( 'kz-evenement-info-style', KZ_PLUGIN_URL . 'assets/css/kz-evenement-info.css', array(), KZ_PLUGIN_VERSION );
         wp_register_style( 'kz-evenementen-overzicht-style', KZ_PLUGIN_URL . 'assets/css/kz-evenementen-overzicht.css', array( 'kz-evenement-info-style' ), KZ_PLUGIN_VERSION );
+        wp_register_style( 'kz-berichten-grid-style', KZ_PLUGIN_URL . 'assets/css/kz-berichten-grid.css', array(), KZ_PLUGIN_VERSION );
         wp_register_style( 'kz-pagina-style', KZ_PLUGIN_URL . 'assets/css/kz-pagina.css', array(), KZ_PLUGIN_VERSION );
         wp_register_style( 'kz-evenement-info-fonts', 'https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&family=Work+Sans:wght@400;500&display=swap', array(), null );
 
