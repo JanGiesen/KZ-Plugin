@@ -52,7 +52,7 @@ class KZ_Element_Groeperingen {
                                 __( 'Geen achtergrond', 'kz-plugin' ) => 'geen',
                             ),
                             'std'         => 'rood',
-                            'description' => __( 'Kleur van de cirkel achter de afbeelding. De afbeelding staat er helemaal in, niets wordt bijgesneden.', 'kz-plugin' ),
+                            'description' => __( 'Kleur van de cirkel; alleen te zien achter een afbeelding met een doorzichtige achtergrond.', 'kz-plugin' ),
                         ),
                         array(
                             'type'        => 'dropdown',
@@ -163,9 +163,9 @@ class KZ_Element_Groeperingen {
                 $naam = get_the_title( $post );
                 $foto = KZ_Berichten_Grid::foto_url( $post, 'medium' );
                 ?>
-                <div class="kz-grid__item kz-groep">
+                <div class="kz-grid__item kz-groepering">
                     <a href="<?php echo esc_url( get_permalink( $post ) ); ?>" title="<?php echo esc_attr( wp_strip_all_tags( $naam ) ); ?>">
-                        <span class="kz-groep__foto">
+                        <span class="kz-groepering__foto">
                             <?php if ( $foto ) : ?>
                                 <img src="<?php echo esc_url( $foto ); ?>" alt="<?php echo esc_attr( KZ_Berichten_Grid::foto_alt( $post ) ); ?>" loading="lazy" decoding="async" />
                             <?php endif; ?>

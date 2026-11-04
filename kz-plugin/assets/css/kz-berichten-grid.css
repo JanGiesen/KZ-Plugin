@@ -56,14 +56,28 @@
     color: var(--kz-tekst);
 }
 
-/* ---------- Groeperingen: ronde afbeeldingen (.kz-groep) ----------
- * De afbeelding staat helemaal in een rode (of witte) cirkel, niets wordt
- * bijgesneden. Optioneel een dunne rand (wit op een rode achtergrond). De
- * naam staat eronder in Work Sans, gewone letters.
+/* ---------- Groeperingen: ronde afbeeldingen ----------
+ * De afbeelding (vierkant, meestal met een eigen rode achtergrond) vult de
+ * cirkel helemaal, optioneel met een dunne rand (wit op een rode achtergrond).
+ * De naam staat eronder in Work Sans, gewone letters.
+ *
+ * Bewust NIET de klasse .kz-groep: die heeft op de site nog eigen Custom CSS
+ * van de oude WPBakery-grid (ronde uitsnede van het hele item), die de naam
+ * afknipt. Daarom ook de resets hieronder tegen CSS van het thema.
  */
 
 .kz-groeperingen {
     row-gap: var(--kz-rij-ruimte, 40px);
+}
+
+.kz-groeperingen .kz-groepering,
+.kz-groeperingen .kz-groepering > a {
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    clip-path: none;
 }
 
 .kz-groeperingen .kz-grid__titel {
@@ -77,36 +91,41 @@
     text-transform: none;
 }
 
-.kz-groep__foto {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.kz-groeperingen .kz-groepering__foto {
+    display: block;
     position: relative;
     width: 100%;
+    height: auto;
     aspect-ratio: 1 / 1;
     box-sizing: border-box;
-    padding: 7%;
+    margin: 0;
+    padding: 0;
     border-radius: 50%;
     overflow: hidden;
     transition: transform 0.3s ease;
 }
 
-.kz-groep__foto img {
+.kz-groeperingen .kz-groepering__foto img {
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
     border-radius: 0;
+    box-shadow: none;
+    object-fit: cover;
 }
 
-.kz-groeperingen--cirkel-rood .kz-groep__foto { background: #e53935; }
-.kz-groeperingen--cirkel-wit .kz-groep__foto  { background: #ffffff; }
+.kz-groeperingen--cirkel-rood .kz-groepering__foto { background: #e53935; }
+.kz-groeperingen--cirkel-wit .kz-groepering__foto  { background: #ffffff; }
 
-.kz-groeperingen--rand-wit .kz-groep__foto  { border: 2px solid #ffffff; }
-.kz-groeperingen--rand-rood .kz-groep__foto { border: 2px solid #e53935; }
+.kz-groeperingen--rand-wit .kz-groepering__foto  { border: 2px solid #ffffff; }
+.kz-groeperingen--rand-rood .kz-groepering__foto { border: 2px solid #e53935; }
 
-.kz-groep > a:hover .kz-groep__foto,
-.kz-groep > a:focus-visible .kz-groep__foto {
+.kz-groepering > a:hover .kz-groepering__foto,
+.kz-groepering > a:focus-visible .kz-groepering__foto {
     transform: scale(1.05);
 }
 
@@ -179,7 +198,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .kz-groep__foto,
+    .kz-groepering__foto,
     .kz-nieuws__foto img {
         transition: none;
     }
