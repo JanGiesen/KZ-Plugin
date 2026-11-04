@@ -67,7 +67,26 @@
  */
 
 .kz-groeperingen {
+    /* Flex in plaats van grid: een niet volle onderste rij staat zo in het
+       midden. --kz-k is het aantal per rij, --kz-g de ruimte ertussen. */
+    --kz-k: var(--kz-kol, 6);
+    --kz-g: var(--kz-ruimte, 15px);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    column-gap: var(--kz-g);
     row-gap: var(--kz-rij-ruimte, 40px);
+}
+
+.kz-groeperingen > .kz-groepering {
+    flex: 0 0 calc((100% - (var(--kz-k) - 1) * var(--kz-g)) / var(--kz-k));
+    max-width: calc((100% - (var(--kz-k) - 1) * var(--kz-g)) / var(--kz-k));
+}
+
+@media (max-width: 1024px) {
+    .kz-groeperingen {
+        --kz-k: var(--kz-kol-tablet, 4);
+    }
 }
 
 .kz-groeperingen .kz-groepering,
@@ -102,7 +121,7 @@
     padding: 0;
     border-radius: 50%;
     overflow: hidden;
-    transition: transform 0.3s ease;
+    transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .kz-groeperingen .kz-groepering__foto img {
@@ -124,13 +143,23 @@
 .kz-groeperingen--rand-wit .kz-groepering__foto  { border: 2px solid #ffffff; }
 .kz-groeperingen--rand-rood .kz-groepering__foto { border: 2px solid #e53935; }
 
+/* Hover: groter en een slag gedraaid, met een klein veer-effect. De naam
+   draait niet mee. */
+.kz-groeperingen .kz-groepering:hover,
+.kz-groeperingen .kz-groepering:focus-within {
+    position: relative;
+    z-index: 2;
+}
+
 .kz-groepering > a:hover .kz-groepering__foto,
 .kz-groepering > a:focus-visible .kz-groepering__foto {
-    transform: scale(1.05);
+    transform: scale(1.15) rotate(-8deg);
 }
 
 @media (max-width: 767px) {
     .kz-groeperingen {
+        --kz-k: var(--kz-kol-mobiel, 3);
+        --kz-g: min(var(--kz-ruimte, 15px), 15px);
         row-gap: min(var(--kz-rij-ruimte, 40px), 24px);
     }
 
