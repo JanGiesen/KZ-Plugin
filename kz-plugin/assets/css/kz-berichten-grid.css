@@ -56,18 +56,36 @@
     color: var(--kz-tekst);
 }
 
-/* ---------- Groeperingen: ronde foto's (.kz-groep) ---------- */
+/* ---------- Groeperingen: ronde afbeeldingen (.kz-groep) ----------
+ * De afbeelding staat helemaal in een rode (of witte) cirkel, niets wordt
+ * bijgesneden. Optioneel een dunne rand (wit op een rode achtergrond). De
+ * naam staat eronder in Work Sans, gewone letters.
+ */
+
+.kz-groeperingen {
+    row-gap: var(--kz-rij-ruimte, 40px);
+}
 
 .kz-groeperingen .kz-grid__titel {
+    margin-top: 14px;
+    font-family: 'Work Sans', sans-serif;
+    font-weight: 400;
+    font-size: 1.1em;
+    letter-spacing: 0.03em;
+    line-height: 1.45;
     text-align: center;
-    text-transform: uppercase;
+    text-transform: none;
 }
 
 .kz-groep__foto {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
     width: 100%;
     aspect-ratio: 1 / 1;
+    box-sizing: border-box;
+    padding: 7%;
     border-radius: 50%;
     overflow: hidden;
     transition: transform 0.3s ease;
@@ -77,22 +95,31 @@
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-}
-
-.kz-groeperingen--cirkel-wit .kz-groep__foto  { background: #ffffff; }
-.kz-groeperingen--cirkel-rood .kz-groep__foto { background: #e53935; }
-
-/* Op een gekleurde cirkel staat de .svg er iets binnen, niet tot de rand. */
-.kz-groeperingen--cirkel-wit .kz-groep__foto img,
-.kz-groeperingen--cirkel-rood .kz-groep__foto img {
     object-fit: contain;
+    border-radius: 0;
 }
+
+.kz-groeperingen--cirkel-rood .kz-groep__foto { background: #e53935; }
+.kz-groeperingen--cirkel-wit .kz-groep__foto  { background: #ffffff; }
+
+.kz-groeperingen--rand-wit .kz-groep__foto  { border: 2px solid #ffffff; }
+.kz-groeperingen--rand-rood .kz-groep__foto { border: 2px solid #e53935; }
 
 .kz-groep > a:hover .kz-groep__foto,
 .kz-groep > a:focus-visible .kz-groep__foto {
-    transform: scale(1.06);
+    transform: scale(1.05);
+}
+
+@media (max-width: 767px) {
+    .kz-groeperingen {
+        row-gap: min(var(--kz-rij-ruimte, 40px), 24px);
+    }
+
+    .kz-groeperingen .kz-grid__titel {
+        margin-top: 8px;
+        font-size: 0.9em;
+        letter-spacing: 0;
+    }
 }
 
 /* ---------- Nieuws ---------- */

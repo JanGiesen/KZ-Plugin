@@ -40,19 +40,37 @@ class KZ_Element_Groeperingen {
                             'description' => __( 'Leeg = alle groeperingen.', 'kz-plugin' ),
                         ),
                         KZ_Berichten_Grid::vc_veld_sortering( 'datum' ),
-                        KZ_Berichten_Grid::vc_veld_ja_nee( 'toon_titel', __( 'Naam tonen', 'kz-plugin' ), 'nee', __( 'De naam onder de ronde foto.', 'kz-plugin' ) ),
+                        KZ_Berichten_Grid::vc_veld_ja_nee( 'toon_titel', __( 'Naam tonen', 'kz-plugin' ), 'ja', __( 'De naam onder de ronde foto.', 'kz-plugin' ) ),
                         KZ_Berichten_Grid::vc_veld_kleur( 'rood' ),
                         array(
                             'type'        => 'dropdown',
                             'heading'     => __( 'Cirkel', 'kz-plugin' ),
                             'param_name'  => 'cirkel',
                             'value'       => array(
-                                __( 'Geen achtergrond', 'kz-plugin' ) => 'geen',
-                                __( 'Wit', 'kz-plugin' )              => 'wit',
                                 __( 'Rood', 'kz-plugin' )             => 'rood',
+                                __( 'Wit', 'kz-plugin' )              => 'wit',
+                                __( 'Geen achtergrond', 'kz-plugin' ) => 'geen',
+                            ),
+                            'std'         => 'rood',
+                            'description' => __( 'Kleur van de cirkel achter de afbeelding. De afbeelding staat er helemaal in, niets wordt bijgesneden.', 'kz-plugin' ),
+                        ),
+                        array(
+                            'type'        => 'dropdown',
+                            'heading'     => __( 'Rand om de cirkel', 'kz-plugin' ),
+                            'param_name'  => 'rand',
+                            'value'       => array(
+                                __( 'Geen', 'kz-plugin' ) => 'geen',
+                                __( 'Wit', 'kz-plugin' )  => 'wit',
+                                __( 'Rood', 'kz-plugin' ) => 'rood',
                             ),
                             'std'         => 'geen',
-                            'description' => __( 'Achtergrond achter de ronde foto (handig bij een .svg met doorzichtige achtergrond).', 'kz-plugin' ),
+                            'description' => __( 'Een dunne rand; wit is bedoeld voor een rode achtergrond.', 'kz-plugin' ),
+                        ),
+                        array(
+                            'type'        => 'textfield',
+                            'heading'     => __( 'Ruimte tussen de rijen (px)', 'kz-plugin' ),
+                            'param_name'  => 'rij_ruimte',
+                            'value'       => '40',
                         ),
                         array(
                             'type'        => 'textfield',
@@ -62,7 +80,7 @@ class KZ_Element_Groeperingen {
                             'description' => __( 'Laat staan, tenzij het post type anders heet.', 'kz-plugin' ),
                         ),
                     ),
-                    KZ_Berichten_Grid::vc_velden_opmaak( 6, 4, 3, 30 )
+                    KZ_Berichten_Grid::vc_velden_opmaak( 6, 4, 3, 15 )
                 ),
             )
         );
@@ -73,14 +91,16 @@ class KZ_Element_Groeperingen {
             array(
                 'aantal'          => '',
                 'sortering'       => 'datum',
-                'toon_titel'      => 'nee',
+                'toon_titel'      => 'ja',
                 'tekstkleur'      => 'rood',
-                'cirkel'          => 'geen',
+                'cirkel'          => 'rood',
+                'rand'            => 'geen',
+                'rij_ruimte'      => '40',
                 'post_type'       => 'groeperingen',
                 'kolommen'        => '6',
                 'kolommen_tablet' => '4',
                 'kolommen_mobiel' => '3',
-                'ruimte'          => '30',
+                'ruimte'          => '15',
                 'el_class'        => '',
                 'css'             => '',
             ),
@@ -114,13 +134,15 @@ class KZ_Element_Groeperingen {
         }
 
         wp_enqueue_style( 'kz-berichten-grid-style' );
+        wp_enqueue_style( 'kz-evenement-info-fonts' ); // Work Sans voor de namen.
 
         $kleur  = 'wit' === $atts['tekstkleur'] ? 'wit' : 'rood';
-        $cirkel = in_array( $atts['cirkel'], array( 'wit', 'rood' ), true ) ? $atts['cirkel'] : 'geen';
+        $cirkel = in_array( $atts['cirkel'], array( 'wit', 'rood', 'geen' ), true ) ? $atts['cirkel'] : 'rood';
+        $rand   = in_array( $atts['rand'], array( 'wit', 'rood' ), true ) ? $atts['rand'] : 'geen';
         $titel  = KZ_Berichten_Grid::ja( $atts['toon_titel'] );
 
         $klassen = KZ_Berichten_Grid::wrapper_klassen(
-            array( 'kz-grid', 'kz-groeperingen', 'kz-grid--' . $kleur, 'kz-groeperingen--cirkel-' . $cirkel ),
+            array( 'kz-grid', 'kz-groeperingen', 'kz-grid--' . $kleur, 'kz-groeperingen--cirkel-' . $cirkel, 'kz-groeperingen--rand-' . $rand ),
             $atts['el_class'],
             $atts['css']
         );
@@ -130,6 +152,8 @@ class KZ_Element_Groeperingen {
             KZ_Berichten_Grid::kolommen( $atts['kolommen_mobiel'], 3 ),
             min( 100, absint( $atts['ruimte'] ) )
         );
+
+        $stijl .= sprintf( '--kz-rij-ruimte:%dpx;', min( 200, absint( $atts['rij_ruimte'] ) ) );
 
         ob_start();
         ?>
