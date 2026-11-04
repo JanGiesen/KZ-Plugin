@@ -87,12 +87,12 @@ class KZ_Admin {
         'groeperingen'     => array(
             'label'     => 'KZ-Groeperingen',
             'shortcode' => 'kz_groeperingen',
-            'params'    => 'aantal, sortering, toon_titel, tekstkleur, cirkel, post_type, kolommen, kolommen_tablet, kolommen_mobiel, ruimte, el_class',
+            'params'    => 'aantal, sortering, toon_titel, tekstkleur, cirkel, rand, rij_ruimte, post_type, kolommen, kolommen_tablet, kolommen_mobiel, ruimte, el_class',
         ),
         'nieuws'           => array(
             'label'     => 'KZ-Nieuws',
             'shortcode' => 'kz_nieuws',
-            'params'    => 'per_pagina, paginering, max_aantal, categorie, sortering, verhouding, toon_datum, toon_titel, toon_samenvatting, woorden, tekstkleur, leeg_tekst, post_type, kolommen, kolommen_tablet, kolommen_mobiel, ruimte, el_class',
+            'params'    => 'per_pagina, paginering, max_aantal, categorie, sortering, verhouding, toon_datum, toon_titel, toon_samenvatting, woorden, tekstkleur, paginering_kleur, leeg_tekst, post_type, kolommen, kolommen_tablet, kolommen_mobiel, ruimte, el_class',
         ),
     );
 

@@ -85,6 +85,20 @@ class KZ_Element_Nieuws {
                         ),
                         KZ_Berichten_Grid::vc_veld_kleur( 'rood' ),
                         array(
+                            'type'        => 'dropdown',
+                            'heading'     => __( 'Kleur paginering', 'kz-plugin' ),
+                            'param_name'  => 'paginering_kleur',
+                            'value'       => array(
+                                __( 'Rood (voor een witte achtergrond)', 'kz-plugin' ) => 'rood',
+                                __( 'Wit (voor een rode achtergrond)', 'kz-plugin' )   => 'wit',
+                            ),
+                            'std'         => 'rood',
+                            'dependency'  => array(
+                                'element' => 'paginering',
+                                'value'   => array( 'ja' ),
+                            ),
+                        ),
+                        array(
                             'type'        => 'textfield',
                             'heading'     => __( 'Tekst als er geen berichten zijn', 'kz-plugin' ),
                             'param_name'  => 'leeg_tekst',
@@ -119,6 +133,7 @@ class KZ_Element_Nieuws {
                 'toon_samenvatting' => 'nee',
                 'woorden'           => '20',
                 'tekstkleur'        => 'rood',
+                'paginering_kleur'  => 'rood',
                 'leeg_tekst'        => '',
                 'post_type'         => 'post',
                 'kolommen'          => '3',
@@ -241,7 +256,7 @@ class KZ_Element_Nieuws {
             </div>
             <?php
             if ( $paginering ) {
-                echo KZ_Berichten_Grid::paginering( $pagina, $totaal_paginas, KZ_Berichten_Grid::basis_url(), $kleur ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- alles is al ge-escaped.
+                echo KZ_Berichten_Grid::paginering( $pagina, $totaal_paginas, KZ_Berichten_Grid::basis_url(), 'wit' === $atts['paginering_kleur'] ? 'wit' : 'rood' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- alles is al ge-escaped.
             }
             ?>
         </div>
