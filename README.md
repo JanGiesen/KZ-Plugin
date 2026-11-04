@@ -86,7 +86,7 @@ Waarom: een WPBakery Post Grid tekent een lege container en haalt de items pas i
 - Paginering van KZ-Nieuws gaat via de server: `/nieuws/?pagina=2` (ook `/nieuws/page/2/` wordt gelezen). Pagina 1 is de kale permalink.
 - Kolommen per scherm: `kolommen` (computer), `kolommen_tablet` (tot 1024px), `kolommen_mobiel` (tot 767px). Groeperingen standaard 6/4/3, nieuws 3/2/1. Daarmee is de Custom CSS (4 en 3 per rij) die in WPBakery op de oude grids stond overbodig.
 - Omdat de items nu in de gecachete HTML staan, krijgt elke pagina met zo'n grid een LiteSpeed-cachetag (`KZ_GRID_post`, `KZ_GRID_groeperingen`). Opslaan, publiceren of verwijderen van een bericht van dat type leegt die tag (`litespeed_purge`), dus een nieuw bericht staat meteen op /nieuws/. Zonder LiteSpeed doet dat niets.
-- KZ-Groeperingen (sinds 8.30.1): de afbeelding staat helemaal in een cirkel (`cirkel`: rood, wit of geen), met optioneel een dunne rand (`rand`: wit voor een rode achtergrond, of rood), de naam eronder in Work Sans (`toon_titel`) en `rij_ruimte` tussen de rijen.
+- KZ-Groeperingen (sinds 8.30.1): de afbeelding vult een cirkel (`cirkel`: rood, wit of geen, alleen te zien bij een doorzichtige afbeelding), met optioneel een dunne rand (`rand`: wit voor een rode achtergrond, of rood), de naam eronder in Work Sans (`toon_titel`) en `rij_ruimte` tussen de rijen. Sinds 8.30.2 heet de klasse per item `kz-groepering`, niet `kz-groep`: aan die laatste hangt op de site nog Custom CSS van de oude grid.
 - KZ-Nieuws: `paginering_kleur` rood (witte achtergrond) of wit (rode achtergrond).
 - Code: `includes/class-kz-berichten-grid.php` (gedeeld), `includes/elements/class-kz-groeperingen.php`, `includes/elements/class-kz-nieuws.php`, `assets/css/kz-berichten-grid.css`.
 

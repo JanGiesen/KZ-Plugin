@@ -3,7 +3,7 @@
  * Plugin Name: KZ Plugin
  * Plugin URI: https://github.com/JanGiesen/KZ-Plugin
  * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, evenement info, evenementen overzicht, motto, pagina, groeperingen, nieuws).
- * Version: 8.30.1
+ * Version: 8.30.2
  * Author: Kraonige Zwaone
  * Text Domain: kz-plugin
  * Update URI: https://github.com/JanGiesen/KZ-Plugin
@@ -203,13 +203,19 @@
  * (parameter rand), met de naam eronder in Work Sans (standaard aan) en meer
  * ruimte tussen de rijen (rij_ruimte). KZ-Nieuws krijgt paginering_kleur
  * (rood of wit), zodat de paginering op een rode achtergrond te zien is.
+ *
+ * 8.30.2: KZ-Groeperingen gebruikt niet meer de klasse kz-groep: daar hing op
+ * de site nog Custom CSS van de oude grid aan, die het hele item rond afknipte
+ * (ook de naam). Nu kz-groepering, met resets tegen CSS van het thema. De
+ * afbeelding vult de cirkel weer helemaal (de afbeeldingen zijn vierkant met
+ * een eigen rode achtergrond).
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Directe toegang niet toegestaan.
 }
 
-define( 'KZ_PLUGIN_VERSION', '8.30.1' );
+define( 'KZ_PLUGIN_VERSION', '8.30.2' );
 define( 'KZ_PLUGIN_FILE', __FILE__ );
 define( 'KZ_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KZ_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
