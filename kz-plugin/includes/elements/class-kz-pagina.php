@@ -330,7 +330,7 @@ class KZ_Element_Pagina {
                     . '</div></div></section>';
 
             case 'intro':
-                $beeld = self::veilige_foto( $i['afbeelding'] );
+                $beeld = self::beeld_voor_kleur( $i['afbeelding'], $i['afbeeldingWit'], $opmaak['achtergrond'] );
                 $logo  = 'kzp__logo';
                 if ( '' === $beeld ) {
                     $logo .= ' kzp__logo--standaard';
@@ -410,7 +410,7 @@ class KZ_Element_Pagina {
                         . $afstand
                         . '</div></li>';
                 }
-                $kaart = self::veilige_foto( $i['kaart'] );
+                $kaart = self::beeld_voor_kleur( $i['kaart'], $i['kaartWit'], $opmaak['achtergrond'] );
                 return '<section class="' . esc_attr( $band . ' kzp__route ' . $kant ) . '"><div class="kzp__binnen' . ( '' !== $kaart ? ' kzp__raster kzp__raster--6-6' : '' ) . '">'
                     . '<div class="kzp__tekstkolom">'
                     . self::titel( $i['titel'] )
@@ -478,7 +478,7 @@ class KZ_Element_Pagina {
                 // De Intro van een andere pagina (ingevuld door website_pagina_ophalen()),
                 // met de datum erboven en een knop naar die pagina.
                 $intro = $i['intro'];
-                $beeld = self::veilige_foto( $intro['afbeelding'] );
+                $beeld = self::beeld_voor_kleur( $intro['afbeelding'], $intro['afbeeldingWit'], $opmaak['achtergrond'] );
                 $logo  = 'kzp__logo';
                 if ( '' === $beeld ) {
                     $logo .= ' kzp__logo--standaard';
@@ -1070,6 +1070,22 @@ class KZ_Element_Pagina {
         return KZ_Link_In_Bio::veilige_foto( $url );
     }
 
+    /**
+     * Welke van twee versies van een afbeelding op deze band komt (Intro:
+     * afbeelding/afbeeldingWit, Route: kaart/kaartWit): de eerste op een rode
+     * band, de tweede op een witte. Is de passende leeg, dan de andere; zijn
+     * ze allebei leeg, dan ''. Gelijk aan beeldVoorKleur() in KZ-Studio
+     * (src/lib/paginaSjablonen.ts).
+     */
+    public static function beeld_voor_kleur( $rood, $wit, $achtergrond ) {
+        $r = self::veilige_foto( $rood );
+        $w = self::veilige_foto( $wit );
+        if ( 'wit' === $achtergrond ) {
+            return '' !== $w ? $w : $r;
+        }
+        return '' !== $r ? $r : $w;
+    }
+
     // ------------------------------------------------------------------
     // Ophalen
     // ------------------------------------------------------------------
@@ -1209,12 +1225,13 @@ class KZ_Element_Pagina {
 
             case 'intro':
                 return array(
-                    'titel'      => self::tekst( $r, 'titel', $l['titel'] ),
-                    'intro'      => self::tekst( $r, 'intro', $l['intro'] ),
-                    'tekst'      => self::tekst( $r, 'tekst', $l['tekst'] ),
-                    'afbeelding' => self::tekst( $r, 'afbeelding', $l['url'] ),
-                    'knop'       => self::schoon_knop( $r ),
-                    'kleur'      => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
+                    'titel'         => self::tekst( $r, 'titel', $l['titel'] ),
+                    'intro'         => self::tekst( $r, 'intro', $l['intro'] ),
+                    'tekst'         => self::tekst( $r, 'tekst', $l['tekst'] ),
+                    'afbeelding'    => self::tekst( $r, 'afbeelding', $l['url'] ),
+                    'afbeeldingWit' => self::tekst( $r, 'afbeeldingWit', $l['url'] ),
+                    'knop'          => self::schoon_knop( $r ),
+                    'kleur'         => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
                 );
 
             case 'dag':
@@ -1282,6 +1299,7 @@ class KZ_Element_Pagina {
                     'titel'    => self::tekst( $r, 'titel', $l['titel'] ),
                     'stappen'  => $stappen,
                     'kaart'    => self::tekst( $r, 'kaart', $l['url'] ),
+                    'kaartWit' => self::tekst( $r, 'kaartWit', $l['url'] ),
                     'knop'     => self::schoon_knop( $r ),
                     'kleur'    => self::keuze( $r, 'kleur', array( 'auto', 'rood', 'wit' ), 'auto' ),
                     'fotokant' => self::keuze( $r, 'fotokant', array( 'auto', 'links', 'rechts' ), 'auto' ),
