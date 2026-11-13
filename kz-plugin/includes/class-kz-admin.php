@@ -62,7 +62,7 @@ class KZ_Admin {
         'recent_albums'    => array(
             'label'     => 'KZ-Recente Albums',
             'shortcode' => 'kz_recente_albums',
-            'params'    => 'aantal, columns, sortering (galerij, aangemaakt), uitsluiten, show_title, text_color',
+            'params'    => 'aantal, columns, sortering (galerij, aangemaakt, naam_af, naam_op), uitsluiten, show_title, text_color, titel_grootte',
         ),
         'recent_products'  => array(
             'label'     => 'KZ-Winkel Producten',

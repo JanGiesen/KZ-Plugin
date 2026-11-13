@@ -49,10 +49,11 @@ Iconen, de URL-regel (`https://`, `http://`, `mailto:`, `tel:` — nooit `javasc
 Sinds 8.32.0 is er naast **KZ-Recente Galerijen** (`[kz_recente_galerijen]`) het element **KZ-Recente Albums** (`[kz_recente_albums aantal="5" columns="5"]`): de meest recente NextGEN Gallery-albums, in precies hetzelfde ontwerp (zelfde CSS, `assets/css/kz-recente-galerijen.css`).
 
 - `ngg_album` heeft geen datum. Met `sortering="galerij"` (standaard) komt het album met de nieuwste galerij bovenaan (`date_created` van `ngg_gallery`, ook via sub-albums); lege albums vallen dan weg. Met `sortering="aangemaakt"` telt het laatst aangemaakte album (hoogste id).
+- Sinds 8.33.0 ook op naam: `sortering="naam_af"` (Z-A, dus 2026-2027 bovenaan) of `naam_op` (A-Z). Natuurlijke sortering, dus getallen in de juiste volgorde.
 - `uitsluiten`: komma-gescheiden slugs of id's van albums die nooit getoond worden, bijvoorbeeld een hoofdalbum waar alle jaren in zitten.
 - Voorbeeldafbeelding: de ingestelde voorbeeldfoto van het album, anders die van de nieuwste galerij erin.
-- Link: de gekoppelde WordPress-pagina van het album (`pageid`) als die gepubliceerd is, anders `/fotos/{album-slug}/`.
-- Verder `show_title` en `text_color` (wit of rood), net als bij de galerijen. Code: `includes/elements/class-kz-recent-albums.php`.
+- Link: `/fotos/{albumnaam}/`, bijv. `/fotos/2023-2024/` (de naam via `sanitize_title()`). In 8.32.0 ging hij eerst via de gekoppelde pagina (`pageid`) en de slug, maar die klopten niet altijd.
+- Verder `show_title` en `text_color` (wit of rood), net als bij de galerijen, en `titel_grootte` (px, standaard 32; schaalt op smal terug tot 16px). Code: `includes/elements/class-kz-recent-albums.php`.
 
 ## KZ-Motto
 

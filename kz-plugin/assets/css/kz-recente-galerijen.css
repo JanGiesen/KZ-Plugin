@@ -75,6 +75,13 @@
     color: #e53935;
 }
 
+/* KZ-Recente Albums: grotere naam (bijv. "2026-2027"), schaalt terug op smal. */
+.kz-recente-albums .kz-recente-galerij-titel {
+    font-size: clamp(16px, 5vw, var(--kz-titel-grootte, 32px));
+    line-height: 1.1;
+    margin-top: 12px;
+}
+
 @media (max-width: 768px) {
     .kz-recente-galerijen {
         grid-template-columns: repeat(3, 1fr) !important;

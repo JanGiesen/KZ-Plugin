@@ -3,7 +3,7 @@
  * Plugin Name: KZ Plugin
  * Plugin URI: https://github.com/JanGiesen/KZ-Plugin
  * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, recente galerijen, recente albums, evenement info, evenementen overzicht, motto, pagina, groeperingen, nieuws).
- * Version: 8.32.0
+ * Version: 8.33.0
  * Author: Kraonige Zwaone
  * Text Domain: kz-plugin
  * Update URI: https://github.com/JanGiesen/KZ-Plugin
@@ -225,13 +225,18 @@
  * Galerijen. Standaard gesorteerd op de nieuwste galerij in het album (ook via
  * sub-albums), of op het laatst aangemaakte album; albums overslaan kan met
  * uitsluiten. Link: de gekoppelde pagina van het album, anders /fotos/{slug}/.
+ *
+ * 8.33.0: KZ-Recente Albums — sorteren op naam (naam_af, naam_op), grotere
+ * albumnaam (titel_grootte, standaard 32px, schaalt terug op smal), en de link
+ * is nu altijd /fotos/{albumnaam}/ (bijv. /fotos/2023-2024/) in plaats van de
+ * gekoppelde pagina of de slug, die niet altijd klopten.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Directe toegang niet toegestaan.
 }
 
-define( 'KZ_PLUGIN_VERSION', '8.32.0' );
+define( 'KZ_PLUGIN_VERSION', '8.33.0' );
 define( 'KZ_PLUGIN_FILE', __FILE__ );
 define( 'KZ_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KZ_PLUGIN_URL', plugin_dir_url( __FILE__ ) );

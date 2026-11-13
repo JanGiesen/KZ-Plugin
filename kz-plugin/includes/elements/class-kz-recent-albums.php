@@ -7,7 +7,8 @@
  * ngg_album heeft geen datumkolom. "Meest recent" is daarom standaard het
  * album met de nieuwste galerij erin (date_created van ngg_gallery, ook via
  * sub-albums); met sortering="aangemaakt" is het het laatst aangemaakte
- * album (hoogste id).
+ * album (hoogste id). Met naam_af / naam_op wordt op albumnaam gesorteerd
+ * (natuurlijk, dus 2026-2027 vóór 2025-2026 bij naam_af).
  *
  * De sortorder-kolom van ngg_album is base64-gecodeerde JSON: een lijst van
  * galerij-id's ("12") en sub-album-id's met een a ervoor ("a3").
@@ -64,9 +65,11 @@ class KZ_Element_Recent_Albums {
                         'value'       => array(
                             'Nieuwste galerij in het album' => 'galerij',
                             'Laatst aangemaakte album'      => 'aangemaakt',
+                            'Naam (Z-A, nieuwste jaar eerst)' => 'naam_af',
+                            'Naam (A-Z)'                    => 'naam_op',
                         ),
                         'std'         => 'galerij',
-                        'description' => __( 'Wat telt als "recent": het album met de nieuwste galerij, of het album dat het laatst is aangemaakt.', 'kz-plugin' ),
+                        'description' => __( 'Het album met de nieuwste galerij, het laatst aangemaakte album, of op naam.', 'kz-plugin' ),
                     ),
                     array(
                         'type'        => 'textfield',
@@ -97,6 +100,13 @@ class KZ_Element_Recent_Albums {
                         'std'         => 'wit',
                         'description' => __( 'Kleur van de albumtitel onder de voorbeeldafbeelding.', 'kz-plugin' ),
                     ),
+                    array(
+                        'type'        => 'textfield',
+                        'heading'     => __( 'Titelgrootte (px)', 'kz-plugin' ),
+                        'param_name'  => 'titel_grootte',
+                        'value'       => '32',
+                        'description' => __( 'Lettergrootte van de albumnaam op de computer. Op kleinere schermen schaalt hij mee terug.', 'kz-plugin' ),
+                    ),
                 ),
             )
         );
@@ -112,7 +122,8 @@ class KZ_Element_Recent_Albums {
                 'sortering'  => 'galerij',
                 'uitsluiten' => '',
                 'show_title' => 'true',
-                'text_color' => 'wit',
+                'text_color'    => 'wit',
+                'titel_grootte' => '32',
             ),
             $atts,
             self::SHORTCODE
@@ -128,7 +139,8 @@ class KZ_Element_Recent_Albums {
 
         $aantal     = max( 1, absint( $atts['aantal'] ) );
         $columns    = max( 1, absint( $atts['columns'] ) );
-        $sortering  = 'aangemaakt' === $atts['sortering'] ? 'aangemaakt' : 'galerij';
+        $sortering  = in_array( $atts['sortering'], array( 'aangemaakt', 'naam_af', 'naam_op' ), true ) ? $atts['sortering'] : 'galerij';
+        $grootte    = min( 120, max( 10, absint( $atts['titel_grootte'] ) ) );
         $show_title = 'true' === $atts['show_title'];
         $text_color = 'rood' === $atts['text_color'] ? 'rood' : 'wit';
         $uitsluiten = array_filter( array_map( 'trim', explode( ',', strtolower( (string) $atts['uitsluiten'] ) ) ), 'strlen' );
@@ -199,8 +211,8 @@ class KZ_Element_Recent_Albums {
                 }
             }
 
-            // Lege albums tellen niet mee bij "nieuwste galerij".
-            if ( 'galerij' === $sortering && ! $album->latest_gallery ) {
+            // Lege albums tonen we niet, behalve bij "laatst aangemaakt".
+            if ( 'aangemaakt' !== $sortering && ! $album->latest_gallery ) {
                 continue;
             }
 
@@ -210,6 +222,12 @@ class KZ_Element_Recent_Albums {
         usort(
             $lijst,
             function ( $a, $b ) use ( $sortering ) {
+                if ( 'naam_af' === $sortering || 'naam_op' === $sortering ) {
+                    $cmp = strnatcasecmp( (string) $a->name, (string) $b->name );
+                    if ( 0 !== $cmp ) {
+                        return 'naam_af' === $sortering ? -$cmp : $cmp;
+                    }
+                }
                 if ( 'galerij' === $sortering ) {
                     $cmp = strcmp( $b->latest_gallery->date_created, $a->latest_gallery->date_created );
                     if ( 0 !== $cmp ) {
@@ -229,7 +247,7 @@ class KZ_Element_Recent_Albums {
 
         ob_start();
         ?>
-        <div class="kz-recente-galerijen kz-recente-albums kz-recente-galerijen--<?php echo esc_attr( $text_color ); ?>" style="--kz-columns: <?php echo esc_attr( $columns ); ?>;">
+        <div class="kz-recente-galerijen kz-recente-albums kz-recente-galerijen--<?php echo esc_attr( $text_color ); ?>" style="--kz-columns: <?php echo esc_attr( $columns ); ?>; --kz-titel-grootte: <?php echo esc_attr( $grootte ); ?>px;">
             <?php foreach ( $lijst as $album ) : ?>
                 <?php
                 $titel     = KZ_Element_Recent_Galleries::strip_leading_date( $album->name );
@@ -279,23 +297,18 @@ class KZ_Element_Recent_Albums {
     }
 
     /**
-     * Link naar het album: de gekoppelde WordPress-pagina (pageid) als die
-     * gepubliceerd is, anders /fotos/{album-slug}/ — hetzelfde begin als de
-     * galerijlinks van KZ-Recente Galerijen (/fotos/{album}/ngggaleries/...).
+     * Link naar het album: /fotos/{albumnaam}/, bijv. /fotos/2023-2024/.
+     * Gebaseerd op de naam (via sanitize_title), niet op de slug of de
+     * gekoppelde pagina (pageid): die wezen in 8.32.0 niet altijd naar de
+     * juiste pagina. Zonder bruikbare naam valt hij terug op de slug.
      */
     private static function get_album_link( $album ) {
-        if ( ! empty( $album->pageid ) && 'publish' === get_post_status( $album->pageid ) ) {
-            $link = get_permalink( $album->pageid );
-            if ( $link ) {
-                return $link;
-            }
+        $deel = sanitize_title( (string) $album->name );
+        if ( '' === $deel ) {
+            $deel = sanitize_title( (string) $album->slug );
         }
 
-        if ( ! empty( $album->slug ) ) {
-            return home_url( '/fotos/' . $album->slug . '/' );
-        }
-
-        return '';
+        return '' !== $deel ? home_url( '/fotos/' . $deel . '/' ) : '';
     }
 
     /**
