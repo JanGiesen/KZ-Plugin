@@ -6,7 +6,7 @@ Deze repo bevat één plugin:
 
 | Map | Plugin | Doel |
 |---|---|---|
-| `kz-plugin/` | **KZ Plugin** | WPBakery-elementen: post carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, recente galerijen, winkel producten, evenement info, evenementen overzicht, motto, groeperingen, nieuws (+ post type `kz_evenement` voor KZ-Studio), en de Link-In-Bio-pagina op link.kraonigezwaone.nl |
+| `kz-plugin/` | **KZ Plugin** | WPBakery-elementen: post carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, recente galerijen, recente albums, winkel producten, evenement info, evenementen overzicht, motto, groeperingen, nieuws (+ post type `kz_evenement` voor KZ-Studio), en de Link-In-Bio-pagina op link.kraonigezwaone.nl |
 
 KZ Plugin is de samenvoeging/opvolger van eerder losse plugins (KZ-Kraonige Zwaone Plugin 7.1, KZ Vindt, KZH Ticket Element). Alle shortcode-namen en parameters zijn ongewijzigd overgenomen zodat bestaande content op de site blijft werken. Bij activatie deactiveert hij automatisch de oude losse plugins (met een melding in het dashboard) om dubbele shortcode-registratie te voorkomen.
 
@@ -43,6 +43,16 @@ De pagina is losse HTML (`includes/class-kz-link-in-bio.php` + `assets/css/kz-li
 4. Een pagina-cacheplugin moet het subdomein als eigen host behandelen (de meeste doen dat vanzelf). De pagina stuurt zelf `Cache-Control: max-age=60`.
 
 Iconen, de URL-regel (`https://`, `http://`, `mailto:`, `tel:` — nooit `javascript:`) en de CSS staan ook in KZ-Studio, voor het voorbeeld in het beheerscherm (`src/lib/linkInBio.ts`, `src/pages/website/linkInBio.css`). Houd die gelijk.
+
+## KZ-Recente Albums
+
+Sinds 8.32.0 is er naast **KZ-Recente Galerijen** (`[kz_recente_galerijen]`) het element **KZ-Recente Albums** (`[kz_recente_albums aantal="5" columns="5"]`): de meest recente NextGEN Gallery-albums, in precies hetzelfde ontwerp (zelfde CSS, `assets/css/kz-recente-galerijen.css`).
+
+- `ngg_album` heeft geen datum. Met `sortering="galerij"` (standaard) komt het album met de nieuwste galerij bovenaan (`date_created` van `ngg_gallery`, ook via sub-albums); lege albums vallen dan weg. Met `sortering="aangemaakt"` telt het laatst aangemaakte album (hoogste id).
+- `uitsluiten`: komma-gescheiden slugs of id's van albums die nooit getoond worden, bijvoorbeeld een hoofdalbum waar alle jaren in zitten.
+- Voorbeeldafbeelding: de ingestelde voorbeeldfoto van het album, anders die van de nieuwste galerij erin.
+- Link: de gekoppelde WordPress-pagina van het album (`pageid`) als die gepubliceerd is, anders `/fotos/{album-slug}/`.
+- Verder `show_title` en `text_color` (wit of rood), net als bij de galerijen. Code: `includes/elements/class-kz-recent-albums.php`.
 
 ## KZ-Motto
 
