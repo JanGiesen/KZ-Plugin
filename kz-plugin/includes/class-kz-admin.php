@@ -57,7 +57,12 @@ class KZ_Admin {
         'recent_galleries' => array(
             'label'     => 'KZ-Recente Galerijen',
             'shortcode' => 'kz_recente_galerijen',
-            'params'    => 'aantal, columns, show_title',
+            'params'    => 'aantal, columns, show_title, text_color',
+        ),
+        'recent_albums'    => array(
+            'label'     => 'KZ-Recente Albums',
+            'shortcode' => 'kz_recente_albums',
+            'params'    => 'aantal, columns, sortering (galerij, aangemaakt), uitsluiten, show_title, text_color',
         ),
         'recent_products'  => array(
             'label'     => 'KZ-Winkel Producten',

@@ -2,8 +2,8 @@
 /**
  * Plugin Name: KZ Plugin
  * Plugin URI: https://github.com/JanGiesen/KZ-Plugin
- * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, evenement info, evenementen overzicht, motto, pagina, groeperingen, nieuws).
- * Version: 8.31.0
+ * Description: WPBakery-elementen voor de Kraonige Zwaone website (carrousel, knop, event blok, header link, hover afbeelding, tab widget, KZ Vindt grid, ticket, recente galerijen, recente albums, evenement info, evenementen overzicht, motto, pagina, groeperingen, nieuws).
+ * Version: 8.32.0
  * Author: Kraonige Zwaone
  * Text Domain: kz-plugin
  * Update URI: https://github.com/JanGiesen/KZ-Plugin
@@ -219,13 +219,19 @@
  * witte, ook als de kleur op "auto" om en om wisselt. Is er maar één, dan
  * komt die op elke kleur. Datum + Sync volgt de Intro waar hij uit komt.
  * Zie beeld_voor_kleur(); gelijk aan beeldVoorKleur() in KZ-Studio (2.23.0).
+ *
+ * 8.32.0: nieuw element KZ-Recente Albums (shortcode kz_recente_albums) — de
+ * meest recente NextGEN Gallery-albums, in hetzelfde ontwerp als KZ-Recente
+ * Galerijen. Standaard gesorteerd op de nieuwste galerij in het album (ook via
+ * sub-albums), of op het laatst aangemaakte album; albums overslaan kan met
+ * uitsluiten. Link: de gekoppelde pagina van het album, anders /fotos/{slug}/.
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Directe toegang niet toegestaan.
 }
 
-define( 'KZ_PLUGIN_VERSION', '8.31.0' );
+define( 'KZ_PLUGIN_VERSION', '8.32.0' );
 define( 'KZ_PLUGIN_FILE', __FILE__ );
 define( 'KZ_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'KZ_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -247,6 +253,7 @@ class KZ_Plugin {
         'vindt_grid'      => 'KZ_Element_Vindt_Grid',
         'ticket'          => 'KZ_Element_Ticket',
         'recent_galleries' => 'KZ_Element_Recent_Galleries',
+        'recent_albums'    => 'KZ_Element_Recent_Albums',
         'recent_products'  => 'KZ_Element_Recent_Products',
         'event_info'       => 'KZ_Element_Event_Info',
         'event_overview'   => 'KZ_Element_Event_Overview',
@@ -307,6 +314,7 @@ class KZ_Plugin {
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-vindt-grid.php';
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-ticket.php';
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-recent-galleries.php';
+        require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-recent-albums.php';
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-recent-products.php';
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-event-info.php';
         require_once KZ_PLUGIN_PATH . 'includes/elements/class-kz-event-overview.php';

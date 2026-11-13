@@ -173,7 +173,7 @@ class KZ_Element_Recent_Galleries {
      * galerij. Gaat via de gekoppelde WP-attachment (post_id); alleen als die
      * ontbreekt valt het terug op het klassieke NextGEN-bestandspad.
      */
-    private static function get_gallery_thumb_url( $gallery, $ngg_pictures_table, $wpdb ) {
+    public static function get_gallery_thumb_url( $gallery, $ngg_pictures_table, $wpdb ) {
         $picture = null;
 
         if ( ! empty( $gallery->previewpic ) ) {
@@ -263,7 +263,7 @@ class KZ_Element_Recent_Galleries {
      * Verbergt de interne YYYY-MM-DD-datumprefix uit galerijnamen
      * (afspraak: elke galerij heet "YYYY-MM-DD Omschrijving").
      */
-    private static function strip_leading_date( $titel ) {
+    public static function strip_leading_date( $titel ) {
         return preg_replace( '/^\d{4}-\d{2}-\d{2}\s+/', '', $titel );
     }
 }
