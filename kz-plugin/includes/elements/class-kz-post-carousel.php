@@ -124,19 +124,19 @@ class KZ_Element_Post_Carousel {
         $output .= '</div>';
         $output .= '</div>';
         $output .= '<div class="swiper-button-prev mobile-hidden">'
-            . '<svg viewBox="0 0 24 24"><polyline points="15 5 8 12 15 19" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+            . '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><polyline points="15 5 8 12 15 19" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
             . '</div>';
         $output .= '<div class="swiper-button-next mobile-hidden">'
-            . '<svg viewBox="0 0 24 24"><polyline points="9 5 16 12 9 19" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+            . '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><polyline points="9 5 16 12 9 19" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
             . '</div>';
         $output .= '</div>';
 
         $output .= '<div class="mobile-navigation">';
-        $output .= '<div class="swiper-button-prev mobile-only">'
-            . '<svg viewBox="0 0 24 24"><polyline points="15 5 8 12 15 19" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        $output .= '<div class="swiper-button-prev mobile-only" role="button" tabindex="0" aria-label="' . esc_attr__( 'Vorige', 'kz-plugin' ) . '">'
+            . '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><polyline points="15 5 8 12 15 19" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
             . '</div>';
-        $output .= '<div class="swiper-button-next mobile-only">'
-            . '<svg viewBox="0 0 24 24"><polyline points="9 5 16 12 9 19" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+        $output .= '<div class="swiper-button-next mobile-only" role="button" tabindex="0" aria-label="' . esc_attr__( 'Volgende', 'kz-plugin' ) . '">'
+            . '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><polyline points="9 5 16 12 9 19" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>'
             . '</div>';
         $output .= '</div>';
 

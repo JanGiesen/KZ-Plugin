@@ -192,9 +192,16 @@ class KZ_Plugin_Updater {
         // moet dus altijd gezet worden, ongeacht of de repo privé is.
         $token = get_option( 'kz_github_token' );
 
+        // Alleen voor precies dit pakket. Zonder die controle kreeg bij "alles
+        // bijwerken" elke volgende download in hetzelfde verzoek (wordpress.org,
+        // andere plugins) het GitHub-token mee.
+        $pakket = (string) $package;
         add_filter(
             'http_request_args',
-            function ( $args ) use ( $token ) {
+            function ( $args, $url ) use ( $token, $pakket ) {
+                if ( (string) $url !== $pakket ) {
+                    return $args;
+                }
                 $args['headers']['Accept'] = 'application/octet-stream';
                 if ( ! empty( $token ) ) {
                     $args['headers']['Authorization'] = 'Bearer ' . $token;
@@ -202,7 +209,7 @@ class KZ_Plugin_Updater {
                 return $args;
             },
             10,
-            1
+            2
         );
 
         return $reply;

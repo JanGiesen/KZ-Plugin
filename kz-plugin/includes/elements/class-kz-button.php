@@ -125,7 +125,12 @@ class KZ_Element_Button {
         $text_html    = esc_html( $text );
 
         $output  = '<div class="kz-button-wrapper" style="' . $wrapper_styles . '">';
-        $output .= '<a class="' . esc_attr( $button_class ) . '" href="' . $link['href'] . '"' . $link['target'] . $link['rel'] . $link['title'] . '>' . $text_html . '</a>';
+        if ( '' === $link['href'] ) {
+            // Geen link: dan ook geen <a href=""> die naar dezelfde pagina wijst.
+            $output .= '<span class="' . esc_attr( $button_class ) . '">' . $text_html . '</span>';
+        } else {
+            $output .= '<a class="' . esc_attr( $button_class ) . '" href="' . $link['href'] . '"' . $link['target'] . $link['rel'] . $link['title'] . '>' . $text_html . '</a>';
+        }
         $output .= '</div>';
 
         return $output;

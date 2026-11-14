@@ -273,6 +273,9 @@ class KZ_Element_Event_Info {
     public static function render( $atts, $content = '' ) {
         // Automatisch: de inhoud komt uit KZ-Studio, de opmaak van dit blok blijft.
         if ( is_array( $atts ) && isset( $atts['bron'] ) && 'automatisch' === $atts['bron'] ) {
+            if ( class_exists( 'KZ_Evenementen' ) ) {
+                KZ_Evenementen::cache_tot_middernacht();
+            }
             $post = class_exists( 'KZ_Evenementen' ) ? KZ_Evenementen::kies_automatisch( isset( $atts['categorie'] ) ? trim( $atts['categorie'] ) : '' ) : null;
             if ( ! $post ) {
                 return '';

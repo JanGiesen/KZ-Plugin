@@ -153,8 +153,12 @@ class KZ_Admin {
         }
         update_option( 'kz_plugin_disabled_elements', $disabled );
 
-        if ( isset( $_POST['kz_github_token'] ) ) {
-            update_option( 'kz_github_token', sanitize_text_field( wp_unslash( $_POST['kz_github_token'] ) ) );
+        // Het token staat niet meer leesbaar in het formulier: leeg laten = niets
+        // wijzigen, het vinkje "wissen" haalt het weg.
+        if ( ! empty( $_POST['kz_github_token_wissen'] ) ) {
+            delete_option( 'kz_github_token' );
+        } elseif ( isset( $_POST['kz_github_token'] ) && '' !== trim( wp_unslash( $_POST['kz_github_token'] ) ) ) {
+            update_option( 'kz_github_token', sanitize_text_field( wp_unslash( $_POST['kz_github_token'] ) ), false );
         }
 
         if ( isset( $_POST['kz_link_in_bio_supabase_url'] ) ) {
@@ -163,7 +167,10 @@ class KZ_Admin {
         if ( isset( $_POST['kz_link_in_bio_supabase_key'] ) ) {
             update_option( KZ_Link_In_Bio::OPTIE_SLEUTEL, sanitize_text_field( wp_unslash( $_POST['kz_link_in_bio_supabase_key'] ) ), false );
         }
+        // Adres en sleutel zijn gedeeld: na opslaan alles opnieuw ophalen.
         KZ_Link_In_Bio::vergeet_cache();
+        KZ_Element_Motto::vergeet_cache();
+        KZ_Element_Pagina::vergeet_cache();
 
         wp_safe_redirect( add_query_arg( array( 'page' => 'kz-plugin', 'kz_saved' => '1' ), admin_url( 'admin.php' ) ) );
         exit;
@@ -361,13 +368,17 @@ class KZ_Admin {
                                 </td>
                                 <td><strong><?php echo esc_html( $el['label'] ); ?></strong></td>
                                 <td><code>[<?php echo esc_html( $el['shortcode'] ); ?>]</code></td>
-                                <td><?php echo esc_html( $el['params'] ); ?></td>
+                                <td>
+                                    <?php if ( '' !== trim( (string) $el['params'] ) ) : ?>
+                                        <details><summary>Toon</summary><?php echo esc_html( $el['params'] ); ?></details>
+                                    <?php endif; ?>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
 
-                <h2 id="kz-link-in-bio" style="margin-top: 30px;">Link-In-Bio</h2>
+                <h2 id="kz-link-in-bio" style="margin-top: 30px;">Koppeling met KZ-Studio &amp; Link-In-Bio</h2>
                 <p>
                     De pagina op <a href="<?php echo esc_url( KZ_Link_In_Bio::pagina_url() ); ?>" target="_blank" rel="noopener"><?php echo esc_html( KZ_Link_In_Bio::HOST ); ?></a>
                     (en als reserve op <a href="<?php echo esc_url( home_url( '/' . KZ_Link_In_Bio::PAD . '/' ) ); ?>" target="_blank" rel="noopener"><?php echo esc_html( '/' . KZ_Link_In_Bio::PAD . '/' ); ?></a>).
@@ -404,7 +415,10 @@ class KZ_Admin {
 
                 <h2 style="margin-top: 30px;">GitHub-token (optioneel)</h2>
                 <p>Alleen nodig zolang de plugin-repository privé is. Fine-grained token met alleen leestoegang tot deze repo.</p>
-                <input type="text" name="kz_github_token" value="<?php echo esc_attr( $github_token ); ?>" class="regular-text" placeholder="ghp_..." />
+                <input type="password" name="kz_github_token" value="" class="regular-text" autocomplete="off" placeholder="<?php echo $github_token ? esc_attr__( 'Opgeslagen (leeg laten = ongewijzigd)', 'kz-plugin' ) : 'ghp_...'; ?>" />
+                <?php if ( $github_token ) : ?>
+                    <label style="margin-left:10px;"><input type="checkbox" name="kz_github_token_wissen" value="1" /> Token wissen</label>
+                <?php endif; ?>
 
                 <p class="submit">
                     <button type="submit" class="button button-primary">Instellingen opslaan</button>
@@ -420,7 +434,7 @@ class KZ_Admin {
             <h2 id="kz-motto" style="margin-top: 30px;">Motto</h2>
             <p>
                 De .svg's van het element KZ-Motto en welke er bij &ldquo;Keuze&rdquo; getoond wordt, beheer je in KZ-Studio onder Website &rarr; Overig &rarr; Motto.
-                Deze site haalt die elke minuut op, met het Supabase-adres en de anon-key van de Link-In-Bio hierboven.
+                Deze site haalt die elke minuut op, met het Supabase-adres en de anon-key van de koppeling hierboven.
             </p>
             <p>
                 <strong>Laatst opgehaald:</strong>
@@ -446,7 +460,7 @@ class KZ_Admin {
             <h2 id="kz-paginas" style="margin-top: 30px;">Pagina's</h2>
             <p>
                 Pagina's met het element KZ-Pagina (zoals <code>[kz_pagina pagina="5dd"]</code>) beheer je in KZ-Studio onder Website &rarr; Pagina's.
-                Na Publiceren daar haalt deze site de nieuwe versie binnen een minuut op, met het Supabase-adres en de anon-key van de Link-In-Bio hierboven.
+                Na Publiceren daar haalt deze site de nieuwe versie binnen een minuut op, met het Supabase-adres en de anon-key van de koppeling hierboven.
             </p>
             <?php if ( is_array( $pagina_status ) && $pagina_status ) : ?>
                 <table class="widefat" style="max-width: 700px;">
@@ -474,7 +488,7 @@ class KZ_Admin {
             <form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="margin-top: 10px;">
                 <?php wp_nonce_field( 'kz_plugin_paginas_verversen' ); ?>
                 <input type="hidden" name="action" value="kz_plugin_paginas_verversen" />
-                <button type="submit" class="button button-secondary">Pagina's nu opnieuw ophalen</button>
+                <button type="submit" class="button button-secondary">Cache van pagina's legen</button>
             </form>
 
             <h2 id="kz-fotos" style="margin-top: 30px;">Foto's uit KZ-Studio</h2>

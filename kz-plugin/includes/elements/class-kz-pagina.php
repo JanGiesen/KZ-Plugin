@@ -1103,6 +1103,12 @@ class KZ_Element_Pagina {
             return $cache;
         }
 
+        // Net mislukt en nog geen laatste goede versie: niet bij elk bezoek
+        // opnieuw seconden wachten op Supabase.
+        if ( get_transient( self::CACHE . $slug . '_fout' ) ) {
+            return null;
+        }
+
         $vers = self::ophalen( $slug );
         if ( is_array( $vers ) ) {
             set_transient( self::CACHE . $slug, $vers, self::CACHE_SECONDEN );
@@ -1117,6 +1123,7 @@ class KZ_Element_Pagina {
             set_transient( self::CACHE . $slug, $laatst, self::CACHE_SECONDEN );
             return $laatst;
         }
+        set_transient( self::CACHE . $slug . '_fout', 1, MINUTE_IN_SECONDS );
         return null;
     }
 
@@ -1126,6 +1133,7 @@ class KZ_Element_Pagina {
         if ( is_array( $status ) ) {
             foreach ( array_keys( $status ) as $slug ) {
                 delete_transient( self::CACHE . $slug );
+                delete_transient( self::CACHE . $slug . '_fout' );
             }
         }
     }
@@ -1143,7 +1151,7 @@ class KZ_Element_Pagina {
         $antwoord = wp_remote_post(
             $url . '/rest/v1/rpc/website_pagina_ophalen',
             array(
-                'timeout' => 5,
+                'timeout' => 3,
                 'headers' => array(
                     'apikey'        => $sleutel,
                     'Authorization' => 'Bearer ' . $sleutel,
@@ -1511,7 +1519,11 @@ class KZ_Element_Pagina {
 
     /** Alleen "jjjj-mm-dd", anders leeg. */
     private static function datum( array $r, $sleutel ) {
-        return isset( $r[ $sleutel ] ) && is_string( $r[ $sleutel ] ) && preg_match( '/^\d{4}-\d{2}-\d{2}$/', $r[ $sleutel ] ) ? $r[ $sleutel ] : '';
+        if ( ! isset( $r[ $sleutel ] ) || ! is_string( $r[ $sleutel ] ) || ! preg_match( '/^(\d{4})-(\d{2})-(\d{2})$/', $r[ $sleutel ], $m ) ) {
+            return '';
+        }
+        // Ook een bestaande datum: maand 13 gaf anders een ongedefinieerde index.
+        return checkdate( (int) $m[2], (int) $m[3], (int) $m[1] ) ? $r[ $sleutel ] : '';
     }
 
     /** Een onderdeel, evenementblok, groep of vraag die in KZ-Studio is verborgen. */

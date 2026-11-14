@@ -122,11 +122,22 @@
         const mobilePrev = container.parentNode.querySelector('.mobile-navigation .swiper-button-prev');
         const mobileNext = container.parentNode.querySelector('.mobile-navigation .swiper-button-next');
 
+        // Ook met het toetsenbord (Enter/spatie): het zijn <div>'s met role="button".
+        function metToetsen(knop, actie) {
+            knop.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    actie();
+                }
+            });
+        }
+
         if (mobilePrev) {
             mobilePrev.addEventListener('click', function(e) {
                 e.preventDefault();
                 swiper.slidePrev();
             });
+            metToetsen(mobilePrev, function() { swiper.slidePrev(); });
         }
 
         if (mobileNext) {
@@ -134,6 +145,7 @@
                 e.preventDefault();
                 swiper.slideNext();
             });
+            metToetsen(mobileNext, function() { swiper.slideNext(); });
         }
     }
 

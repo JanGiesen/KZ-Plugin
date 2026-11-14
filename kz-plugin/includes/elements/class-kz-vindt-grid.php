@@ -115,7 +115,7 @@ class KZ_Element_Vindt_Grid {
             self::SHORTCODE
         );
 
-        $items = vc_param_group_parse_atts( $atts['items'] );
+        $items = KZ_Link_Helper::param_group( $atts['items'] );
         $vakken = array();
         foreach ( is_array( $items ) ? $items : array() as $item ) {
             $vakken[] = array(

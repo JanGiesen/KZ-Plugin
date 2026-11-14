@@ -101,6 +101,8 @@ class KZ_Element_Motto {
     }
 
     public static function render( $atts ) {
+        // Een ander motto in KZ-Studio moet binnen een paar minuten zichtbaar zijn.
+        do_action( 'litespeed_control_set_ttl', 120 );
         $atts = shortcode_atts(
             array(
                 'variant'  => 'keuze',
@@ -174,6 +176,12 @@ class KZ_Element_Motto {
             return $cache;
         }
 
+        // Net mislukt en nog geen laatste goede versie: niet bij elk bezoek
+        // opnieuw seconden wachten op Supabase.
+        if ( get_transient( self::CACHE . '_fout' ) ) {
+            return null;
+        }
+
         $vers = self::ophalen();
         if ( is_array( $vers ) ) {
             set_transient( self::CACHE, $vers, self::CACHE_SECONDEN );
@@ -188,12 +196,14 @@ class KZ_Element_Motto {
             set_transient( self::CACHE, $laatst, self::CACHE_SECONDEN );
             return $laatst;
         }
+        set_transient( self::CACHE . '_fout', 1, MINUTE_IN_SECONDS );
         return null;
     }
 
     /** Leegt de cache, zodat het volgende bezoek vers ophaalt. */
     public static function vergeet_cache() {
         delete_transient( self::CACHE );
+        delete_transient( self::CACHE . '_fout' );
     }
 
     /** Roept motto_ophalen() aan; geeft de opgeschoonde gegevens terug, of null bij een fout. */
@@ -209,7 +219,7 @@ class KZ_Element_Motto {
         $antwoord = wp_remote_post(
             $url . '/rest/v1/rpc/motto_ophalen',
             array(
-                'timeout' => 5,
+                'timeout' => 3,
                 'headers' => array(
                     'apikey'        => $sleutel,
                     'Authorization' => 'Bearer ' . $sleutel,
@@ -254,10 +264,10 @@ class KZ_Element_Motto {
     private static function schoon( array $json ) {
         $schoon = array();
         foreach ( array_keys( self::soorten() ) as $sleutel ) {
-            $url = isset( $json[ $sleutel ] ) ? trim( (string) $json[ $sleutel ] ) : '';
+            $url = isset( $json[ $sleutel ] ) && is_string( $json[ $sleutel ] ) ? trim( $json[ $sleutel ] ) : '';
             $schoon[ $sleutel ] = preg_match( '#^https://\S+$#i', $url ) ? esc_url_raw( $url, array( 'https' ) ) : '';
         }
-        $schoon['keuze'] = isset( $json['keuze'] ) && isset( self::soorten()[ $json['keuze'] ] ) ? $json['keuze'] : 'seizoen';
+        $schoon['keuze'] = isset( $json['keuze'] ) && is_string( $json['keuze'] ) && isset( self::soorten()[ $json['keuze'] ] ) ? $json['keuze'] : 'seizoen';
         return $schoon;
     }
 }

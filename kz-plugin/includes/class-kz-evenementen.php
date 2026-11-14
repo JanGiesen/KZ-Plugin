@@ -252,6 +252,20 @@ class KZ_Evenementen {
      *
      * @return WP_Post|null
      */
+    /**
+     * Voor een pagina die evenementen toont: de cachetag van het post type
+     * (KZ_Berichten_Grid leegt die bij elke wijziging) en hooguit tot
+     * middernacht in de LiteSpeed-cache, want daarna kan er een "verlopen" zijn.
+     */
+    public static function cache_tot_middernacht() {
+        if ( class_exists( 'KZ_Berichten_Grid' ) ) {
+            KZ_Berichten_Grid::cache_tag( self::POST_TYPE );
+        }
+        $nu         = current_time( 'timestamp' );
+        $middernacht = strtotime( 'tomorrow', $nu );
+        do_action( 'litespeed_control_set_ttl', max( 300, (int) ( $middernacht - $nu ) ) );
+    }
+
     public static function kies_automatisch( $categorie ) {
         $laatste = null;
         foreach ( self::gesorteerd( $categorie ) as $post ) {

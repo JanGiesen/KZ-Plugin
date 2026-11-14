@@ -90,7 +90,7 @@ class KZ_Element_Tab_Widget {
 
         $years_data = array();
         if ( ! empty( $atts['years'] ) ) {
-            $years_array = vc_param_group_parse_atts( $atts['years'] );
+            $years_array = KZ_Link_Helper::param_group( $atts['years'] );
             if ( is_array( $years_array ) ) {
                 foreach ( $years_array as $year_data ) {
                     if ( isset( $year_data['year'] ) && ! empty( $year_data['year'] ) ) {
@@ -98,7 +98,7 @@ class KZ_Element_Tab_Widget {
                         $years_data[ $year ] = array();
 
                         if ( isset( $year_data['categories'] ) && ! empty( $year_data['categories'] ) ) {
-                            $categories_array = vc_param_group_parse_atts( $year_data['categories'] );
+                            $categories_array = KZ_Link_Helper::param_group( $year_data['categories'] );
                             if ( is_array( $categories_array ) ) {
                                 foreach ( $categories_array as $category_data ) {
                                     if ( isset( $category_data['category_name'] ) && ! empty( $category_data['category_name'] ) ) {
@@ -107,7 +107,19 @@ class KZ_Element_Tab_Widget {
 
                                         $decoded_data = json_decode( $category_data_json, true );
                                         if ( is_array( $decoded_data ) ) {
-                                            $years_data[ $year ][ $category_name ] = $decoded_data;
+                                            // Alleen naam en punten, als platte tekst: de JS zet ze
+                                            // met textContent neer, maar ook hier niets anders door.
+                                            $rijen = array();
+                                            foreach ( $decoded_data as $rij ) {
+                                                if ( ! is_array( $rij ) ) {
+                                                    continue;
+                                                }
+                                                $rijen[] = array(
+                                                    'naam'   => sanitize_text_field( isset( $rij['naam'] ) && is_scalar( $rij['naam'] ) ? (string) $rij['naam'] : '' ),
+                                                    'punten' => sanitize_text_field( isset( $rij['punten'] ) && is_scalar( $rij['punten'] ) ? (string) $rij['punten'] : '' ),
+                                                );
+                                            }
+                                            $years_data[ $year ][ $category_name ] = $rijen;
                                         }
                                     }
                                 }

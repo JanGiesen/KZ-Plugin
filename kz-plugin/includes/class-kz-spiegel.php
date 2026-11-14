@@ -357,7 +357,23 @@ class KZ_Spiegel {
         if ( ! preg_match( '/^\s*(<\?xml[^>]*>\s*)?(<!--.*?-->\s*)*(<!DOCTYPE svg[^>[]*>\s*)?<svg[\s>]/is', $inhoud ) ) {
             return false;
         }
-        return ! preg_match( '/<script|<foreignobject|<iframe|<embed|<object|<!entity|\son[a-z]+\s*=|javascript:|data:text\/html/i', $inhoud );
+        if ( preg_match( '/<script|<foreignobject|<iframe|<embed|<object|<!entity|\son[a-z]+\s*=|javascript:|data:text\/html|<animate|<set[\s>]|<handler|<use[^>]+href\s*=\s*["\']\s*[^"\'#\s]/i', $inhoud ) ) {
+            return false;
+        }
+        // Entities kunnen "javascript:" verstoppen (javascript&#58;): niet nodig in
+        // een logo, dus weigeren.
+        if ( preg_match( '/&#|&[a-z]+;/i', preg_replace( '/&(amp|lt|gt|quot|apos);/i', '', $inhoud ) ) ) {
+            return false;
+        }
+        // Een link mag alleen naar iets binnen het bestand zelf wijzen (#id).
+        if ( preg_match_all( '/\s(?:xlink:)?href\s*=\s*(["\'])(.*?)\1/is', $inhoud, $links ) ) {
+            foreach ( $links[2] as $doel ) {
+                if ( '' !== $doel && '#' !== $doel[0] ) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     // ------------------------------------------------------------------

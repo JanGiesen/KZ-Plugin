@@ -93,6 +93,9 @@ class KZ_Element_Event_Overview {
     }
 
     public static function render( $atts ) {
+        if ( class_exists( 'KZ_Evenementen' ) ) {
+            KZ_Evenementen::cache_tot_middernacht();
+        }
         $atts = shortcode_atts(
             array(
                 'kolommen'      => '2',
