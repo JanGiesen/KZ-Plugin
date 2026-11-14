@@ -111,6 +111,12 @@ class KZ_Link_In_Bio {
             return $cache;
         }
 
+        // Net mislukt en nog geen laatste goede versie: niet bij elk bezoek
+        // opnieuw seconden wachten op Supabase.
+        if ( get_transient( self::CACHE . '_fout' ) ) {
+            return null;
+        }
+
         $vers = self::ophalen();
         if ( is_array( $vers ) ) {
             set_transient( self::CACHE, $vers, self::CACHE_SECONDEN );
@@ -125,12 +131,14 @@ class KZ_Link_In_Bio {
             set_transient( self::CACHE, $laatst, self::CACHE_SECONDEN );
             return $laatst;
         }
+        set_transient( self::CACHE . '_fout', 1, MINUTE_IN_SECONDS );
         return null;
     }
 
     /** Leegt de cache, zodat het volgende bezoek vers ophaalt. */
     public static function vergeet_cache() {
         delete_transient( self::CACHE );
+        delete_transient( self::CACHE . '_fout' );
     }
 
     /**
@@ -149,7 +157,7 @@ class KZ_Link_In_Bio {
         $antwoord = wp_remote_post(
             $url . '/rest/v1/rpc/link_in_bio_ophalen',
             array(
-                'timeout' => 5,
+                'timeout' => 3,
                 'headers' => array(
                     'apikey'        => $sleutel,
                     'Authorization' => 'Bearer ' . $sleutel,
@@ -203,19 +211,19 @@ class KZ_Link_In_Bio {
                 $soort = isset( $l['soort'] ) && in_array( $l['soort'], array( 'social', 'knop', 'kop' ), true ) ? $l['soort'] : 'knop';
                 $links[] = array(
                     'soort' => $soort,
-                    'titel' => isset( $l['titel'] ) ? (string) $l['titel'] : '',
-                    'url'   => isset( $l['url'] ) ? (string) $l['url'] : '',
-                    'icoon' => isset( $l['icoon'] ) ? (string) $l['icoon'] : '',
-                    'foto'  => isset( $l['foto'] ) ? (string) $l['foto'] : '',
+                    'titel' => isset( $l['titel'] ) && is_scalar( $l['titel'] ) ? (string) $l['titel'] : '',
+                    'url'   => isset( $l['url'] ) && is_scalar( $l['url'] ) ? (string) $l['url'] : '',
+                    'icoon' => isset( $l['icoon'] ) && is_scalar( $l['icoon'] ) ? (string) $l['icoon'] : '',
+                    'foto'  => isset( $l['foto'] ) && is_scalar( $l['foto'] ) ? (string) $l['foto'] : '',
                 );
             }
         }
 
         return array(
             'instellingen' => array(
-                'titel'        => isset( $i['titel'] ) ? (string) $i['titel'] : '',
-                'omschrijving' => isset( $i['omschrijving'] ) ? (string) $i['omschrijving'] : '',
-                'voettekst'    => isset( $i['voettekst'] ) ? (string) $i['voettekst'] : '',
+                'titel'        => isset( $i['titel'] ) && is_scalar( $i['titel'] ) ? (string) $i['titel'] : '',
+                'omschrijving' => isset( $i['omschrijving'] ) && is_scalar( $i['omschrijving'] ) ? (string) $i['omschrijving'] : '',
+                'voettekst'    => isset( $i['voettekst'] ) && is_scalar( $i['voettekst'] ) ? (string) $i['voettekst'] : '',
                 'thema'        => $thema,
             ),
             'links'        => $links,

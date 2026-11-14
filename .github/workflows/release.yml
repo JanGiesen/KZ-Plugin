@@ -44,6 +44,19 @@ jobs:
             exit 1
           fi
 
+      - name: Controleer versie (tag, header en constante gelijk)
+        run: |
+          TAG="${{ steps.tagname.outputs.tag }}"
+          WIL="${TAG#kz-plugin-v}"
+          BESTAND="${{ steps.vars.outputs.plugin_dir }}/kz-plugin.php"
+          HEADER=$(sed -n 's/^ \* Version: *//p' "$BESTAND" | head -1 | tr -d '[:space:]')
+          CONST=$(sed -n "s/^define( 'KZ_PLUGIN_VERSION', '\([^']*\)' );/\1/p" "$BESTAND" | head -1)
+          echo "tag=$WIL header=$HEADER constante=$CONST"
+          if [ "$WIL" != "$HEADER" ] || [ "$WIL" != "$CONST" ]; then
+            echo "::error::Versie klopt niet: tag $WIL, header $HEADER, KZ_PLUGIN_VERSION $CONST. Anders biedt WordPress steeds opnieuw een update aan." >&2
+            exit 1
+          fi
+
       - name: Bouw zip
         run: |
           mkdir -p dist

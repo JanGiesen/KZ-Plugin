@@ -15,7 +15,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 class KZ_Link_Helper {
 
     public static function parse( $raw_link ) {
-        $link_parsed = function_exists( 'vc_build_link' ) ? vc_build_link( $raw_link ) : array();
+        if ( ! preg_match( '/^\s*(url|title|target|rel):/', (string) $raw_link ) ) {
+            // Een kale URL (bijv. uit KZ-Pagina): dan is het de URL zelf.
+            $link_parsed = array( 'url' => (string) $raw_link );
+        } elseif ( function_exists( 'vc_build_link' ) ) {
+            $link_parsed = vc_build_link( $raw_link );
+        } else {
+            $link_parsed = self::parse_vc_link( (string) $raw_link );
+        }
 
         $url_raw    = isset( $link_parsed['url'] ) ? (string) $link_parsed['url'] : '';
         $title_attr = isset( $link_parsed['title'] ) ? (string) $link_parsed['title'] : '';
@@ -28,6 +35,35 @@ class KZ_Link_Helper {
             'rel'    => $rel ? ' rel="' . esc_attr( $rel ) . '"' : '',
             'title'  => $title_attr ? ' title="' . esc_attr( $title_attr ) . '"' : '',
         );
+    }
+
+    /**
+     * Zelfde als vc_build_link() voor als WPBakery er (even) niet is:
+     * "url:...|title:...|target:...|rel:...", elk deel URL-gecodeerd.
+     */
+    private static function parse_vc_link( $raw ) {
+        $uit = array();
+        foreach ( explode( '|', $raw ) as $deel ) {
+            $paar = explode( ':', $deel, 2 );
+            if ( 2 === count( $paar ) ) {
+                $uit[ $paar[0] ] = rawurldecode( $paar[1] );
+            }
+        }
+        return $uit;
+    }
+
+    /**
+     * Hulp voor param_group-velden van WPBakery. Zonder WPBakery (uitgezet,
+     * of halverwege een update) gaf vc_param_group_parse_atts() een fatale
+     * fout op elke pagina met zo'n element; nu de eigen terugval.
+     */
+    public static function param_group( $waarde ) {
+        if ( function_exists( 'vc_param_group_parse_atts' ) ) {
+            $lijst = vc_param_group_parse_atts( $waarde );
+        } else {
+            $lijst = json_decode( rawurldecode( (string) $waarde ), true );
+        }
+        return is_array( $lijst ) ? $lijst : array();
     }
 
     /**
@@ -65,7 +101,9 @@ class KZ_Link_Helper {
         $link_host = preg_replace( '#^//([^@]*@)?([^:]*).*$#', '$2', $host );
         $internal  = ( '' === $host ) || ( '' !== $site_host && preg_replace( '/^www\./', '', $link_host ) === preg_replace( '/^www\./', '', $site_host ) );
 
-        if ( $internal ) {
+        // Bestanden in de mediabibliotheek houden hun hoofdletters: de server is
+        // daar hoofdlettergevoelig, dus "/Flyer-HJC.pdf" verkleinen gaf een 404.
+        if ( $internal && ! preg_match( '#^/wp-content/#i', $rest ) ) {
             $split = strcspn( $rest, '?#' );
             $rest  = strtolower( substr( $rest, 0, $split ) ) . substr( $rest, $split );
         }

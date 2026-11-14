@@ -368,17 +368,23 @@ class KZ_Element_Ticket {
                 </div>
             </div>
             <script>(function(){
-                var root=document.getElementById('<?php echo $uid; ?>');
-                var link=root.querySelector('a.kzh-ticket-link');
-                var overlay=document.getElementById('<?php echo $uid; ?>_popup');
-                if(link && overlay){
-                  link.addEventListener('click',function(e){ e.preventDefault(); overlay.style.display='flex'; });
-                  document.getElementById('<?php echo $uid; ?>_cancel').addEventListener('click',function(){ overlay.style.display='none'; });
-                  document.getElementById('<?php echo $uid; ?>_proceed').addEventListener('click',function(){ overlay.style.display='none';
-                    var href='<?php echo $href; ?>'; var target='<?php echo $target; ?>';
-                    if(target==='_blank'){ window.open(href,'_blank'); } else { window.location.href=href; }
-                  });
-                }
+                var root=document.getElementById(<?php echo wp_json_encode( $uid ); ?>);
+                var link=root && root.querySelector('a.kzh-ticket-link');
+                var overlay=document.getElementById(<?php echo wp_json_encode( $uid . '_popup' ); ?>);
+                if(!link || !overlay){ return; }
+                var verder=document.getElementById(<?php echo wp_json_encode( $uid . '_proceed' ); ?>);
+                // In een <script> worden HTML-entities niet teruggezet: daarom de
+                // URL als JSON, anders werd "&" in een link "&#038;".
+                var href=<?php echo wp_json_encode( html_entity_decode( $href, ENT_QUOTES, 'UTF-8' ) ); ?>;
+                var target=<?php echo wp_json_encode( html_entity_decode( $target, ENT_QUOTES, 'UTF-8' ) ); ?>;
+                function sluit(){ overlay.style.display='none'; document.removeEventListener('keydown',opEsc); link.focus(); }
+                function opEsc(e){ if(e.key==='Escape'){ sluit(); } }
+                link.addEventListener('click',function(e){ e.preventDefault(); overlay.style.display='flex'; document.addEventListener('keydown',opEsc); verder.focus(); });
+                document.getElementById(<?php echo wp_json_encode( $uid . '_cancel' ); ?>).addEventListener('click',sluit);
+                overlay.addEventListener('click',function(e){ if(e.target===overlay){ sluit(); } });
+                verder.addEventListener('click',function(){ overlay.style.display='none'; document.removeEventListener('keydown',opEsc);
+                  if(target==='_blank'){ window.open(href,'_blank','noopener'); } else { window.location.href=href; }
+                });
             })();</script>
             <?php endif; ?>
         </div>
