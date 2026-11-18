@@ -371,7 +371,13 @@ class KZ_Element_Event_Info {
             $binnenkort    = ! $verkoop_start || '' === $href || $verkoop_start->format( 'Y-m-d' ) > current_time( 'Y-m-d' );
         }
 
-        if ( $uitverkocht ) {
+        // Datum voorbij: geen kaarten meer, wat de status ook is.
+        $afgelopen = ! $is_seizoen && $datum && class_exists( 'KZ_Evenementen' )
+            && KZ_Evenementen::is_afgelopen( $datum->format( 'Y-m-d' ), $atts['tijd'] );
+
+        if ( $afgelopen ) {
+            $knop_tekst = __( 'Dit evenement is afgelopen', 'kz-plugin' );
+        } elseif ( $uitverkocht ) {
             $knop_tekst = __( 'Uitverkocht', 'kz-plugin' );
         } elseif ( $binnenkort ) {
             $knop_tekst = $verkoop_start
@@ -381,7 +387,7 @@ class KZ_Element_Event_Info {
         } else {
             $knop_tekst = $atts['knop_tekst'];
         }
-        $toon_knop = $uitverkocht || $binnenkort || '' !== $href;
+        $toon_knop = $afgelopen || $uitverkocht || $binnenkort || '' !== $href;
 
         if ( function_exists( 'wpb_js_remove_wpautop' ) ) {
             $omschrijving = wpb_js_remove_wpautop( $content, true );
@@ -463,7 +469,7 @@ class KZ_Element_Event_Info {
 
                 <?php if ( $toon_knop ) : ?>
                     <div class="kz-evt__actie">
-                        <?php if ( $uitverkocht ) : ?>
+                        <?php if ( $afgelopen || $uitverkocht ) : ?>
                             <span class="kz-evt__knop kz-evt__knop--uit" aria-disabled="true"><span><?php echo esc_html( $knop_tekst ); ?></span></span>
                         <?php elseif ( $binnenkort ) : ?>
                             <span class="kz-evt__knop kz-evt__knop--binnenkort" aria-disabled="true"><span><?php echo esc_html( $knop_tekst ); ?></span></span>
