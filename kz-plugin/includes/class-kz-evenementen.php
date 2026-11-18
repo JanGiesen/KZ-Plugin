@@ -205,6 +205,26 @@ class KZ_Evenementen {
         return ( null === $vandaag ? current_time( 'Y-m-d' ) : $vandaag ) >= $grens;
     }
 
+    /**
+     * Afgelopen = de einddag is voorbij (vanaf de dag na het einde). Het einde
+     * is de datum, of de dag erna als de eindtijd na middernacht valt. Het
+     * ticket zegt dan "Dit evenement is afgelopen" in plaats van een knop;
+     * verlopen (van de site af) volgt een dag later. Ook in de app
+     * (isAfgelopen() in src/lib/evenementTijd.ts) — houd ze gelijk.
+     *
+     * @param string $datum "jjjj-mm-dd"
+     */
+    public static function is_afgelopen( $datum, $tijd, $vandaag = null ) {
+        $datum = (string) $datum;
+        if ( ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', $datum ) ) {
+            return false;
+        }
+        $eind  = self::tijd_uit( $tijd, 1 );
+        $dagen = ( null !== $eind && $eind < self::starttijd( $tijd ) ) ? 2 : 1;
+        $grens = gmdate( 'Y-m-d', strtotime( $datum . ' 00:00:00 UTC +' . $dagen . ' days' ) );
+        return ( null === $vandaag ? current_time( 'Y-m-d' ) : $vandaag ) >= $grens;
+    }
+
     /** Alle gepubliceerde evenementen: Seizoenskaart vooraan, dan op datum + starttijd, zonder datum achteraan. */
     public static function gesorteerd( $categorie = '' ) {
         $args = array(

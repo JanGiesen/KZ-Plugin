@@ -228,3 +228,8 @@ geen fatale fout meer als WPBakery even uit staat; links naar bestanden in
 link meer; ticketpopup sluit met Esc en houdt "&" in de URL heel; mobiele
 carrouselpijlen zijn met het toetsenbord te bedienen; de scan op oude plugins
 draait eens per versie in plaats van bij elk beheerscherm.
+
+8.35.0: KZ-Evenement Info (ook in het overzicht en op een KZ-Pagina) — is
+de datum van een evenement voorbij, dan staat er "Dit evenement is
+afgelopen" in plaats van de kaartenknop. Over middernacht ("21:00 - 02:00")
+telt de dag erna als einde. Nieuwe helper KZ_Evenementen::is_afgelopen().
